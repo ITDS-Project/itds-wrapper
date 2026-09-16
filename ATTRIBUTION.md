@@ -1,9 +1,9 @@
-﻿# [Into The Dream Spring Wrapper](https://github.com/WiIIiam278/itds-wrapper)
+﻿# [Into The Dream Spring Wrapper](https://github.com/ITDS-Project/itds-wrapper)
 Avalonia-based wrapper for Into The Dream Spring, based on MelonDS-DS
 
 Available under the GNU General Public License 3.0 (see [LICENSE](LICENSE))
 
-# [melonds-ds](https://github.com/jonko0493/melonds-ds)
+# [melonds-ds](https://github.com/ITDS-Project/melonds-ds)
 
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007

@@ -18,7 +18,7 @@ jobs:
     - name: 'Checkout melonDS DS'
       uses: actions/checkout@v5
       with:
-        repository: jonko0493/melonds-ds
+        repository: ITDS-Project/melonds-ds
         ref: use-my-fork
         path: melondsds
         clean: false
@@ -35,7 +35,7 @@ jobs:
         popd
         cp melondsds/build/src/libretro/melondsds_libretro.so ./melondsds-${{ matrix.platform.name }}.so
     - name: Set-up s5cmd
-      uses: jonko0493/action-setup-s5cmd@windows-and-noflaky
+      uses: ITDS-Project/action-setup-s5cmd@windows-and-noflaky
       with:
         version: v2.3.0
     - name: 'Upload test melonds-ds to bucket'

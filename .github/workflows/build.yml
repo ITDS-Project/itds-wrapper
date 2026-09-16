@@ -25,7 +25,7 @@ jobs:
       with:
         dotnet-version: '10.0.x'
     - name: Set-up s5cmd
-      uses: jonko0493/action-setup-s5cmd@windows-and-noflaky
+      uses: ITDS-Project/action-setup-s5cmd@windows-and-noflaky
       with:
         version: v2.3.0
     - name: 'Download ROM'
@@ -39,7 +39,7 @@ jobs:
     - name: 'Checkout melonDS DS'
       uses: actions/checkout@v5
       with:
-        repository: jonko0493/melonds-ds
+        repository: ITDS-Project/melonds-ds
         ref: use-my-fork
         path: melondsds
         clean: false
@@ -131,7 +131,7 @@ jobs:
       with:
         dotnet-version: '10.0.x'
     - name: Set-up s5cmd
-      uses: jonko0493/action-setup-s5cmd@windows-and-noflaky
+      uses: ITDS-Project/action-setup-s5cmd@windows-and-noflaky
       with:
         version: v2.3.0
     - name: 'Download ROM'
@@ -145,7 +145,7 @@ jobs:
     - name: 'Checkout melonDS DS'
       uses: actions/checkout@v5
       with:
-        repository: jonko0493/melonds-ds
+        repository: ITDS-Project/melonds-ds
         ref: use-my-fork
         path: melondsds
         clean: false
@@ -163,6 +163,8 @@ jobs:
         distribution: 'temurin'
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
+      with:
+        packages: platform-tools
     - name: Setup Android NDK
       uses: nttld/setup-ndk@v1.5.0
       with:
@@ -262,7 +264,7 @@ jobs:
       with:
         dotnet-version: '10.0.x'
     - name: Set-up s5cmd
-      uses: jonko0493/action-setup-s5cmd@windows-and-noflaky
+      uses: ITDS-Project/action-setup-s5cmd@windows-and-noflaky
       with:
         version: v2.3.0
     - name: 'Download ROM'
@@ -276,7 +278,7 @@ jobs:
     - name: 'Checkout melonDS DS'
       uses: actions/checkout@v5
       with:
-        repository: jonko0493/melonds-ds
+        repository: ITDS-Project/melonds-ds
         ref: use-my-fork
         path: melondsds
         clean: false
@@ -359,7 +361,7 @@ jobs:
         path: itds-wrapper
         clean: false
     - name: Set-up s5cmd
-      uses: jonko0493/action-setup-s5cmd@windows-and-noflaky
+      uses: ITDS-Project/action-setup-s5cmd@windows-and-noflaky
       with:
         version: v2.3.0
     - name: Make steam dir
