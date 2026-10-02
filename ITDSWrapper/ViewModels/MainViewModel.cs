@@ -165,6 +165,8 @@ public class MainViewModel : ViewModelBase
     }
 
     [Reactive] public string BordersSettingDesc { get; set; }
+    
+    [Reactive] public string AudioDeviceSettingsDesc { get; set; }
 
     [Reactive] public string ScreenReaderSettingDesc { get; set; }
     [Reactive] public string VirtualButtonsLayoutSettingDesc { get; set; }
@@ -278,6 +280,7 @@ public class MainViewModel : ViewModelBase
     public ICommand ChangeScreenLayoutCommand { get; }
     public ICommand ChangeRenderingModeCommand { get; }
     public ICommand ChangeBorderSettingsCommand { get; }
+    public ICommand ChangeAudioDeviceSettingsCommand { get; }
     public ICommand ChangeScreenReaderSettingsCommand { get; }
     public ICommand ChangeControlPadHapticsSettingsCommand { get; }
     public ICommand ChangeVirtualButtonsLayoutSettingsCommand { get; }
@@ -401,6 +404,7 @@ public class MainViewModel : ViewModelBase
         ChangeScreenLayoutCommand = ReactiveCommand.Create<bool>(ChangeScreenLayout);
         ChangeRenderingModeCommand = ReactiveCommand.Create<bool>(ChangeRenderingMode);
         ChangeBorderSettingsCommand = ReactiveCommand.Create(ToggleBorderSettings);
+        ChangeAudioDeviceSettingsCommand = ReactiveCommand.Create(ChangeAudioDevice);
         ChangeScreenReaderSettingsCommand = ReactiveCommand.Create(ToggleScreenReader);
         ChangeVirtualButtonsLayoutSettingsCommand = ReactiveCommand.Create(ToggleVirtualButtonsLayout);
         ChangeControlPadHapticsSettingsCommand = ReactiveCommand.Create(ToggleControlPadHaptics);
@@ -585,6 +589,11 @@ public class MainViewModel : ViewModelBase
         }
 
         WrapperSettings.BordersEnabled = !WrapperSettings.BordersEnabled;
+    }
+
+    public void ChangeAudioDevice()
+    {
+        
     }
 
     private void ToggleScreenReader()

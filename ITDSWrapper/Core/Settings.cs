@@ -22,6 +22,8 @@ public class Settings
     public MacOsRenderingMode MacOsRenderingMode { get; set; } = MacOsRenderingMode.METAL;
     public LinuxRenderingMode LinuxRenderingMode { get; set; } = LinuxRenderingMode.GLX;
 
+    public string AudioDevice { get; set; } = string.Empty;
+
     public void Save(string path)
     {
         if (!Directory.Exists(path))

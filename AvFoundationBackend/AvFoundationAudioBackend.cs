@@ -117,4 +117,8 @@ public class AvFoundationAudioBackend : IAudioBackend
 
         destination.FrameLength = frames;
     }
+
+    public void SetDevice(string device)
+    {
+    }
 }

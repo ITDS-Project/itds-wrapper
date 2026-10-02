@@ -184,6 +184,24 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Audio Device.
+        /// </summary>
+        public static string SettingsAudioDevice {
+            get {
+                return ResourceManager.GetString("SettingsAudioDevice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Audio.
+        /// </summary>
+        public static string SettingsAudioHeader {
+            get {
+                return ResourceManager.GetString("SettingsAudioHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Back.
         /// </summary>
         public static string SettingsBack {

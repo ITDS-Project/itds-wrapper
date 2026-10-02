@@ -1,3 +1,4 @@
+using System.Linq;
 using ITDSWrapper.Audio;
 #if IS_LINUX
 using NAudio.Wave;
@@ -45,6 +46,17 @@ public class AlsaAudioBackend : IAudioBackend
     {
 #if IS_LINUX
         _waveProvider?.AddSamples(samples, 0, samples.Length);
+#endif
+    }
+
+    public void SetDevice(string device)
+    {
+#if IS_LINUX
+        if (!AlsaDeviceEnumerator.GetPlaybackDevices().Any(d => d.Name == device))
+            return;
+        
+        _wavePlayer?.Dispose();
+        _wavePlayer = new(device);
 #endif
     }
 }

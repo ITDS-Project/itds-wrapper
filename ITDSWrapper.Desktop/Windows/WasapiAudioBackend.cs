@@ -45,4 +45,11 @@ public class WasapiAudioBackend : IAudioBackend
         _waveProvider?.AddSamples(samples, 0, samples.Length);
 #endif
     }
+
+    public void SetDevice(string device)
+    {
+#if IS_WINDOWS
+        
+#endif
+    }
 }

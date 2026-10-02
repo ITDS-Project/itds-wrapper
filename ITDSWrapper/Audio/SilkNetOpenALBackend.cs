@@ -117,6 +117,11 @@ public class SilkNetOpenALBackend : IAudioBackend
         }
     }
 
+    public void SetDevice(string device)
+    {
+        DeviceName = device;
+    }
+
     private BufferFormat GetBufferFormat(int numChannels)
     {
         if (numChannels == 2)

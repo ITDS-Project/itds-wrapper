@@ -56,6 +56,11 @@ public class MainActivity : AvaloniaMainActivity
 
     public override View? OnCreateView(View? parent, string name, Context context, IAttributeSet attrs)
     {
+        if (App!.AudioBackend is null)
+        {
+            App.AudioBackend =  new AndroidAudioBackend(context);
+        }
+        
         View? view = base.OnCreateView(parent, name, context, attrs);
         AndroidHapticsBackend? hapticsBackend = HapticsBackend;
         if (hapticsBackend is not null && view is not null)
@@ -88,8 +93,7 @@ public class AndroidApp : AvaloniaAndroidApplication<App>
             .UseReactiveUI()
             .AfterSetup(b =>
             {
-                ((App)b.Instance!).AudioBackend = new AndroidAudioBackend();
-                ((App)b.Instance).PauseDriver = new();
+                ((App)b.Instance!).PauseDriver = new();
                 ((App)b.Instance).HapticsBackend = new AndroidHapticsBackend();
                 ((App)b.Instance).BatteryMonitor = new AndroidBatteryMonitor();
                 ((App)b.Instance).ScreenReader = new AndroidScreenReader(this,

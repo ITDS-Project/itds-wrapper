@@ -149,4 +149,10 @@
     <data name="LinuxRenderingModeVulkan" xml:space="preserve">
         <value>Vulkan</value>
     </data>
+    <data name="SettingsAudioDevice" xml:space="preserve">
+        <value>Audio Device</value>
+    </data>
+    <data name="SettingsAudioHeader" xml:space="preserve">
+        <value>Audio</value>
+    </data>
 </root>

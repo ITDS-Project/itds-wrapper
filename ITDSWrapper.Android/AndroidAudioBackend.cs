@@ -1,7 +1,9 @@
 // Referenced https://gist.github.com/neilt6/6d07322070470536ea0ba409c343c2a5 while creating this
 
 using System;
+using System.Linq;
 using System.Threading;
+using Android.Content;
 using Android.Media;
 using ITDSWrapper.Audio;
 
@@ -9,6 +11,7 @@ namespace ITDSWrapper.Android;
 
 public class AndroidAudioBackend : IAudioBackend
 {
+    private readonly Context _context;
     private readonly SynchronizationContext? _synchronizationContext;
     AudioTrack? _audioTrack;
     float _volume;
@@ -37,8 +40,9 @@ public class AndroidAudioBackend : IAudioBackend
 
     private bool _pause;
     
-    public AndroidAudioBackend()
+    public AndroidAudioBackend(Context context)
     {
+        _context = context;
         _synchronizationContext = SynchronizationContext.Current;
 
         _volume = 1.0f;
@@ -111,5 +115,19 @@ public class AndroidAudioBackend : IAudioBackend
             //Write the specified wave buffer to the audio track
             _audioTrack.Write(waveBuffer, 0, waveBuffer.Length);
         }
+    }
+
+    public void SetDevice(string device)
+    {
+        AudioManager? manager = AudioManager.FromContext(_context);
+        AudioDeviceInfo[]? devices = manager?.GetDevices(GetDevicesTargets.Outputs);
+        if (devices is null || devices.Length == 0)
+            return;
+
+        AudioDeviceInfo? selectedDevice = devices.FirstOrDefault(d => d.ProductName == device);
+        if (selectedDevice is null)
+            return;
+        
+        _audioTrack?.SetPreferredDevice(selectedDevice);
     }
 }
