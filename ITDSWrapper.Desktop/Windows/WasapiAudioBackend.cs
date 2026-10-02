@@ -52,4 +52,12 @@ public class WasapiAudioBackend : IAudioBackend
         
 #endif
     }
+
+    public WrapperAudioDevice[] GetDeviceList()
+    {
+#if IS_WINDOWS
+        
+#endif
+        return [];
+    }
 }

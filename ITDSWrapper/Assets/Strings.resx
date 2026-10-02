@@ -162,4 +162,10 @@
     <data name="SettingsAudioHeader" xml:space="preserve">
         <value>Audio</value>
     </data>
+    <data name="SettingsAudioDeviceDefault" xml:space="preserve">
+        <value>Default</value>
+    </data>
+    <data name="SettingsAudio" xml:space="preserve">
+        <value>Audio Settings</value>
+    </data>
 </root>

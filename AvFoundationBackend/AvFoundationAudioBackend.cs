@@ -121,4 +121,9 @@ public class AvFoundationAudioBackend : IAudioBackend
     public void SetDevice(string device)
     {
     }
+
+    public WrapperAudioDevice[] GetDeviceList()
+    {
+        return [];
+    }
 }

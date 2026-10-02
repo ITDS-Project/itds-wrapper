@@ -122,6 +122,11 @@ public class SilkNetOpenALBackend : IAudioBackend
         DeviceName = device;
     }
 
+    public WrapperAudioDevice[] GetDeviceList()
+    {
+        return [];
+    }
+
     private BufferFormat GetBufferFormat(int numChannels)
     {
         if (numChannels == 2)

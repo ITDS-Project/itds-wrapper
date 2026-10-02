@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Input;
@@ -165,9 +166,7 @@ public class MainViewModel : ViewModelBase
     }
 
     [Reactive] public string BordersSettingDesc { get; set; }
-    
     [Reactive] public string AudioDeviceSettingsDesc { get; set; }
-
     [Reactive] public string ScreenReaderSettingDesc { get; set; }
     [Reactive] public string VirtualButtonsLayoutSettingDesc { get; set; }
     [Reactive] public string VirtualButtonsHapticsSettingDesc { get; set; }
@@ -178,6 +177,7 @@ public class MainViewModel : ViewModelBase
     [Reactive] public EmuImageSource? CurrentFrame { get; set; }
 
     [Reactive] public bool DisplaySettingsMenuOpen { get; set; }
+    [Reactive] public bool AudioSettingsMenuOpen { get; set; }
     [Reactive] public bool ControllerSettingsMenuOpen { get; set; }
     [Reactive] public bool AccessibilitySettingsMenuOpen { get; set; }
     [Reactive] public bool LegalMenuOpen { get; set; }
@@ -269,6 +269,7 @@ public class MainViewModel : ViewModelBase
 
     public ICommand CloseMenuOverlayCommand { get; }
     public ICommand OpenDisplaySettingsMenuCommand { get; }
+    public ICommand OpenAudioSettingsMenuCommand { get; }
     public ICommand OpenControllerSettingsMenuCommand { get; }
     public ICommand OpenAccessibilitySettingsMenuCommand { get; }
     public ICommand OpenSurveyUrlCommand { get; }
@@ -357,6 +358,10 @@ public class MainViewModel : ViewModelBase
             _audioBackend = new SilkNetOpenALBackend(Wrapper.SampleRate, 32);
         }
 
+        AudioDeviceSettingsDesc =
+            _audioBackend.GetDeviceList().FirstOrDefault(d => d.InternalName == WrapperSettings.AudioDevice)
+                ?.DisplayName ?? Strings.SettingsAudioDeviceDefault;
+
         if (((App)Application.Current).HapticsBackend is not null)
         {
             _hapticsBackend = ((App)Application.Current).HapticsBackend!;
@@ -393,6 +398,7 @@ public class MainViewModel : ViewModelBase
 
         CloseMenuOverlayCommand = ReactiveCommand.Create(ToggleMenuOverlay);
         OpenDisplaySettingsMenuCommand = ReactiveCommand.Create(OpenDisplaySettings);
+        OpenAudioSettingsMenuCommand = ReactiveCommand.Create(OpenAudioSettings);
         OpenControllerSettingsMenuCommand = ReactiveCommand.Create(OpenControllerSettings);
         OpenAccessibilitySettingsMenuCommand = ReactiveCommand.Create(OpenAccessibilitySettings);
         OpenSurveyUrlCommand = ReactiveCommand.Create(() => OpenUrl("https://google.com"));
@@ -404,7 +410,7 @@ public class MainViewModel : ViewModelBase
         ChangeScreenLayoutCommand = ReactiveCommand.Create<bool>(ChangeScreenLayout);
         ChangeRenderingModeCommand = ReactiveCommand.Create<bool>(ChangeRenderingMode);
         ChangeBorderSettingsCommand = ReactiveCommand.Create(ToggleBorderSettings);
-        ChangeAudioDeviceSettingsCommand = ReactiveCommand.Create(ChangeAudioDevice);
+        ChangeAudioDeviceSettingsCommand = ReactiveCommand.Create<bool>(ChangeAudioDevice);
         ChangeScreenReaderSettingsCommand = ReactiveCommand.Create(ToggleScreenReader);
         ChangeVirtualButtonsLayoutSettingsCommand = ReactiveCommand.Create(ToggleVirtualButtonsLayout);
         ChangeControlPadHapticsSettingsCommand = ReactiveCommand.Create(ToggleControlPadHaptics);
@@ -432,34 +438,41 @@ public class MainViewModel : ViewModelBase
     private void OpenDisplaySettings()
     {
         DisplaySettingsMenuOpen = true;
-        LegalMenuOpen = ControllerSettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
+        AudioSettingsMenuOpen = LegalMenuOpen = ControllerSettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
+        ShowSidebar = !IsMobile;
+    }
+
+    private void OpenAudioSettings()
+    {
+        AudioSettingsMenuOpen = true;
+        DisplaySettingsMenuOpen = LegalMenuOpen = ControllerSettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
     }
 
     private void OpenControllerSettings()
     {
         ControllerSettingsMenuOpen = true;
-        LegalMenuOpen = DisplaySettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
+        AudioSettingsMenuOpen = LegalMenuOpen = DisplaySettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
     }
 
     private void OpenAccessibilitySettings()
     {
         AccessibilitySettingsMenuOpen = true;
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = LegalMenuOpen = false;
+        AudioSettingsMenuOpen = DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = LegalMenuOpen = false;
         ShowSidebar = !IsMobile;
     }
 
     private void OpenLegal()
     {
         LegalMenuOpen = true;
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
+        AudioSettingsMenuOpen = DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
     }
 
     private void CloseSubMenu()
     {
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = AccessibilitySettingsMenuOpen = LegalMenuOpen = false;
+        AudioSettingsMenuOpen = DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = AccessibilitySettingsMenuOpen = LegalMenuOpen = false;
         ShowSidebar = true;
     }
 
@@ -467,7 +480,7 @@ public class MainViewModel : ViewModelBase
     {
         DisplayMenuOverlay = !DisplayMenuOverlay;
         _pauseDriver.PushPauseState(DisplayMenuOverlay);
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = LegalMenuOpen = false;
+        AudioSettingsMenuOpen = DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = LegalMenuOpen = false;
         ScreenEffect = ScreenEffect is null ? new BlurEffect { Radius = 50 } : null;
         ShowSidebar = true;
 
@@ -591,9 +604,55 @@ public class MainViewModel : ViewModelBase
         WrapperSettings.BordersEnabled = !WrapperSettings.BordersEnabled;
     }
 
-    public void ChangeAudioDevice()
+    public void ChangeAudioDevice(bool forward)
     {
-        
+        List<WrapperAudioDevice> deviceList = [.. _audioBackend.GetDeviceList()];
+        if (deviceList.Count <= 1)
+            return;
+
+        int devIndex = deviceList.FindIndex(d => d.InternalName == WrapperSettings.AudioDevice);
+        devIndex = (devIndex + (forward ? 1 : -1)) % deviceList.Count;
+        devIndex = devIndex < 0 ? deviceList.Count - 1 : devIndex;
+
+        bool changeSuccess = false;
+        if (forward)
+        {
+            for (int i = devIndex; i < deviceList.Count;)
+            {
+                try
+                {
+                    _audioBackend.SetDevice(deviceList[i].InternalName);
+                    changeSuccess = true;
+                    break;
+                }
+                catch
+                {
+                    devIndex = ++i;
+                }
+            }
+        }
+        else
+        {
+            for (int i = devIndex; i >= 0;)
+            {
+                try
+                {
+                    _audioBackend.SetDevice(deviceList[i].InternalName);
+                    changeSuccess = true;
+                    break;
+                }
+                catch
+                {
+                    devIndex = --i;
+                }
+            }
+        }
+
+        if (changeSuccess)
+        {
+            WrapperSettings.AudioDevice = deviceList[devIndex].InternalName;
+            AudioDeviceSettingsDesc = deviceList[devIndex].DisplayName;
+        }
     }
 
     private void ToggleScreenReader()
@@ -1025,6 +1084,9 @@ public class MainViewModel : ViewModelBase
 
     private void SetBorder()
     {
+        if (string.IsNullOrEmpty(_currentBorder))
+            return;
+        
         using Stream borderStream =
             AssetLoader.Open(
                 new($"avares://ITDSWrapper/Assets/Borders/{_currentBorder}/{_currentBorderFrame + 1:0000}.jpg"));
@@ -1039,6 +1101,9 @@ public class MainViewModel : ViewModelBase
 
     private void SetNextBorder()
     {
+        if (string.IsNullOrEmpty(_nextBorder))
+            return;
+        
         using Stream borderStream =
             AssetLoader.Open(new($"avares://ITDSWrapper/Assets/Borders/{_nextBorder}/{_nextBorderFrame + 1:0000}.jpg"));
         NextBorder = new(borderStream);

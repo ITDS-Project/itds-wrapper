@@ -15,7 +15,7 @@ public class AndroidAudioBackend : IAudioBackend
     private readonly SynchronizationContext? _synchronizationContext;
     AudioTrack? _audioTrack;
     float _volume;
-    
+
     public float Volume
     {
         get => _volume;
@@ -29,7 +29,7 @@ public class AndroidAudioBackend : IAudioBackend
     public int DesiredLatency { get; set; }
 
     public int NumberOfBuffers { get; set; }
-    
+
     public AudioUsageKind Usage { get; set; }
 
     public AudioContentType ContentType { get; set; }
@@ -39,7 +39,7 @@ public class AndroidAudioBackend : IAudioBackend
     public int? AudioSessionId => _audioTrack?.AudioSessionId;
 
     private bool _pause;
-    
+
     public AndroidAudioBackend(Context context)
     {
         _context = context;
@@ -48,7 +48,7 @@ public class AndroidAudioBackend : IAudioBackend
         _volume = 1.0f;
         NumberOfBuffers = 2;
         DesiredLatency = 300;
-        
+
         Usage = AudioUsageKind.Game;
         ContentType = AudioContentType.Music;
         PerformanceMode = AudioTrackPerformanceMode.None;
@@ -59,7 +59,7 @@ public class AndroidAudioBackend : IAudioBackend
         //Determine the buffer size
         Encoding encoding = Encoding.Pcm16bit;
         ChannelOut channelMask = ChannelOut.Stereo;
-        
+
         int minBufferSize = AudioTrack.GetMinBufferSize((int)sampleRate, channelMask, encoding);
 
         _audioTrack = new AudioTrack.Builder()
@@ -127,7 +127,14 @@ public class AndroidAudioBackend : IAudioBackend
         AudioDeviceInfo? selectedDevice = devices.FirstOrDefault(d => d.ProductName == device);
         if (selectedDevice is null)
             return;
-        
+
         _audioTrack?.SetPreferredDevice(selectedDevice);
+    }
+
+    public WrapperAudioDevice[] GetDeviceList()
+    {
+        AudioManager? manager = AudioManager.FromContext(_context);
+        AudioDeviceInfo[]? devices = manager?.GetDevices(GetDevicesTargets.Outputs);
+        return devices?.Select(d => new WrapperAudioDevice(d.ProductName!, d.ProductName!)).ToArray() ?? [];
     }
 }

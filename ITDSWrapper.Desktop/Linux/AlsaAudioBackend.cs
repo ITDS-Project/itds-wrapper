@@ -57,6 +57,15 @@ public class AlsaAudioBackend : IAudioBackend
         
         _wavePlayer?.Dispose();
         _wavePlayer = new(device);
+        _wavePlayer.Init(_waveProvider);
+#endif
+    }
+
+    public WrapperAudioDevice[] GetDeviceList()
+    {
+#if IS_LINUX
+        return
+            [.. AlsaDeviceEnumerator.GetPlaybackDevices().Select(d => new WrapperAudioDevice(d.Name, d.Description))];
 #endif
     }
 }
