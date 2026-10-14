@@ -6,7 +6,6 @@ using System.Text.Json;
 using Avalonia;
 using Avalonia.ReactiveUI;
 using ITDSWrapper.Core;
-using ITDSWrapper.Desktop.Linux;
 #if MACOS
 using AvFoundationBackend;
 #endif

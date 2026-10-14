@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
@@ -40,12 +39,12 @@ public class MainViewModel : ViewModelBase
         SCREEN_LAYOUT,
     }
 
-    [Reactive] public WindowState WindowState { get; set; } = WindowState.FullScreen;
-    [Reactive] public WindowDecorations Decorations { get; set; } = WindowDecorations.Full;
+    [Reactive] public WindowState WindowState { get; set; }
+    [Reactive] public WindowDecorations Decorations { get; set; }
     [Reactive] public bool ExtendClientArea { get; set; }
     [Reactive] public string WindowingModeDesc { get; set; } = Strings.WindowStateFullScreen;
 
-    private bool _ignoreFullScreenReposition = false;
+    private bool _ignoreFullScreenReposition;
     public int WindowingModeIdx
     {
         get => (int)WrapperSettings.WindowingMode;
