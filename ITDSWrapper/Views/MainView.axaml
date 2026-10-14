@@ -154,7 +154,7 @@
                 <Grid IsVisible="{Binding DisplaySettingsMenuOpen}" Classes="submenucontainer" RowDefinitions="Auto,*,Auto,Auto"
                       RowSpacing="5" ColumnSpacing="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <Label Grid.Row="0" Classes="header" Content="{x:Static assets:Strings.SettingsDisplayHeader}" />
-                    <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,Auto"
+                    <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,Auto"
                           VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                         <Label Grid.Row="0" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.WindowStateSettingsLabel}" IsVisible="{Binding !IsMobile}"/>
                         <Button Grid.Row="0" Grid.Column="1" Classes="setting" Content="&lt;" Command="{Binding ChangeWindowingSettingsCommand}"
@@ -163,28 +163,35 @@
                         <Button Grid.Row="0" Grid.Column="3" Classes="setting" Content=">" Command="{Binding ChangeWindowingSettingsCommand}"
                                 CommandParameter="{x:True}" IsVisible="{Binding !IsMobile}"/>
                         
-                        <Label Grid.Row="1" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.ScreenLayoutLeftRight}" IsVisible="{Binding !IsMobile}"/>
-                        <Button Grid.Row="1" Grid.Column="1" Classes="setting" Content="&lt;" Command="{Binding ChangeScreenLayoutCommand}"
+                        <Label Grid.Row="1" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsFullScreenMonitor}" IsVisible="{Binding !IsMobile}"/>
+                        <Button Grid.Row="1" Grid.Column="1" Classes="setting" Content="&lt;" Command="{Binding ChangeCurrentMonitorCommand}"
                                 CommandParameter="{x:False}" IsVisible="{Binding !IsMobile}"/>
-                        <Label Grid.Row="1" Grid.Column="2" Classes="setting setting-value" Content="{Binding TargetScreenLayoutDesc}" IsVisible="{Binding !IsMobile}"/>
-                        <Button Grid.Row="1" Grid.Column="3" Classes="setting" Content=">" Command="{Binding ChangeScreenLayoutCommand}"
+                        <Label Grid.Row="1" Grid.Column="2" Classes="setting setting-value" Content="{Binding CurrentMonitor}" IsVisible="{Binding !IsMobile}"/>
+                        <Button Grid.Row="1" Grid.Column="3" Classes="setting" Content=">" Command="{Binding ChangeCurrentMonitorCommand}"
                                 CommandParameter="{x:True}" IsVisible="{Binding !IsMobile}"/>
                         
-                        <Label Grid.Row="2" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsBorders}"/>
-                        <Button Grid.Row="2" Grid.Column="1" Classes="setting" Content="&lt;" Command="{Binding ChangeBorderSettingsCommand}"/>
-                        <Label Grid.Row="2" Grid.Column="2" Classes="setting setting-value" Content="{Binding BordersSettingDesc}"/>
-                        <Button Grid.Row="2" Grid.Column="3" Classes="setting" Content=">" Command="{Binding ChangeBorderSettingsCommand}"/>
+                        <Label Grid.Row="2" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.ScreenLayoutLeftRight}" IsVisible="{Binding !IsMobile}"/>
+                        <Button Grid.Row="2" Grid.Column="1" Classes="setting" Content="&lt;" Command="{Binding ChangeScreenLayoutCommand}"
+                                CommandParameter="{x:False}" IsVisible="{Binding !IsMobile}"/>
+                        <Label Grid.Row="2" Grid.Column="2" Classes="setting setting-value" Content="{Binding TargetScreenLayoutDesc}" IsVisible="{Binding !IsMobile}"/>
+                        <Button Grid.Row="2" Grid.Column="3" Classes="setting" Content=">" Command="{Binding ChangeScreenLayoutCommand}"
+                                CommandParameter="{x:True}" IsVisible="{Binding !IsMobile}"/>
                         
-                        <Label IsVisible="{Binding !IsMobile}" Grid.Row="3" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsGraphicsBackend}"/>
-                        <Button IsVisible="{Binding !IsMobile}" Grid.Row="3" Grid.Column="1" Classes="setting" Content="&lt;"
+                        <Label Grid.Row="3" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsBorders}"/>
+                        <Button Grid.Row="3" Grid.Column="1" Classes="setting" Content="&lt;" Command="{Binding ChangeBorderSettingsCommand}"/>
+                        <Label Grid.Row="3" Grid.Column="2" Classes="setting setting-value" Content="{Binding BordersSettingDesc}"/>
+                        <Button Grid.Row="3" Grid.Column="3" Classes="setting" Content=">" Command="{Binding ChangeBorderSettingsCommand}"/>
+                        
+                        <Label IsVisible="{Binding !IsMobile}" Grid.Row="4" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsGraphicsBackend}"/>
+                        <Button IsVisible="{Binding !IsMobile}" Grid.Row="4" Grid.Column="1" Classes="setting" Content="&lt;"
                                 Command="{Binding ChangeRenderingModeCommand}" CommandParameter="{x:False}"/>
-                        <Label IsVisible="{OnPlatform 'False', Linux='True'}" Grid.Row="3" Grid.Column="2" Classes="setting setting-value" Content="{Binding LinuxRenderingModeDesc}"/>
-                        <Label IsVisible="{OnPlatform 'False', macOS='True'}" Grid.Row="3" Grid.Column="2" Classes="setting setting-value" Content="{Binding MacOsRenderingModeDesc}"/>
-                        <Label IsVisible="{OnPlatform 'False', Windows='True'}" Grid.Row="3" Grid.Column="2" Classes="setting setting-value" Content="{Binding WindowsRenderingModeDesc}"/>
-                        <Button IsVisible="{Binding !IsMobile}" Grid.Row="3" Grid.Column="3" Classes="setting" Content=">"
+                        <Label IsVisible="{OnPlatform 'False', Linux='True'}" Grid.Row="4" Grid.Column="2" Classes="setting setting-value" Content="{Binding LinuxRenderingModeDesc}"/>
+                        <Label IsVisible="{OnPlatform 'False', macOS='True'}" Grid.Row="4" Grid.Column="2" Classes="setting setting-value" Content="{Binding MacOsRenderingModeDesc}"/>
+                        <Label IsVisible="{OnPlatform 'False', Windows='True'}" Grid.Row="4" Grid.Column="2" Classes="setting setting-value" Content="{Binding WindowsRenderingModeDesc}"/>
+                        <Button IsVisible="{Binding !IsMobile}" Grid.Row="4" Grid.Column="3" Classes="setting" Content=">"
                                 Command="{Binding ChangeRenderingModeCommand}" CommandParameter="{x:True}"/>
                         
-                        <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" Classes="menuitem"  IsVisible="{Binding IsMobile}"
+                        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Classes="menuitem"  IsVisible="{Binding IsMobile}"
                                 Command="{Binding SettingsBackCommand}"
                                 Content="{x:Static assets:Strings.SettingsBack}" />
                     </Grid>

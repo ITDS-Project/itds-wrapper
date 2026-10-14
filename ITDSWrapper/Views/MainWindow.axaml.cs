@@ -2,6 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using ITDSWrapper.ViewModels;
 
 namespace ITDSWrapper.Views;
@@ -11,6 +12,12 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+    }
+
+    protected override void OnLoaded(RoutedEventArgs e)
+    {
+        base.OnLoaded(e);
+        ((MainViewModel)DataContext!).SetupWindowing();
     }
 
     protected override void OnOpened(EventArgs e)
@@ -23,19 +30,19 @@ public partial class MainWindow : Window
 
     protected override void OnClosing(WindowClosingEventArgs e)
     {
-        ((MainViewModel)View.DataContext!).Closing = true;
+        ((MainViewModel)DataContext!).Closing = true;
         base.OnClosing(e);
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
-        ((MainViewModel)View.DataContext!).HandleKey(e.PhysicalKey, true);
+        ((MainViewModel)DataContext!).HandleKey(e.PhysicalKey, true);
     }
 
     protected override void OnKeyUp(KeyEventArgs e)
     {
         base.OnKeyUp(e);
-        ((MainViewModel)View.DataContext!).HandleKey(e.PhysicalKey, false);
+        ((MainViewModel)DataContext!).HandleKey(e.PhysicalKey, false);
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 #if IS_WINDOWS
 using System.Globalization;
 using System.Speech.Synthesis;

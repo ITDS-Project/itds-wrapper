@@ -156,4 +156,7 @@
     <data name="LinuxRenderingModeSoftware" xml:space="preserve">
         <value>Software</value>
     </data>
+    <data name="SettingsFullScreenMonitor" xml:space="preserve">
+        <value>Monitor</value>
+    </data>
 </root>

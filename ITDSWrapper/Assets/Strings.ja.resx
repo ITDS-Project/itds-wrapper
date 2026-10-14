@@ -149,4 +149,7 @@
     <data name="LinuxRenderingModeVulkan" xml:space="preserve">
         <value>Vulkan</value>
     </data>
+    <data name="SettingsFullScreenMonitor" xml:space="preserve">
+        <value>Monitor</value>
+    </data>
 </root>
