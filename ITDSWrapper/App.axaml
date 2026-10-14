@@ -1,8 +1,10 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:ITDSWrapper"
+             xmlns:assets="using:ITDSWrapper.Assets"
              x:Class="ITDSWrapper.App"
-             RequestedThemeVariant="Dark">
+             RequestedThemeVariant="Dark"
+             Name="{x:Static assets:Strings.GameTitle}">
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
