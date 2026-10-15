@@ -265,6 +265,42 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dual Screen Mode.
+        /// </summary>
+        public static string SettingsDualScreen {
+            get {
+                return ResourceManager.GetString("SettingsDualScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Auto.
+        /// </summary>
+        public static string SettingsDualScreenAuto {
+            get {
+                return ResourceManager.GetString("SettingsDualScreenAuto", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Off.
+        /// </summary>
+        public static string SettingsDualScreenOff {
+            get {
+                return ResourceManager.GetString("SettingsDualScreenOff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to On.
+        /// </summary>
+        public static string SettingsDualScreenOn {
+            get {
+                return ResourceManager.GetString("SettingsDualScreenOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to General Settings.
         /// </summary>
         public static string SettingsGeneral {

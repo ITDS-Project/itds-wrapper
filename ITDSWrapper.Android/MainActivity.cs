@@ -3,6 +3,7 @@ using System.Globalization;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.Hardware.Display;
 using Android.Runtime;
 using Android.Util;
 using Android.Views;
@@ -26,6 +27,7 @@ public class MainActivity : AvaloniaMainActivity
     private AndroidHapticsBackend? HapticsBackend => App?.HapticsBackend as AndroidHapticsBackend;
     private AndroidControllerInputDriver? ControllerInputDriver => App?.InputDrivers?[0] as AndroidControllerInputDriver;
     private AndroidUpdater? Updater => App?.Updater as AndroidUpdater;
+    private AndroidDualScreenBackend? DualScreenBackend => App?.DualScreenBackend as AndroidDualScreenBackend;
 
     public override void OnWindowFocusChanged(bool hasFocus)
     {
@@ -56,6 +58,13 @@ public class MainActivity : AvaloniaMainActivity
 
     public override View? OnCreateView(View? parent, string name, Context context, IAttributeSet attrs)
     {
+        DisplayManager? displayManager = (DisplayManager?)context.GetSystemService(DisplayService);
+
+        if (displayManager?.GetDisplays(DisplayManager.DisplayCategoryPresentation)?.Length > 0)
+        {
+            DualScreenBackend?.Initialize(context, displayManager.GetDisplays(DisplayManager.DisplayCategoryPresentation)![0]!);
+        }
+        
         View? view = base.OnCreateView(parent, name, context, attrs);
         AndroidHapticsBackend? hapticsBackend = HapticsBackend;
         if (hapticsBackend is not null && view is not null)
@@ -99,6 +108,7 @@ public class AndroidApp : AvaloniaAndroidApplication<App>
                     });
                 ((App)b.Instance).InputDrivers = [controllerInputDriver];
                 ((App)b.Instance).Updater = updater;
+                ((App)b.Instance).DualScreenBackend = new AndroidDualScreenBackend();
             });
     }
 }

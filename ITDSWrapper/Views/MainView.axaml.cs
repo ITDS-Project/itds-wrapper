@@ -15,7 +15,7 @@ public partial class MainView : UserControl
 
     private void MainView_OnSizeChanged(object? sender, SizeChangedEventArgs e)
     {
-        if (!MainViewModel.IsMobile)
+        if (!MainViewModel.IsMobile || ((MainViewModel)DataContext!).DualScreenBackend?.IsActive == true)
             return;
 
         int currentLayout = ((MainViewModel)DataContext!).TargetScreenLayoutIdx;

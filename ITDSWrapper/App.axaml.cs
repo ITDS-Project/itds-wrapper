@@ -7,6 +7,7 @@ using Avalonia.Markup.Xaml;
 using ITDSWrapper.Accessibility;
 using ITDSWrapper.Audio;
 using ITDSWrapper.Core;
+using ITDSWrapper.Graphics;
 using ITDSWrapper.Haptics;
 using ITDSWrapper.Input;
 using ITDSWrapper.ViewModels;
@@ -26,6 +27,7 @@ public partial class App : Application
     public IScreenReader? ScreenReader { get; set; }
     public InputSwitcher? InputSwitcher { get; set; }
     public Action<TopLevel>? DesktopTopLevelOpened { get; set; }
+    public IDualScreenBackend? DualScreenBackend { get; set; }
 
     public override void Initialize()
     {
