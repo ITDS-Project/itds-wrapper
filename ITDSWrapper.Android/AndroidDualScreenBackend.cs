@@ -20,7 +20,8 @@ public class AndroidDualScreenBackend : IDualScreenBackend
     
     public bool IsActive { get; set; } = false;
     public event Action? ActiveChanged;
-    public event Action<float?, float?>? OnTouch;
+    public event Action<float?, float?>? OnPress;
+    public event Action? OnRelease;
 
     public void Initialize(Context outerContext, Display dualScreen)
     {
@@ -32,7 +33,16 @@ public class AndroidDualScreenBackend : IDualScreenBackend
         _view.SetScaleType(ImageView.ScaleType.FitCenter);
         _view.Touch += (_, args) =>
         {
-            OnTouch?.Invoke(args.Event?.GetX(), args.Event?.GetY());
+            if (args.Event?.Action == MotionEventActions.Down)
+            {
+                OnPress?.Invoke(args.Event?.RawX / _view.Width * 256, args.Event?.RawY / _view.Height * 192 + 192);
+                args.Handled = true;
+            }
+            else if (args.Event?.Action == MotionEventActions.Up)
+            {
+                OnRelease?.Invoke();
+                args.Handled = true;
+            }
         };
         _presentation.AddContentView(_view, new(dualScreen.Width, dualScreen.Height));
         _presentation.Show();
