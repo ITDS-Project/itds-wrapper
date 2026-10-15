@@ -403,6 +403,11 @@ public class MainViewModel : ViewModelBase
                     TargetScreenLayoutLocked = false;
                 }
             };
+            DualScreenBackend.OnTouch += (x, y) =>
+            {
+                Console.WriteLine($"({x}, {y})");
+                _pointerState?.Press(x ?? 0, y ?? 0, ScreenLayout.TOP_BOTTOM);
+            };
         }
 
         _pauseDriver = ((App)Application.Current).PauseDriver ?? new();
