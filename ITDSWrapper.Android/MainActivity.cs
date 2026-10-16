@@ -31,7 +31,10 @@ public class MainActivity : AvaloniaMainActivity
 
     public override void OnWindowFocusChanged(bool hasFocus)
     {
-        PauseDriver?.PushPauseState(!hasFocus);
+        if (DualScreenBackend?.IsActive != true)
+        {
+            PauseDriver?.PushPauseState(!hasFocus);
+        }
         base.OnWindowFocusChanged(hasFocus);
     }
 

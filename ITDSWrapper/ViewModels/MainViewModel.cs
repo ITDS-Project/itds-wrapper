@@ -405,7 +405,7 @@ public class MainViewModel : ViewModelBase
             };
             DualScreenBackend.OnPress += (x, y) =>
             {
-                _pointerState?.Press(x ?? 0, y ?? 0, ScreenLayout.TOP_BOTTOM);
+                _pointerState?.Press(x ?? 0, y ?? 0, ScreenLayout.TOP_BOTTOM, true);
             };
             DualScreenBackend.OnRelease += () =>
             {
@@ -969,7 +969,7 @@ public class MainViewModel : ViewModelBase
         else
         {
             CurrentFrame ??= new(frame[..(frame.Length / 2)], width, height / 2);
-            CurrentFrame.SetFrame(frame[..(frame.Length / 2)]);
+            CurrentFrame.SetFrame(frame);
             DualScreenBackend.SetSecondFrame(frame[(frame.Length / 2)..], width, height);
         }
     }

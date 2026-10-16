@@ -35,7 +35,11 @@ public class AndroidDualScreenBackend : IDualScreenBackend
         {
             if (args.Event?.Action == MotionEventActions.Down)
             {
-                OnPress?.Invoke(args.Event?.RawX / _view.Width * 256, args.Event?.RawY / _view.Height * 192 + 192);
+                float[] point = [args.Event!.GetX(), args.Event.GetY()];
+                Matrix inverse = new();
+                _view.ImageMatrix?.Invert(inverse);
+                inverse?.MapPoints(point);
+                OnPress?.Invoke(point[0], point[1] + 192);
                 args.Handled = true;
             }
             else if (args.Event?.Action == MotionEventActions.Up)
@@ -46,8 +50,8 @@ public class AndroidDualScreenBackend : IDualScreenBackend
         };
         _presentation.AddContentView(_view, new(dualScreen.Width, dualScreen.Height));
         _presentation.Show();
-        ActiveChanged?.Invoke();
         IsActive = true;
+        ActiveChanged?.Invoke();
     }
     
     public void SetSecondFrame(byte[] pixels, uint width, uint height)
@@ -61,6 +65,6 @@ public class AndroidDualScreenBackend : IDualScreenBackend
         }
         _pixBuffer = ByteBuffer.Wrap(pixels);
         _frame?.CopyPixelsFromBuffer(_pixBuffer);
-        Dispatcher.UIThread.Invoke(() => _view?.SetImageBitmap(_frame));
+        Dispatcher.UIThread.Post(() => _view?.SetImageBitmap(_frame));
     }
 }
