@@ -20,9 +20,11 @@ public class Settings
     public int WindowLocationX { get; set; }
     public int WindowLocationY { get; set; }
     public ScreenLayout CurrentScreenLayout { get; set; } = ScreenLayout.TOP_BOTTOM;
+    public DualScreenSettings DualScreenMode { get; set; } = DualScreenSettings.AUTO;
     public WindowsRenderingMode WindowsRenderingMode { get; set; } = WindowsRenderingMode.WINDOWS_GL;
     public MacOsRenderingMode MacOsRenderingMode { get; set; } = MacOsRenderingMode.METAL;
     public LinuxRenderingMode LinuxRenderingMode { get; set; } = LinuxRenderingMode.GLX;
+    
 
     public void Save(string path)
     {
@@ -53,6 +55,13 @@ public enum ScreenLayout
     TOP_BOTTOM,
     LEFT_RIGHT,
     RIGHT_LEFT,
+}
+
+public enum DualScreenSettings
+{
+    AUTO,
+    ON,
+    OFF,
 }
 
 public enum WindowsRenderingMode

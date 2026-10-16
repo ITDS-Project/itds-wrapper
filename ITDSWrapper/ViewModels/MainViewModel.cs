@@ -130,6 +130,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
+    [Reactive] public bool TargetScreenLayoutLocked { get; set; } = false;
     [Reactive] public string TargetScreenLayoutDesc { get; set; } = Strings.ScreenLayoutTopBottom;
 
     public int TargetScreenLayoutIdx
@@ -143,6 +144,24 @@ public class MainViewModel : ViewModelBase
                 TargetScreenLayoutDesc = new[]
                 {
                     Strings.ScreenLayoutTopBottom, Strings.ScreenLayoutLeftRight, Strings.ScreenLayoutRightLeft
+                }[value];
+            }
+        }
+    }
+
+    [Reactive] public string DualScreenModeDesc { get; set; } = Strings.SettingsDualScreenAuto;
+
+    public int DualScreenModeIdx
+    {
+        get;
+        set
+        {
+            field = value;
+            if (value >= 0 && value < Enum.GetNames<DualScreenSettings>().Length)
+            {
+                DualScreenModeDesc = new[]
+                {
+                    Strings.SettingsDualScreenAuto, Strings.SettingsDualScreenOn, Strings.SettingsDualScreenOff,
                 }[value];
             }
         }
@@ -262,7 +281,7 @@ public class MainViewModel : ViewModelBase
 
     public static int MenuMargins => IsMobile ? 30 : 50;
 
-    public bool DisplayVirtualControls => IsMobile && CurrentInputDriver == 0;
+    public bool DisplayVirtualControls => IsMobile && CurrentInputDriver == 0 && DualScreenBackend?.IsActive != true;
 
     [Reactive] public Bitmap? CurrentBorder { get; set; }
     [Reactive] public Bitmap? NextBorder { get; set; }
@@ -283,6 +302,7 @@ public class MainViewModel : ViewModelBase
 
     private readonly IAudioBackend _audioBackend;
     private readonly IHapticsBackend? _hapticsBackend;
+    public IDualScreenBackend? DualScreenBackend { get; }
 
     private readonly List<IInputDriver> _inputDrivers;
     public int NumInputDrivers => _inputDrivers.Count;
@@ -318,6 +338,7 @@ public class MainViewModel : ViewModelBase
     public ICommand ChangeWindowingSettingsCommand { get; }
     public ICommand ChangeCurrentMonitorCommand { get; }
     public ICommand ChangeScreenLayoutCommand { get; }
+    public ICommand ChangeDualScreenModeCommand { get; }
     public ICommand ChangeRenderingModeCommand { get; }
     public ICommand ChangeBorderSettingsCommand { get; }
     public ICommand ChangeScreenReaderSettingsCommand { get; }
@@ -401,6 +422,38 @@ public class MainViewModel : ViewModelBase
             _hapticsBackend.Initialize();
         }
 
+        if (((App)Application.Current).DualScreenBackend is not null)
+        {
+            DualScreenBackend = ((App)Application.Current).DualScreenBackend;
+            DualScreenBackend!.ActiveChanged += () =>
+            {
+                CurrentFrame = null;
+                this.RaisePropertyChanged(nameof(DisplayVirtualControls));
+                if (DualScreenBackend.IsActive)
+                {
+                    EmuRenderRatio = 256.0 / 192.0;
+                    EmuRenderHeight = 192.0;
+                    ChangeScreenLayout(ScreenLayout.TOP_BOTTOM);
+                    TargetScreenLayoutLocked = true;
+                }
+                else
+                {
+                    EmuRenderRatio = 256.0 / 384.0;
+                    EmuRenderHeight = 384.0;
+                    ChangeScreenLayout(ScreenLayout.TOP_BOTTOM);
+                    TargetScreenLayoutLocked = false;
+                }
+            };
+            DualScreenBackend.OnPress += (x, y) =>
+            {
+                _pointerState?.Press(x ?? 0, y ?? 0, ScreenLayout.TOP_BOTTOM, true);
+            };
+            DualScreenBackend.OnRelease += () =>
+            {
+                _pointerState?.Release();
+            };
+        }
+
         _pauseDriver = ((App)Application.Current).PauseDriver ?? new();
         _pauseDriver.AudioBackend = _audioBackend;
 
@@ -441,6 +494,7 @@ public class MainViewModel : ViewModelBase
         ChangeWindowingSettingsCommand = ReactiveCommand.Create<bool>(ChangeWindowingSettings);
         ChangeCurrentMonitorCommand = ReactiveCommand.Create<bool>(ChangeCurrentMonitor);
         ChangeScreenLayoutCommand = ReactiveCommand.Create<bool>(ChangeScreenLayout);
+        ChangeDualScreenModeCommand = ReactiveCommand.Create<bool>(ChangeDualScreenMode);
         ChangeRenderingModeCommand = ReactiveCommand.Create<bool>(ChangeRenderingMode);
         ChangeBorderSettingsCommand = ReactiveCommand.Create(ToggleBorderSettings);
         ChangeScreenReaderSettingsCommand = ReactiveCommand.Create(ToggleScreenReader);
@@ -592,6 +646,41 @@ public class MainViewModel : ViewModelBase
                 SendLayoutChangeToCore(numPresses);
             };
         }
+    }
+
+    private void ChangeScreenLayout(ScreenLayout targetLayout)
+    {
+        TargetScreenLayoutIdx = (int)targetLayout;
+        
+        if (TargetScreenLayoutIdx == (int)WrapperSettings.CurrentScreenLayout)
+        {
+            _settingsChangesBuffer.Remove(Setting.SCREEN_LAYOUT);
+        }
+        else
+        {
+            _settingsChangesBuffer[Setting.SCREEN_LAYOUT] = () =>
+            {
+                int numPresses = TargetScreenLayoutIdx - (int)WrapperSettings.CurrentScreenLayout;
+                numPresses = numPresses < 0 ? Enum.GetValues<ScreenLayout>().Length + numPresses : numPresses;
+
+                ChangeEmulatedScreenLayout();
+                SendLayoutChangeToCore(numPresses);
+            };
+        }
+    }
+
+    private void ChangeDualScreenMode(bool forward)
+    {
+        if (!forward && DualScreenModeIdx == 0)
+        {
+            DualScreenModeIdx = Enum.GetValues<DualScreenSettings>().Length - 1;
+        }
+        else
+        {
+            DualScreenModeIdx = (DualScreenModeIdx + (forward ? 1 : -1)) % Enum.GetValues<DualScreenSettings>().Length;
+        }
+
+        WrapperSettings.DualScreenMode = (DualScreenSettings)DualScreenModeIdx;
     }
 
     private void ChangeRenderingMode(bool forward)
@@ -941,8 +1030,17 @@ public class MainViewModel : ViewModelBase
 
     private void DisplayFrame(byte[] frame, uint width, uint height)
     {
-        CurrentFrame ??= new(frame, width, height);
-        CurrentFrame.SetFrame(frame);
+        if (DualScreenBackend?.IsActive != true)
+        {
+            CurrentFrame ??= new(frame, width, height);
+            CurrentFrame.SetFrame(frame);
+        }
+        else
+        {
+            CurrentFrame ??= new(frame[..(frame.Length / 2)], width, height / 2);
+            CurrentFrame.SetFrame(frame);
+            DualScreenBackend.SetSecondFrame(frame[(frame.Length / 2)..], width, height);
+        }
     }
 
     private void PlaySample(byte[] sample)

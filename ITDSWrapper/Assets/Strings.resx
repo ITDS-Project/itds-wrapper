@@ -156,6 +156,18 @@
     <data name="LinuxRenderingModeSoftware" xml:space="preserve">
         <value>Software</value>
     </data>
+    <data name="SettingsDualScreenAuto" xml:space="preserve">
+        <value>Auto</value>
+    </data>
+    <data name="SettingsDualScreenOn" xml:space="preserve">
+        <value>On</value>
+    </data>
+    <data name="SettingsDualScreenOff" xml:space="preserve">
+        <value>Off</value>
+    </data>
+    <data name="SettingsDualScreen" xml:space="preserve">
+        <value>Dual Screen Mode</value>
+    </data>
     <data name="SettingsFullScreenMonitor" xml:space="preserve">
         <value>Monitor</value>
     </data>

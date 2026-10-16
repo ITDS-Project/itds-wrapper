@@ -21,7 +21,7 @@
         <Image Grid.Row="0" Grid.RowSpan="4" Stretch="UniformToFill" Source="{Binding NextBorder}"
                Opacity="{Binding NextBorderOpacity}"/>
 
-        <Grid Row="0" Margin="0 0 23 0" MinHeight="{Binding TopPadding}" IsVisible="{Binding IsMobile}">
+        <Grid Row="0" Margin="0 0 23 0" MinHeight="{Binding TopPadding}" IsVisible="{Binding DisplayVirtualControls}">
             <Grid Grid.Row="0" Grid.Column="0" RowDefinitions="*" ColumnDefinitions="*" Width="46" Height="46" HorizontalAlignment="Right">
                 <Grid.Background>
                     <SvgResourceExtension Path="/Assets/VirtualButtons/MenuButton.svg" Stretch="Fill" AlignmentX="Center" AlignmentY="Center" />
@@ -172,10 +172,11 @@
                         
                         <Label Grid.Row="2" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.ScreenLayoutLeftRight}" IsVisible="{Binding !IsMobile}"/>
                         <Button Grid.Row="2" Grid.Column="1" Classes="setting" Content="&lt;" Command="{Binding ChangeScreenLayoutCommand}"
-                                CommandParameter="{x:False}" IsVisible="{Binding !IsMobile}"/>
-                        <Label Grid.Row="2" Grid.Column="2" Classes="setting setting-value" Content="{Binding TargetScreenLayoutDesc}" IsVisible="{Binding !IsMobile}"/>
+                                CommandParameter="{x:False}" IsVisible="{Binding !IsMobile}" IsEnabled="{Binding !TargetScreenLayoutLocked}"/>
+                        <Label Grid.Row="2" Grid.Column="2" Classes="setting setting-value" Content="{Binding TargetScreenLayoutDesc}" IsVisible="{Binding !IsMobile}"
+                               IsEnabled="{Binding !TargetScreenLayoutLocked}"/>
                         <Button Grid.Row="2" Grid.Column="3" Classes="setting" Content=">" Command="{Binding ChangeScreenLayoutCommand}"
-                                CommandParameter="{x:True}" IsVisible="{Binding !IsMobile}"/>
+                                CommandParameter="{x:True}" IsVisible="{Binding !IsMobile}" IsEnabled="{Binding !TargetScreenLayoutLocked}"/>
                         
                         <Label Grid.Row="3" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsBorders}"/>
                         <Button Grid.Row="3" Grid.Column="1" Classes="setting" Content="&lt;" Command="{Binding ChangeBorderSettingsCommand}"/>

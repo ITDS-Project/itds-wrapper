@@ -12,9 +12,14 @@ public class PointerState(double width, double height)
     public short RetroX => (short)((32767 * 2.0 + 1) / Width * X - 0x7FFF);
     public short RetroY => (short)((32767 * 2.0 + 1) / Height * Y - 0x7FFF);
 
-    public void Press(double x, double y, ScreenLayout layout)
+    public void Press(double x, double y, ScreenLayout layout, bool screenCoords = false)
     {
         double xMin, xMax, yMin, yMax;
+        if (screenCoords)
+        {
+            x *= Width / 256.0;
+            y *= Height / 384.0;
+        }
         switch (layout)
         {
             default:
@@ -24,14 +29,14 @@ public class PointerState(double width, double height)
                 yMin = Height / 2;
                 yMax = Height;
                 break;
-            
+
             case ScreenLayout.LEFT_RIGHT:
                 xMin = Width / 2;
                 xMax = Width;
                 yMin = 0;
                 yMax = Height;
                 break;
-            
+
             case ScreenLayout.RIGHT_LEFT:
                 xMin = 0;
                 xMax = Width / 2;
