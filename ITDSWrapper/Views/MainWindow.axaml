@@ -12,6 +12,7 @@
         WindowDecorations="{Binding Decorations}"
         ExtendClientAreaToDecorationsHint="{Binding ExtendClientArea}"
         WindowState="{Binding WindowState}"
+        WindowStartupLocation="Manual"
         Title="{x:Static assets:Strings.GameTitle}">
         <views:MainView Name="View" />
 </Window>

@@ -17,6 +17,8 @@ public class Settings
     public byte LanguageIndex => (byte)_langCodeArray.IndexOf(LanguageCode);
     
     public WindowingMode WindowingMode { get; set; } = WindowingMode.FULL_SCREEN;
+    public int WindowLocationX { get; set; }
+    public int WindowLocationY { get; set; }
     public ScreenLayout CurrentScreenLayout { get; set; } = ScreenLayout.TOP_BOTTOM;
     public DualScreenSettings DualScreenMode { get; set; } = DualScreenSettings.AUTO;
     public WindowsRenderingMode WindowsRenderingMode { get; set; } = WindowsRenderingMode.WINDOWS_GL;

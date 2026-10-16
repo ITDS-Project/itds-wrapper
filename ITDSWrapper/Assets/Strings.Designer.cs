@@ -265,6 +265,15 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Monitor.
+        /// </summary>
+        public static string SettingsFullScreenMonitor {
+            get {
+                return ResourceManager.GetString("SettingsFullScreenMonitor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Dual Screen Mode.
         /// </summary>
         public static string SettingsDualScreen {
