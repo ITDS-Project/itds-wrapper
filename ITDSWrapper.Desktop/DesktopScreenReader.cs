@@ -3,6 +3,7 @@ using System;
 using System.Globalization;
 using System.Speech.Synthesis;
 #elif IS_LINUX
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 #endif

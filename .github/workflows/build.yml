@@ -15,7 +15,8 @@ env:
 
 jobs:
   build-ios-wrapper:
-    runs-on: 'macos-26'
+    runs-on: 'xcode-27'
+    name: 'Build iOS wrapper'
     steps:
     # Setup
     - name: 'Checkout repository'
@@ -92,7 +93,7 @@ jobs:
     - name: Set Xcode version
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '26.6'
+        xcode-version: '27.1'
 
     - name: Restore & Publish Wrapper
       run: |
@@ -120,7 +121,8 @@ jobs:
         wait-for-processing: 'true'
         backend: AppStoreAPI
 
-  build-android-wrapper:            
+  build-android-wrapper:  
+    name: 'Build Android wrapper'          
     runs-on: 'ubuntu-latest'
     steps:
     # Setup
@@ -212,6 +214,7 @@ jobs:
       matrix:
         platform:
           - image: 'ubuntu-latest'
+            name: 'Build Linux wrapper'
             tfm: net10.0
             rid: 'linux-x64'
             single_file: true
@@ -221,7 +224,8 @@ jobs:
             shell: 'bash'
             artifact: 'publish'
             steamworks_target: 'publish'
-          - image: 'macos-26'
+          - image: 'xcode-27'
+            name: 'Build macOS (Intel x64) wrapper'
             tfm: net10.0-macos
             rid: 'osx-x64'
             single_file: false
@@ -231,7 +235,8 @@ jobs:
             shell: 'bash'
             artifact: 'ITDSWrapper.Desktop.app'
             steamworks_target: 'ITDSWrapper.Desktop.app/Contents/MacOS'
-          - image: 'macos-26'
+          - image: 'xcode-27'
+            name: 'Build macOS (Apple Silicon ARM64) wrapper'
             tfm: net10.0-macos
             rid: 'osx-arm64'
             single_file: false
@@ -242,6 +247,7 @@ jobs:
             artifact: 'ITDSWrapper.Desktop.app'
             steamworks_target: 'ITDSWrapper.Desktop.app/Contents/MacOS'
           - image: 'windows-latest'
+            name: 'Build Windows wrapper'
             tfm: net10.0
             rid: 'win-x64'
             single_file: true
@@ -253,6 +259,7 @@ jobs:
             artifact: 'publish'
             steamworks_target: 'publish'
     runs-on: ${{ matrix.platform.image }}
+    name: ${{ matrix.platform.name }}
     defaults:
       run:
         shell: ${{ matrix.platform.shell }}
@@ -289,7 +296,7 @@ jobs:
         packages: ccache cmake libepoxy-dev libopengl0 libopengl-dev ninja-build p7zip-full x11-xserver-utils xdg-utils xvfb
         version: 1.2
     - name: Install Dependencies (macOS)
-      if: ${{ matrix.platform.image == 'macos-26' }}
+      if: ${{ matrix.platform.image == 'xcode-27' }}
       shell: bash
       run: brew install pkg-config cmake ninja ccache
     - name: Install MSYS2 Dependencies (Windows)
@@ -323,7 +330,7 @@ jobs:
     - name: Set Xcode version
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '26.6'
+        xcode-version: '27.1'
       if: ${{ matrix.platform.tfm == 'net10.0-macos' }}
     - name: Restore & Publish Wrapper
       run: |
