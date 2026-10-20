@@ -15,7 +15,7 @@ env:
 
 jobs:
   build-ios-wrapper:
-    runs-on: 'macos-27'
+    runs-on: 'xcode-27'
     name: 'Build iOS wrapper'
     steps:
     # Setup
@@ -224,7 +224,7 @@ jobs:
             shell: 'bash'
             artifact: 'publish'
             steamworks_target: 'publish'
-          - image: 'macos-27'
+          - image: 'xcode-27'
             name: 'Build macOS (Intel x64) wrapper'
             tfm: net10.0-macos
             rid: 'osx-x64'
@@ -235,7 +235,7 @@ jobs:
             shell: 'bash'
             artifact: 'ITDSWrapper.Desktop.app'
             steamworks_target: 'ITDSWrapper.Desktop.app/Contents/MacOS'
-          - image: 'macos-27'
+          - image: 'xcode-27'
             name: 'Build macOS (Apple Silicon ARM64) wrapper'
             tfm: net10.0-macos
             rid: 'osx-arm64'
@@ -296,7 +296,7 @@ jobs:
         packages: ccache cmake libepoxy-dev libopengl0 libopengl-dev ninja-build p7zip-full x11-xserver-utils xdg-utils xvfb
         version: 1.2
     - name: Install Dependencies (macOS)
-      if: ${{ matrix.platform.image == 'macos-27' }}
+      if: ${{ matrix.platform.image == 'xcode-27' }}
       shell: bash
       run: brew install pkg-config cmake ninja ccache
     - name: Install MSYS2 Dependencies (Windows)
