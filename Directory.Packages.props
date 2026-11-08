@@ -15,7 +15,6 @@
     <PackageVersion Include="Avalonia.Android" Version="12.1.1" />
     <PackageVersion Include="Avalonia.ReactiveUI" Version="11.3.9" />
     <PackageVersion Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3" />
-    <PackageVersion Include="Discord.Net.Webhook" Version="3.20.1" />
     <PackageVersion Include="espeak-ng" Version="1.1.3" />
     <PackageVersion Include="Facepunch.Steamworks.Package" Version="1.0.6" />
     <PackageVersion Include="Facepunch.Steamworks.Posix" Version="2.4.6" />

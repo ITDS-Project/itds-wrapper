@@ -7,7 +7,7 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <AssemblyMetadata Include="DiscordWebhookUri" Value="$(DISCORD_WEBHOOK_URI)" />
+        <AssemblyMetadata Include="PlaytestApiToken" Value="$(PLAYTEST_API_TOKEN)" />
     </ItemGroup>
     
     <ItemGroup>
@@ -24,7 +24,6 @@
         <PackageReference Include="Avalonia.Fonts.Inter" />
         <PackageReference Include="Avalonia.ReactiveUI" />
         <PackageReference Include="AvaloniaUI.DiagnosticsSupport" />
-        <PackageReference Include="Discord.Net.Webhook" />
         <PackageReference Include="ReactiveUI.Fody" />
         <PackageReference Include="Silk.NET.OpenAL" />
         <PackageReference Include="Silk.NET.OpenAL.Extensions.EXT" />
