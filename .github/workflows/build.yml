@@ -15,7 +15,6 @@ on:
 
 env:
   Version: ${{ inputs.version == '' && format('1.0.{0}', github.run_number) || inputs.version }}
-  RomFile: ${{ inputs.rom_file }}
   AssemblyVersion: ${{ inputs.version == '' && format('1.0.{0}', github.run_number) || inputs.version }}
   AndroidVersion: ${{ github.run_number }}
 
@@ -36,8 +35,7 @@ jobs:
       with:
         version: v2.3.0
     - name: 'Download ROM'
-      run: |
-        s5cmd cp s3://into-the-dream-spring-builds/$RomFile ./
+      run: s5cmd cp s3://into-the-dream-spring-builds/${{ inputs.rom_file }} ./
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_KEY }}
@@ -143,8 +141,7 @@ jobs:
       with:
         version: v2.3.0
     - name: 'Download ROM'
-      run: |
-        s5cmd cp s3://into-the-dream-spring-builds/$RomFile ./
+      run: s5cmd cp s3://into-the-dream-spring-builds/${{ inputs.rom_file }} ./
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_KEY }}
@@ -281,8 +278,7 @@ jobs:
       with:
         version: v2.3.0
     - name: 'Download ROM'
-      run: |
-        s5cmd cp s3://into-the-dream-spring-builds/$RomFile ./
+      run: s5cmd cp s3://into-the-dream-spring-builds/${{ inputs.rom_file }} ./
       shell: pwsh
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
