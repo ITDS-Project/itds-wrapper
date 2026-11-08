@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -12,7 +13,7 @@ namespace ITDSWrapper.Playtest;
 
 public class PlaytestApiClient
 {
-    private const string PlaytestApiUri = "https://playtest.intothedreamspring.com/api";
+    private const string PlaytestApiUri = "https://localhost:8081/api/ingest";
     private readonly HttpClient _httpClient = new();
     private readonly string? _playtestApiToken;
     private readonly string _sessionGuid = Guid.NewGuid().ToString();
@@ -36,6 +37,21 @@ public class PlaytestApiClient
     public async Task SendLogs(List<string> logs)
     {
         PlaytestApiRequest request = new(_sessionGuid, string.Empty, _platformId, string.Join('\n', logs));
-        await _httpClient.PostAsync("/ingest", JsonContent.Create(request));
+        try
+        {
+            HttpResponseMessage response = await _httpClient.PostAsync("/logs", JsonContent.Create(request));
+            if (response.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                await Task.Run(async () =>
+                {
+                    await Task.Delay(response.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(3));
+                    await SendLogs(logs);
+                });
+            }
+        }
+        catch
+        {
+            Console.WriteLine("oh no");
+        }
     }
 }
