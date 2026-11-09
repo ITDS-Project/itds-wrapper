@@ -38,6 +38,9 @@ public partial class LogInterpreter : IDisposable
 
     public virtual int InterpretLog(string log)
     {
+        if (log.Contains("with FileMode 0x") || log.Contains("MAC: "))
+            return -1;
+        
         _recentLogs.Add(log);
         if (_recentLogs.Count >= 50)
         {
