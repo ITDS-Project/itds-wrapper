@@ -24,6 +24,8 @@ public class PlaytestApiClient
     private readonly ConcurrentQueue<PlaytestApiRequest> _requestsQueue = new();
     private readonly SemaphoreSlim _flushLock = new(1, 1);
 
+    private int _currentRequest;
+
     public string? Username { get; set; }
 
     public PlaytestApiClient()
@@ -43,7 +45,7 @@ public class PlaytestApiClient
     public void QueueLogs(List<string> logs)
     {
         _requestsQueue.Enqueue(new(_sessionGuid, Username?.Replace("\0", "") ?? string.Empty, _platformId,
-            string.Join("", logs)));
+            string.Join("", logs), _currentRequest++));
     }
 
     public async Task FlushLogs(bool wait = false)
