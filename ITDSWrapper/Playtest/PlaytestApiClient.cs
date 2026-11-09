@@ -13,7 +13,7 @@ namespace ITDSWrapper.Playtest;
 
 public class PlaytestApiClient
 {
-    private const string PlaytestApiUri = "http://localhost:8080/api/ingest/";
+    private const string PlaytestApiUri = "https://playtest.intothedreamspring.com/api/ingest/";
     private readonly HttpClient _httpClient = new();
     private readonly string? _playtestApiToken;
     private readonly string _sessionGuid = Guid.NewGuid().ToString();
