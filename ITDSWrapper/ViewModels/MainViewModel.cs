@@ -913,7 +913,8 @@ public class MainViewModel : ViewModelBase
                 Wrapper.Run();
                 if (++logTicks >= 300)
                 {
-                    Task.Run(async () => await _logInterpreter?.FlushLogs());
+                    logTicks = 0;
+                    _ = Task.Run(async () => await _logInterpreter?.FlushLogs());
                 }
 
                 while (DateTime.Now < nextTick)
@@ -1029,7 +1030,7 @@ public class MainViewModel : ViewModelBase
             inputDriver.Shutdown();
         }
 
-        _logInterpreter?.FlushLogs().GetAwaiter().GetResult();
+        _logInterpreter?.FlushLogs(wait: true).GetAwaiter().GetResult();
         _updater?.Die();
         Wrapper.Dispose();
         _logInterpreter?.Dispose();

@@ -35,12 +35,15 @@ public partial class LogInterpreter : IDisposable
 
     private readonly List<string> _recentLogs = [];
     private readonly PlaytestApiClient _playtestApiClient = new();
+    private readonly object _recentLogsLock = new();
 
     public virtual int InterpretLog(string log)
     {
-        if (log.Contains("with FileMode 0x") || log.Contains("MAC: "))
+        if (log.Contains("with FileMode 0x") || log.Contains(" interface with ID ") ||
+            log.Contains(" homebrew SD card image ") || log.Contains("DSi SD card image found at") ||
+            log.Contains("directory: ") || log.Contains("cannot open shared object file: No such file or directory"))
             return -1;
-        
+
         _recentLogs.Add(log);
         if (_recentLogs.Count >= 50)
         {
@@ -90,24 +93,33 @@ public partial class LogInterpreter : IDisposable
             case LanguageReceivedVerb:
                 LangReceived = true;
                 break;
-            
+
             case SaveTraceVerb:
                 if (logParam.StartsWith("DONE"))
                 {
                     _playtestApiClient.QueueLogs(_recentLogs);
                     _recentLogs.Clear();
                 }
+
                 break;
         }
 
         return wrapperPrefixLocation;
     }
 
-    public async Task FlushLogs()
+    private void QueueRecentLogs()
     {
-        _playtestApiClient.QueueLogs(_recentLogs);
-        _recentLogs.Clear();
-        await _playtestApiClient.FlushLogs();
+        lock (_recentLogsLock)
+        {
+            _playtestApiClient.QueueLogs(_recentLogs);
+            _recentLogs.Clear();
+        }
+    }
+
+    public async Task FlushLogs(bool wait = false)
+    {
+        QueueRecentLogs();
+        await _playtestApiClient.FlushLogs(wait);
     }
 
     public void Dispose()
