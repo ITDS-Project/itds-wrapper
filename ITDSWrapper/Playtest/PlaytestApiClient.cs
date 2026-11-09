@@ -11,14 +11,14 @@ namespace ITDSWrapper.Playtest;
 
 public class PlaytestApiClient
 {
-    private const string PlaytestApiUri = "http://localhost:8080/api/ingest/";
+    private const string PlaytestApiUri = "http://playtest.intothedreamspring.com/api/ingest/";
     private readonly HttpClient _httpClient = new();
     private readonly string? _playtestApiToken;
     private readonly string _sessionGuid = Guid.NewGuid().ToString();
     private readonly string _platformId =
         $"{RuntimeInformation.RuntimeIdentifier} (v{Assembly.GetExecutingAssembly().GetName().Version})";
 
-    private List<PlaytestApiRequest> _requestsQueue = [];
+    private readonly List<PlaytestApiRequest> _requestsQueue = [];
     private bool _flushingQueue = false;
     
     public string? Username { get; set; }
