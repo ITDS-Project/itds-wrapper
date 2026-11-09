@@ -2,6 +2,7 @@ using System;
 using Android.App;
 using Android.Content;
 using Android.Graphics;
+using Android.Graphics.Drawables;
 using Android.Views;
 using Android.Widget;
 using Avalonia.Threading;
@@ -25,7 +26,10 @@ public class AndroidDualScreenBackend : IDualScreenBackend
     public void Initialize(Context outerContext, Display dualScreen)
     {
         _presentation = new(outerContext, dualScreen);
-        _view = new(outerContext);
+        _presentation.SetCancelable(false);
+        _presentation.Window?.AddFlags(WindowManagerFlags.NotFocusable);
+        _presentation.Window?.SetBackgroundDrawable(new ColorDrawable(Color.Black));
+        _view = new(_presentation.Context);
         _frame = Bitmap.CreateBitmap(256, 192, Bitmap.Config.Argb8888!);
         _view.SetImageBitmap(_frame);
         _view.SetBackgroundColor(Color.Black);
@@ -47,7 +51,7 @@ public class AndroidDualScreenBackend : IDualScreenBackend
                 args.Handled = true;
             }
         };
-        _presentation.AddContentView(_view, new(dualScreen.Width, dualScreen.Height));
+        _presentation.SetContentView(_view);
         _presentation.Show();
         IsActive = true;
         ActiveChanged?.Invoke();
