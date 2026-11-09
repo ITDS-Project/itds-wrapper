@@ -26,6 +26,12 @@ public partial class LogInterpreter : IDisposable
     public bool StartupReceived { get; private set; }
     public bool LangReceived { get; private set; }
 
+    public string? Username
+    {
+        get => _playtestApiClient.Username;
+        set => _playtestApiClient.Username = value;
+    }
+
     private readonly List<string> _recentLogs = [];
     private readonly PlaytestApiClient _playtestApiClient = new();
 
@@ -34,13 +40,13 @@ public partial class LogInterpreter : IDisposable
         _recentLogs.Add(log);
         if (_recentLogs.Count >= 50)
         {
-            Task.Run(async () => await _playtestApiClient.SendLogs(_recentLogs));
+            _playtestApiClient.QueueLogs(_recentLogs);
             _recentLogs.Clear();
         }
 
         if (log.Contains("ARM9: data abort") || log.Contains("ARM9: prefetch abort"))
         {
-            Task.Run(async () => await _playtestApiClient.SendLogs(_recentLogs));
+            _playtestApiClient.QueueLogs(_recentLogs);
             return -1;
         }
 
@@ -82,6 +88,11 @@ public partial class LogInterpreter : IDisposable
         }
 
         return wrapperPrefixLocation;
+    }
+
+    public async Task FlushLogs()
+    {
+        await _playtestApiClient.FlushLogs();
     }
 
     public void Dispose()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
@@ -892,6 +893,7 @@ public class MainViewModel : ViewModelBase
         TimeSpan interval = TimeSpan.FromSeconds(1 / Wrapper.Fps);
         DateTime nextTick = DateTime.Now + interval;
         _updater = ((App)Application.Current!).Updater;
+        int logTicks = 0;
 
         while (!Closing)
         {
@@ -909,6 +911,10 @@ public class MainViewModel : ViewModelBase
             if (!_pauseDriver.IsPaused())
             {
                 Wrapper.Run();
+                if (++logTicks >= 300)
+                {
+                    Task.Run(async () => await _logInterpreter?.FlushLogs());
+                }
 
                 while (DateTime.Now < nextTick)
                 {

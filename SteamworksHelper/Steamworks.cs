@@ -31,6 +31,11 @@ public static class Steamworks
         return SteamApps.GameLanguage;
     }
 
+    public static string Username()
+    {
+        return SteamClient.Name;
+    }
+
     public static void InputInit()
     {
         SteamInput.Init();
