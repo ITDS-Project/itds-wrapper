@@ -1,5 +1,7 @@
 using System;
 using System.Globalization;
+using System.Linq;
+using Android.Accounts;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -94,12 +96,17 @@ public class AndroidApp : AvaloniaAndroidApplication<App>
     {
         AndroidControllerInputDriver controllerInputDriver = new();
         AndroidUpdater updater = new(controllerInputDriver);
+        LogInterpreter logInterpreter = new();
+        AccountManager? manager = AccountManager.Get(Context);
+        Account[]? accounts = manager?.GetAccountsByType("com.google");
+        logInterpreter.Username = accounts?.FirstOrDefault()?.Name;
 
         return base.CustomizeAppBuilder(builder)
             .WithInterFont()
             .UseReactiveUI()
             .AfterSetup(b =>
             {
+                
                 ((App)b.Instance!).AudioBackend = new AndroidAudioBackend();
                 ((App)b.Instance).PauseDriver = new();
                 ((App)b.Instance).HapticsBackend = new AndroidHapticsBackend();

@@ -44,17 +44,19 @@ public partial class LogInterpreter : IDisposable
             log.Contains("directory: ") || log.Contains("cannot open shared object file: No such file or directory"))
             return -1;
 
-        _recentLogs.Add($"{DateTimeOffset.UtcNow}: {log}");
-        if (_recentLogs.Count >= 50)
+        bool abort = log.Contains("ARM9: data abort") || log.Contains("ARM9: prefetch abort");
+        lock (_recentLogsLock)
         {
-            _playtestApiClient.QueueLogs(_recentLogs);
-            _recentLogs.Clear();
+            _recentLogs.Add($"{DateTimeOffset.UtcNow:u}: {log}");
+            if (_recentLogs.Count >= 50 || abort)
+            {
+                _playtestApiClient.QueueLogs(_recentLogs);
+                _recentLogs.Clear();
+            }
         }
 
-        if (log.Contains("ARM9: data abort") || log.Contains("ARM9: prefetch abort"))
+        if (abort)
         {
-            _playtestApiClient.QueueLogs(_recentLogs);
-            _recentLogs.Clear();
             return -1;
         }
 
@@ -97,8 +99,7 @@ public partial class LogInterpreter : IDisposable
             case SaveTraceVerb:
                 if (logParam.StartsWith("DONE"))
                 {
-                    _playtestApiClient.QueueLogs(_recentLogs);
-                    _recentLogs.Clear();
+                    QueueRecentLogs();
                 }
 
                 break;
