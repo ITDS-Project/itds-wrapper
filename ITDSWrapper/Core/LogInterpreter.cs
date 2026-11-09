@@ -16,6 +16,7 @@ public partial class LogInterpreter : IDisposable
     private const string ScreenReaderVerb = "SCREEN_READER";
     private const string StartupReceivedVerb = "STARTUP_RECEIVED";
     private const string LanguageReceivedVerb = "LANG_RECEIVED";
+    private const string SaveTraceVerb = "SAVE_TRACE";
 
     public bool WatchForSdCreate { get; set; }
     public Action<string>? SetNextBorder { get; set; }
@@ -84,6 +85,13 @@ public partial class LogInterpreter : IDisposable
 
             case LanguageReceivedVerb:
                 LangReceived = true;
+                break;
+            
+            case SaveTraceVerb:
+                if (logParam.StartsWith("DONE"))
+                {
+                    _playtestApiClient.QueueLogs(_recentLogs);
+                }
                 break;
         }
 
