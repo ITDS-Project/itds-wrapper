@@ -44,7 +44,7 @@ public partial class LogInterpreter : IDisposable
             log.Contains("directory: ") || log.Contains("cannot open shared object file: No such file or directory"))
             return -1;
 
-        _recentLogs.Add(log);
+        _recentLogs.Add($"{DateTimeOffset.UtcNow}: {log}");
         if (_recentLogs.Count >= 50)
         {
             _playtestApiClient.QueueLogs(_recentLogs);
