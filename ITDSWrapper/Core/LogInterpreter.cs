@@ -48,6 +48,7 @@ public partial class LogInterpreter : IDisposable
         if (log.Contains("ARM9: data abort") || log.Contains("ARM9: prefetch abort"))
         {
             _playtestApiClient.QueueLogs(_recentLogs);
+            _recentLogs.Clear();
             return -1;
         }
 
@@ -91,6 +92,7 @@ public partial class LogInterpreter : IDisposable
                 if (logParam.StartsWith("DONE"))
                 {
                     _playtestApiClient.QueueLogs(_recentLogs);
+                    _recentLogs.Clear();
                 }
                 break;
         }
@@ -100,6 +102,8 @@ public partial class LogInterpreter : IDisposable
 
     public async Task FlushLogs()
     {
+        _playtestApiClient.QueueLogs(_recentLogs);
+        _recentLogs.Clear();
         await _playtestApiClient.FlushLogs();
     }
 

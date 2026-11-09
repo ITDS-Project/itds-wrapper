@@ -1029,6 +1029,7 @@ public class MainViewModel : ViewModelBase
             inputDriver.Shutdown();
         }
 
+        _logInterpreter?.FlushLogs().GetAwaiter().GetResult();
         _updater?.Die();
         Wrapper.Dispose();
         _logInterpreter?.Dispose();
