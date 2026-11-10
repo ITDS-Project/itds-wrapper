@@ -27,7 +27,7 @@ public class MainActivity : AvaloniaMainActivity
     private App? App => Avalonia.Application.Current as App;
     private PauseDriver? PauseDriver => App?.PauseDriver;
     private AndroidHapticsBackend? HapticsBackend => App?.HapticsBackend as AndroidHapticsBackend;
-    private AndroidControllerInputDriver? ControllerInputDriver => App?.InputDrivers?[0] as AndroidControllerInputDriver;
+    private AndroidControllerInputDriver? ControllerInputDriver => App?.InputDrivers?.OfType<AndroidControllerInputDriver>().FirstOrDefault();
     private AndroidUpdater? Updater => App?.Updater as AndroidUpdater;
     private AndroidDualScreenBackend? DualScreenBackend => App?.DualScreenBackend as AndroidDualScreenBackend;
 
@@ -47,7 +47,8 @@ public class MainActivity : AvaloniaMainActivity
             return base.OnKeyDown(keyCode, e);
         }
         ControllerInputDriver?.Push(new AndroidInputContainer(AndroidInputType.KEY, keyCode, null));
-        if (Updater is { } updater) updater.RetValue = 1;
+        if (Updater is { } updater)
+            updater.RetValue = 1;
         return true;
     }
 
@@ -55,7 +56,7 @@ public class MainActivity : AvaloniaMainActivity
     {
         if (e?.DeviceId != ControllerInputDriver?.Controller?.Id)
         {
-            return base.OnKeyDown(keyCode, e);
+            return base.OnKeyUp(keyCode, e);
         }
         ControllerInputDriver?.Release(new AndroidInputContainer(AndroidInputType.KEY, keyCode, null));
         return true;

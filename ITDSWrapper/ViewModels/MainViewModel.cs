@@ -270,13 +270,13 @@ public class MainViewModel : ViewModelBase
 
     public int TopPadding
     {
-        get => IsMobile ? field : 0;
+        get => IsMobile && DualScreenBackend?.IsActive != true ? field : 0;
         set;
     } = 45;
 
     public int BottomPadding
     {
-        get => IsMobile ? field : 0;
+        get => IsMobile && DualScreenBackend?.IsActive != true ? field : 0;
         set;
     } = 10;
 
