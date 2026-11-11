@@ -109,40 +109,43 @@
               XYFocus.RightNavigationStrategy="Projection">
             <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="{Binding TopPadding}"/>
             <Grid Grid.Row="1" IsVisible="{Binding ShowSidebar}" Grid.Column="0" Classes="menu" RowDefinitions="Auto,*,Auto">
-                <Grid Classes="menucontainer" Grid.Row="1" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
-                      Margin="{Binding MenuMargins}" RowSpacing="20">
-                    <Label Grid.Row="0" Classes="header" Content="{x:Static assets:Strings.Menu}" />
-                    <Button Grid.Row="1" Classes="menuitem" x:Name="FirstMenuItem"
-                            Command="{Binding CloseMenuOverlayCommand}"
-                            Content="{x:Static assets:Strings.SettingsBackToGame}" 
-                            XYFocus.Up="{Binding #LastMenuItem}" />
-                    <Button Grid.Row="2" Classes="menuitem" 
-                            Command="{Binding OpenDisplaySettingsMenuCommand}"
-                            Content="{x:Static assets:Strings.SettingsDisplay}" />
-                    <Button Grid.Row="3" Classes="menuitem" 
-                            Command="{Binding OpenControllerSettingsMenuCommand}"
-                            Content="{x:Static assets:Strings.SettingsController}"/>
-                    <Button Grid.Row="4" Classes="menuitem" 
-                            Command="{Binding OpenAccessibilitySettingsMenuCommand}"
-                            Content="{x:Static assets:Strings.SettingsAccessibility}" />
-                    <Button Grid.Row="5" Classes="menuitem" 
-                            Command="{Binding OpenLegalMenuCommand}"
-                            Content="{x:Static assets:Strings.SettingsLegal}" />
-                    <Button Grid.Row="6" Classes="menuitem"
-                            Command="{Binding OpenFeedbackCommand}"
-                            Content="{x:Static assets:Strings.SettingsFeedback}" />
-                    <!-- <Button Grid.Row="6" Classes="menuitem" -->
-                    <!--         Command="{Binding OpenSurveyUrlCommand}" -->
-                    <!--         Content="{x:Static assets:Strings.SettingsPlayerSurvey}" /> -->
-                    <Button Grid.Row="7" Classes="menuitem" 
-                            Command="{Binding OpenDiscordUrlCommand}" 
-                            Content="{x:Static assets:Strings.SettingsDiscord}" />
-                    <Button Grid.Row="8" Classes="menuitem" x:Name="LastMenuItem"
-                            Command="{Binding QuitToDesktopCommand}" 
-                            IsVisible="{Binding !IsMobile}"
-                            Content="{x:Static assets:Strings.SettingsQuitToDesktop}"
-                            XYFocus.Down="{Binding #FirstMenuItem}" />
-                </Grid>
+                <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <Grid Classes="menucontainer" Grid.Row="1"
+                          RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                          Margin="{Binding MenuMargins}" RowSpacing="20">
+                        <Label Grid.Row="0" Classes="header" Content="{x:Static assets:Strings.Menu}" />
+                        <Button Grid.Row="1" Classes="menuitem" x:Name="FirstMenuItem"
+                                Command="{Binding CloseMenuOverlayCommand}"
+                                Content="{x:Static assets:Strings.SettingsBackToGame}"
+                                XYFocus.Up="{Binding #LastMenuItem}" />
+                        <Button Grid.Row="2" Classes="menuitem"
+                                Command="{Binding OpenDisplaySettingsMenuCommand}"
+                                Content="{x:Static assets:Strings.SettingsDisplay}" />
+                        <Button Grid.Row="3" Classes="menuitem"
+                                Command="{Binding OpenControllerSettingsMenuCommand}"
+                                Content="{x:Static assets:Strings.SettingsController}" />
+                        <Button Grid.Row="4" Classes="menuitem"
+                                Command="{Binding OpenAccessibilitySettingsMenuCommand}"
+                                Content="{x:Static assets:Strings.SettingsAccessibility}" />
+                        <Button Grid.Row="5" Classes="menuitem"
+                                Command="{Binding OpenLegalMenuCommand}"
+                                Content="{x:Static assets:Strings.SettingsLegal}" />
+                        <Button Grid.Row="6" Classes="menuitem"
+                                Command="{Binding OpenFeedbackCommand}"
+                                Content="{x:Static assets:Strings.SettingsFeedback}" />
+                        <!-- <Button Grid.Row="6" Classes="menuitem" -->
+                        <!--         Command="{Binding OpenSurveyUrlCommand}" -->
+                        <!--         Content="{x:Static assets:Strings.SettingsPlayerSurvey}" /> -->
+                        <Button Grid.Row="7" Classes="menuitem"
+                                Command="{Binding OpenDiscordUrlCommand}"
+                                Content="{x:Static assets:Strings.SettingsDiscord}" />
+                        <Button Grid.Row="8" Classes="menuitem" x:Name="LastMenuItem"
+                                Command="{Binding QuitToDesktopCommand}"
+                                IsVisible="{Binding !IsMobile}"
+                                Content="{x:Static assets:Strings.SettingsQuitToDesktop}"
+                                XYFocus.Down="{Binding #FirstMenuItem}" />
+                    </Grid>
+                </ScrollViewer>
             </Grid>
             <Grid Grid.Row="1" Grid.Column="1" Classes="submenu"
                   VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
