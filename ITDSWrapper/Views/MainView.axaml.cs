@@ -33,8 +33,10 @@ public partial class MainView : UserControl
         var insetsManager = TopLevel.GetTopLevel(this)?.InsetsManager;
         insetsManager?.DisplayEdgeToEdgePreference = true;
         insetsManager?.IsSystemBarVisible = false;
-        ((MainViewModel) DataContext!).TopPadding = (int?)insetsManager?.SafeAreaPadding.Top ?? 0;
-        ((MainViewModel) DataContext).BottomPadding = (int?)insetsManager?.SafeAreaPadding.Bottom ?? 0;
+        ((MainViewModel)DataContext!).TopPadding = (int?)insetsManager?.SafeAreaPadding.Top ?? 0;
+        ((MainViewModel)DataContext).BottomPadding = ((MainViewModel)DataContext).DualScreenBackend?.IsActive == true
+            ? 0
+            : (int?)insetsManager?.SafeAreaPadding.Bottom ?? 0;
     }
 
     private void DsScreen_OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -56,7 +58,8 @@ public partial class MainView : UserControl
     {
         Point pos = e.GetPosition(sender as Control);
         // If we touch anywhere except the bottom screen, reveal the virtual controls
-        if (MainViewModel.IsMobile && (pos.X < DsScreen.Bounds.Left || pos.Y < DsScreen.Bounds.Top + DsScreen.Bounds.Height / 2 ||
+        if (MainViewModel.IsMobile && (pos.X < DsScreen.Bounds.Left ||
+                                       pos.Y < DsScreen.Bounds.Top + DsScreen.Bounds.Height / 2 ||
                                        pos.X > DsScreen.Bounds.Right || pos.Y > DsScreen.Bounds.Bottom))
         {
             ((MainViewModel)DataContext!).CurrentInputDriver = 0;

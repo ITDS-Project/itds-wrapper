@@ -124,6 +124,11 @@ public static class Program
                         Console.WriteLine("Emitting instantaneous timeline event...");
                         Steamworks.TimelineInstantaneous(cmd[1..]);
                         break;
+                    
+                    case "USERNAME":
+                        Console.WriteLine("Emitting username...");
+                        steamworksClient.SendResponse(Steamworks.Username());
+                        break;
                 }
             }
             catch (Exception ex)

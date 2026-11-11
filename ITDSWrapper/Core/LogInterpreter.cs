@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Discord;
-using Discord.Webhook;
 using ITDSWrapper.Accessibility;
+using ITDSWrapper.Playtest;
+using SkiaSharp;
 
 namespace ITDSWrapper.Core;
 
@@ -20,7 +17,6 @@ public partial class LogInterpreter : IDisposable
     private const string ScreenReaderVerb = "SCREEN_READER";
     private const string StartupReceivedVerb = "STARTUP_RECEIVED";
     private const string LanguageReceivedVerb = "LANG_RECEIVED";
-    private const string WarningVerb = "WARNING";
     private const string SaveTraceVerb = "SAVE_TRACE";
 
     public bool WatchForSdCreate { get; set; }
@@ -32,40 +28,36 @@ public partial class LogInterpreter : IDisposable
     public bool StartupReceived { get; private set; }
     public bool LangReceived { get; private set; }
 
-    private readonly string? _discordWebhookUri;
-    private readonly DropOutQueue<string> _recentLogs = new(500);
-    private readonly List<string> _saveTrace = [];
-    private readonly string _sessionGuid = Guid.NewGuid().ToString();
-    private ulong _threadId = 0;
-
-    public LogInterpreter()
+    public string? Username
     {
-        foreach (var attr in Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyMetadataAttribute>())
-        {
-            if (attr.Key == "DiscordWebhookUri")
-            {
-                _discordWebhookUri = attr.Value;
-            }
-        }
-
-        if (!string.IsNullOrEmpty(_discordWebhookUri))
-        {
-            Task.Run(async () =>
-            {
-                using DiscordWebhookClient client = new(_discordWebhookUri);
-                _threadId = await client.SendMessageAsync(text: "A new session has started!",
-                    threadName: $"Session {_sessionGuid}");
-            });
-        }
+        get => PlaytestApiClient.Username;
+        set => PlaytestApiClient.Username = value;
     }
+    
+    public PlaytestApiClient PlaytestApiClient { get; } = new();
+    private readonly List<string> _recentLogs = [];
+    private readonly object _recentLogsLock = new();
 
     public virtual int InterpretLog(string log)
     {
-        _recentLogs.Add(log);
+        if (log.Contains("with FileMode 0x") || log.Contains(" interface with ID ") ||
+            log.Contains(" homebrew SD card image ") || log.Contains("DSi SD card image found at") ||
+            log.Contains("directory: ") || log.Contains("cannot open shared object file: No such file or directory"))
+            return -1;
 
-        if (log.Contains("ARM9: data abort") || log.Contains("ARM9: prefetch abort"))
+        bool abort = log.Contains("ARM9: data abort") || log.Contains("ARM9: prefetch abort");
+        lock (_recentLogsLock)
         {
-            Task.Run(async () => await SendWebhookLog("Abort", log));
+            _recentLogs.Add($"{DateTimeOffset.UtcNow:u}: {log}");
+            if (_recentLogs.Count >= 50 || abort)
+            {
+                PlaytestApiClient.QueueLogs(_recentLogs);
+                _recentLogs.Clear();
+            }
+        }
+
+        if (abort)
+        {
             return -1;
         }
 
@@ -105,20 +97,10 @@ public partial class LogInterpreter : IDisposable
                 LangReceived = true;
                 break;
 
-            case WarningVerb:
-                Task.Run(async () => await SendWebhookLog("Warning", logParam));
-                break;
-
             case SaveTraceVerb:
-                if (logParam.StartsWith("SCENE"))
-                {
-                    Task.Run(async () => await SendWebhookLog("Crash", $"In scene {logParam}"));
-                }
-
-                _saveTrace.Add(logParam);
                 if (logParam.StartsWith("DONE"))
                 {
-                    Task.Run(async () => await SendWebhookFile("Save Trace", $"savetrace.txt", _saveTrace));
+                    QueueRecentLogs();
                 }
 
                 break;
@@ -127,36 +109,27 @@ public partial class LogInterpreter : IDisposable
         return wrapperPrefixLocation;
     }
 
-    private async Task SendWebhookLog(string title, string description)
+    public void AddRecentLog(string log)
     {
-        if (string.IsNullOrEmpty(_discordWebhookUri))
-            return;
-
-        using DiscordWebhookClient client = new(_discordWebhookUri);
-
-        EmbedBuilder embed = new();
-        embed.WithTitle(title).WithDescription(description);
-        await client.SendMessageAsync(embeds: [embed.Build()], threadId: _threadId);
-
-        await SendWebhookFile("Log", $"{title}.log", _recentLogs.GetList(), client);
+        lock (_recentLogsLock)
+        {
+            _recentLogs.Add($"{DateTimeOffset.UtcNow:u}: {log}\n");
+        }
     }
 
-    private async Task SendWebhookFile(string text, string filename, List<string> lines,
-        DiscordWebhookClient? client = null)
+    private void QueueRecentLogs()
     {
-        if (string.IsNullOrEmpty(_discordWebhookUri))
-            return;
+        lock (_recentLogsLock)
+        {
+            PlaytestApiClient.QueueLogs(_recentLogs);
+            _recentLogs.Clear();
+        }
+    }
 
-        bool dispose = client is null;
-        client ??= new(_discordWebhookUri);
-
-        MemoryStream fileStream = new();
-        StreamWriter writer = new(fileStream);
-        await writer.WriteAsync(string.Join('\n', lines.Select(l => l.Trim())));
-        await writer.FlushAsync();
-        await client.SendFileAsync(text: text, filename: filename, stream: fileStream, threadId: _threadId);
-        if (dispose)
-            client.Dispose();
+    public async Task FlushLogs(bool wait = false)
+    {
+        QueueRecentLogs();
+        await PlaytestApiClient.FlushLogs(wait);
     }
 
     public void Dispose()

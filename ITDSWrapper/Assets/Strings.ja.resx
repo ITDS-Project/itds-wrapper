@@ -164,4 +164,7 @@
     <data name="SettingsFullScreenMonitor" xml:space="preserve">
         <value>Monitor</value>
     </data>
+    <data name="SettingsFeedback" xml:space="preserve">
+        <value>Feedback</value>
+    </data>
 </root>

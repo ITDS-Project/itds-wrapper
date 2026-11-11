@@ -15,7 +15,7 @@ public class SteamLogInterpreter(SdlInputDriver inputDriver, InputSwitcher input
     private const string InputChangeStartVerb = "INPUT_CHANGE_START";
     private const string InputChangeRequestVerb = "INPUT_CHANGE_REQUEST";
     private const string InputChangeCompleteVerb = "INPUT_CHANGE_COMPLETE";
-
+    
     public override int InterpretLog(string log)
     {
         int wrapperPrefixLocation = base.InterpretLog(log);

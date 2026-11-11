@@ -105,7 +105,7 @@ jobs:
         dotnet publish ITDSWrapper.iOS -f net10.0-ios -c Release -p:ArchiveOnBuild=true -p:RuntimeIdentifier=ios-arm64 -p:CodesignKey="Apple Distribution" -p:CodesignProvision="${{ steps.prof.outputs.uuid }}"
       shell: pwsh
       env:
-        DISCORD_WEBHOOK_URI: ${{ secrets.DISCORD_WEBHOOK_URI }}
+        PLAYTEST_API_TOKEN: ${{ secrets.PLAYTEST_API_TOKEN }}
 
     - name: Cat release notes
       uses: pCYSl5EDgo/cat@1.0.1
@@ -195,7 +195,7 @@ jobs:
       env:
         ANDROID_KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
         ANDROID_KEY_PASS: ${{ secrets.ANDROID_KEY_PASS }}
-        DISCORD_WEBHOOK_URI: ${{ secrets.DISCORD_WEBHOOK_URI }}
+        PLAYTEST_API_TOKEN: ${{ secrets.PLAYTEST_API_TOKEN }}
       run: |
         dotnet restore ITDSWrapper.Android -r android-arm64
         dotnet publish ITDSWrapper.Android/ITDSWrapper.Android.csproj -c Release -f net10.0-android -r android-arm64 --self-contained /p:DebugType=None /p:DebugSymbols=false /p:PublishSingleFile=false /p:AndroidKeyStore=true "/p:AndroidSigningKeyStore=$RUNNER_TEMP/upload.keystore" "/p:AndroidSigningKeyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" /p:AndroidSigningStorePass=env:ANDROID_KEYSTORE_PASS /p:AndroidSigningKeyPass=env:ANDROID_KEY_PASS
@@ -341,7 +341,7 @@ jobs:
         dotnet publish ITDSWrapper.Desktop/ITDSWrapper.Desktop.csproj -c Release -f ${{ matrix.platform.tfm }} -r ${{ matrix.platform.rid }} --self-contained -p:DebugType=None -p:DebugSymbols=false -p:PublishSingleFile=${{ matrix.platform.single_file }}
       shell: pwsh
       env:
-        DISCORD_WEBHOOK_URI: ${{ secrets.DISCORD_WEBHOOK_URI }}
+        PLAYTEST_API_TOKEN: ${{ secrets.PLAYTEST_API_TOKEN }}
     - name: Restore & Publish SteamworksHelper
       run: |
         dotnet restore SteamworksHelper/SteamworksHelper.csproj -p:RuntimeIdentifier=${{ matrix.platform.rid }}

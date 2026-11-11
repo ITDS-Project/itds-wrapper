@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
@@ -19,12 +21,14 @@ using ITDSWrapper.Core;
 using ITDSWrapper.Graphics;
 using ITDSWrapper.Haptics;
 using ITDSWrapper.Input;
+using ITDSWrapper.Playtest;
 using ITDSWrapper.ViewModels.Controls;
 using ITDSWrapper.Views;
 using Libretro.NET;
 using Libretro.NET.Bindings;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using SkiaSharp;
 
 namespace ITDSWrapper.ViewModels;
 
@@ -45,6 +49,7 @@ public class MainViewModel : ViewModelBase
     [Reactive] public string WindowingModeDesc { get; set; } = Strings.WindowStateFullScreen;
 
     private bool _ignoreFullScreenReposition;
+
     public int WindowingModeIdx
     {
         get => (int)WrapperSettings.WindowingMode;
@@ -112,6 +117,7 @@ public class MainViewModel : ViewModelBase
     }
 
     private bool _dontUpdatePositionOnMonitorChange = false;
+
     public int CurrentMonitor
     {
         get;
@@ -239,6 +245,7 @@ public class MainViewModel : ViewModelBase
     [Reactive] public bool ControllerSettingsMenuOpen { get; set; }
     [Reactive] public bool AccessibilitySettingsMenuOpen { get; set; }
     [Reactive] public bool LegalMenuOpen { get; set; }
+    [Reactive] public bool FeedbackModalOpen { get; set; }
     [Reactive] public bool ShowSidebar { get; set; }
 
     public Settings WrapperSettings { get; }
@@ -269,13 +276,13 @@ public class MainViewModel : ViewModelBase
 
     public int TopPadding
     {
-        get => IsMobile && DualScreenBackend?.IsActive != true ? field : 0;
+        get => IsMobile ? field : 0;
         set;
     } = 45;
 
     public int BottomPadding
     {
-        get => IsMobile && DualScreenBackend?.IsActive != true ? field : 0;
+        get => IsMobile ? field : 0;
         set;
     } = 10;
 
@@ -330,6 +337,7 @@ public class MainViewModel : ViewModelBase
     public ICommand OpenDisplaySettingsMenuCommand { get; }
     public ICommand OpenControllerSettingsMenuCommand { get; }
     public ICommand OpenAccessibilitySettingsMenuCommand { get; }
+    public ICommand OpenFeedbackCommand { get; }
     public ICommand OpenSurveyUrlCommand { get; }
     public ICommand OpenLegalMenuCommand { get; }
     public ICommand OpenDiscordUrlCommand { get; }
@@ -344,6 +352,10 @@ public class MainViewModel : ViewModelBase
     public ICommand ChangeScreenReaderSettingsCommand { get; }
     public ICommand ChangeControlPadHapticsSettingsCommand { get; }
     public ICommand ChangeVirtualButtonsLayoutSettingsCommand { get; }
+
+    public ICommand PositiveFeedbackCommand { get; }
+    public ICommand NegativeFeedbackCommand { get; }
+    public ICommand ProblemFeedbackCommand { get; }
 
     public ICommand SettingsBackCommand { get; }
 
@@ -448,10 +460,7 @@ public class MainViewModel : ViewModelBase
             {
                 _pointerState?.Press(x ?? 0, y ?? 0, ScreenLayout.TOP_BOTTOM, true);
             };
-            DualScreenBackend.OnRelease += () =>
-            {
-                _pointerState?.Release();
-            };
+            DualScreenBackend.OnRelease += () => { _pointerState?.Release(); };
         }
 
         _pauseDriver = ((App)Application.Current).PauseDriver ?? new();
@@ -486,6 +495,7 @@ public class MainViewModel : ViewModelBase
         OpenDisplaySettingsMenuCommand = ReactiveCommand.Create(OpenDisplaySettings);
         OpenControllerSettingsMenuCommand = ReactiveCommand.Create(OpenControllerSettings);
         OpenAccessibilitySettingsMenuCommand = ReactiveCommand.Create(OpenAccessibilitySettings);
+        OpenFeedbackCommand = ReactiveCommand.Create(OpenFeedback);
         OpenSurveyUrlCommand = ReactiveCommand.Create(() => OpenUrl("https://google.com"));
         OpenLegalMenuCommand = ReactiveCommand.Create(OpenLegal);
         OpenDiscordUrlCommand = ReactiveCommand.Create(() => OpenUrl("https://discord.com"));
@@ -500,6 +510,13 @@ public class MainViewModel : ViewModelBase
         ChangeScreenReaderSettingsCommand = ReactiveCommand.Create(ToggleScreenReader);
         ChangeVirtualButtonsLayoutSettingsCommand = ReactiveCommand.Create(ToggleVirtualButtonsLayout);
         ChangeControlPadHapticsSettingsCommand = ReactiveCommand.Create(ToggleControlPadHaptics);
+
+        PositiveFeedbackCommand =
+            ReactiveCommand.Create<TextBox>(comment => GiveFeedback(FeedbackSentiment.Positive, comment));
+        NegativeFeedbackCommand =
+            ReactiveCommand.Create<TextBox>(comment => GiveFeedback(FeedbackSentiment.Negative, comment));
+        ProblemFeedbackCommand =
+            ReactiveCommand.Create<TextBox>(comment => GiveFeedback(FeedbackSentiment.Problem, comment));
 
         SettingsBackCommand = ReactiveCommand.Create(CloseSubMenu);
 
@@ -554,6 +571,13 @@ public class MainViewModel : ViewModelBase
         ShowSidebar = !IsMobile;
     }
 
+    private void OpenFeedback()
+    {
+        FeedbackModalOpen = true;
+        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = AccessibilitySettingsMenuOpen = LegalMenuOpen = false;
+        ShowSidebar = false;
+    }
+
     private void OpenLegal()
     {
         LegalMenuOpen = true;
@@ -563,7 +587,8 @@ public class MainViewModel : ViewModelBase
 
     private void CloseSubMenu()
     {
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = AccessibilitySettingsMenuOpen = LegalMenuOpen = false;
+        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen =
+            AccessibilitySettingsMenuOpen = LegalMenuOpen = FeedbackModalOpen = false;
         ShowSidebar = true;
     }
 
@@ -571,7 +596,8 @@ public class MainViewModel : ViewModelBase
     {
         DisplayMenuOverlay = !DisplayMenuOverlay;
         _pauseDriver.PushPauseState(DisplayMenuOverlay);
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = LegalMenuOpen = false;
+        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen =
+            AccessibilitySettingsMenuOpen = LegalMenuOpen = FeedbackModalOpen = false;
         ScreenEffect = ScreenEffect is null ? new BlurEffect { Radius = 50 } : null;
         ShowSidebar = true;
 
@@ -651,7 +677,7 @@ public class MainViewModel : ViewModelBase
     private void ChangeScreenLayout(ScreenLayout targetLayout)
     {
         TargetScreenLayoutIdx = (int)targetLayout;
-        
+
         if (TargetScreenLayoutIdx == (int)WrapperSettings.CurrentScreenLayout)
         {
             _settingsChangesBuffer.Remove(Setting.SCREEN_LAYOUT);
@@ -892,6 +918,7 @@ public class MainViewModel : ViewModelBase
         TimeSpan interval = TimeSpan.FromSeconds(1 / Wrapper.Fps);
         DateTime nextTick = DateTime.Now + interval;
         _updater = ((App)Application.Current!).Updater;
+        int logTicks = 0;
 
         while (!Closing)
         {
@@ -909,6 +936,11 @@ public class MainViewModel : ViewModelBase
             if (!_pauseDriver.IsPaused())
             {
                 Wrapper.Run();
+                if (++logTicks >= 300)
+                {
+                    logTicks = 0;
+                    _ = Task.Run(async () => await _logInterpreter?.FlushLogs());
+                }
 
                 while (DateTime.Now < nextTick)
                 {
@@ -1023,6 +1055,7 @@ public class MainViewModel : ViewModelBase
             inputDriver.Shutdown();
         }
 
+        _logInterpreter?.FlushLogs(wait: true).GetAwaiter().GetResult();
         _updater?.Die();
         Wrapper.Dispose();
         _logInterpreter?.Dispose();
@@ -1276,5 +1309,22 @@ public class MainViewModel : ViewModelBase
 
             _inputDrivers[defaultInputDriverIndex].SetBinding(inputKey, button);
         }
+    }
+
+    private void GiveFeedback(FeedbackSentiment sentiment, TextBox commentBox)
+    {
+        PlaytestFeedback feedback = new(Guid.NewGuid().ToString(), sentiment.ToString(), commentBox.Text ?? string.Empty,
+            CurrentFrame is not null);
+        _logInterpreter?.AddRecentLog($"[WRAPPER] FEEDBACK: {JsonSerializer.Serialize(feedback)}");
+        if (CurrentFrame is not null)
+        {
+            _logInterpreter?.PlaytestApiClient.TrySendScreenshotAsync(
+                SKBitmap.FromImage(SKImage.FromPixelCopy(
+                    new((int)CurrentFrame.Size.Width, (int)CurrentFrame.Size.Height, SKColorType.Bgra8888,
+                        SKAlphaType.Opaque), CurrentFrame.Frame)), feedback.Id);
+        }
+
+        commentBox.Clear();
+        ToggleMenuOverlay();
     }
 }

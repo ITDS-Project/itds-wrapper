@@ -151,6 +151,9 @@ sealed class Program
                             AchievementManager = new SteamAchievementManager(ipc),
                             WatchForSdCreate = SteamSaveManager.DownloadCloudSave(ipc),
                         };
+                        ipc.SendCommand("USERNAME");
+                        string username = Encoding.UTF8.GetString(ipc.ReceiveResponse());
+                        logInterpreter.Username = username;
                         ((App)b.Instance).LogInterpreter = logInterpreter;
                     }
                     catch (Exception ex)
