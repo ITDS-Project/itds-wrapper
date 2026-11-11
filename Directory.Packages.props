@@ -21,9 +21,10 @@
     <PackageVersion Include="Facepunch.Steamworks.Win64" Version="2.4.6" />
     <PackageVersion Include="Hardware.Info" Version="110.0.0.1" />
     <PackageVersion Include="LTRData.DiscUtils.Fat" Version="1.0.88" />
-    <PackageVersion Include="NAudio" Version="2.2.1" />
-    <PackageVersion Include="NAudio.Alsa" Version="3.0.1" />
+    <PackageVersion Include="NAudio" Version="3.3.0" />
+    <PackageVersion Include="NAudio.Alsa" Version="3.3.0" />
     <PackageVersion Include="NAudio.Sdl2.Library.Android" Version="2.30.3" />
+    <PackageVersion Include="NAudio.Wasapi" Version="3.3.0" />
     <PackageVersion Include="PortAudioSharp2" Version="1.0.4" />
     <PackageVersion Include="ReactiveUI.Fody" Version="19.5.41" />
     <PackageVersion Include="Silk.NET.Input.Sdl" Version="2.23.0" />

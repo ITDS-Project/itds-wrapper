@@ -45,6 +45,7 @@
         <PackageReference Include="Hardware.Info" />
         <PackageReference Condition="'$(RuntimeIdentifier)'=='win-x64' Or $([System.OperatingSystem]::IsWindows())" Include="NAudio" />
         <PackageReference Condition="'$(RuntimeIdentifier)'=='linux-x64' Or $([System.OperatingSystem]::IsLinux())" Include="NAudio.Alsa" />
+        <PackageReference Include="NAudio.Wasapi" />
         <PackageReference Include="Silk.NET.Input.Sdl" />
         <PackageReference Include="System.Speech" />
     </ItemGroup>
