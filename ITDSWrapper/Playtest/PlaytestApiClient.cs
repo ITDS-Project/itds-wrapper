@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using SkiaSharp;
 
 namespace ITDSWrapper.Playtest;
 
@@ -91,6 +94,41 @@ public class PlaytestApiClient
             if (!response.IsSuccessStatusCode)
             {
                 Console.WriteLine($"Failed to send logs: {(int)response.StatusCode} {response.ReasonPhrase}");
+            }
+
+            return (int)response.StatusCode < 500;
+        }
+
+        return false;
+    }
+
+    public async Task<bool> TrySendScreenshotAsync(SKBitmap screenshot, string feedbackId)
+    {
+        for (int attempt = 0; attempt < 5; attempt++)
+        {
+            HttpResponseMessage response;
+            try
+            {
+                using MemoryStream screenshotStream = new();
+                screenshot.Encode(screenshotStream, SKEncodedImageFormat.Png, 100);
+                screenshotStream.Seek(0, SeekOrigin.Begin);
+                response = await _httpClient.PostAsync($"screenshot?sessionGuid={_sessionGuid}&id={feedbackId}", new StreamContent(screenshotStream) { Headers = { ContentType = new("image/png") }});
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to send screenshot: {ex.Message}");
+                return false;
+            }
+
+            if (response.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                await Task.Delay(response.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(3));
+                continue;
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Failed to send screenshot: {(int)response.StatusCode} {response.ReasonPhrase}");
             }
 
             return (int)response.StatusCode < 500;

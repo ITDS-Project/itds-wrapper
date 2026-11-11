@@ -129,8 +129,11 @@
                             Command="{Binding OpenLegalMenuCommand}"
                             Content="{x:Static assets:Strings.SettingsLegal}" />
                     <Button Grid.Row="6" Classes="menuitem"
-                            Command="{Binding OpenSurveyUrlCommand}"
-                            Content="{x:Static assets:Strings.SettingsPlayerSurvey}" />
+                            Command="{Binding OpenFeedbackCommand}"
+                            Content="{x:Static assets:Strings.SettingsFeedback}" />
+                    <!-- <Button Grid.Row="6" Classes="menuitem" -->
+                    <!--         Command="{Binding OpenSurveyUrlCommand}" -->
+                    <!--         Content="{x:Static assets:Strings.SettingsPlayerSurvey}" /> -->
                     <Button Grid.Row="7" Classes="menuitem" 
                             Command="{Binding OpenDiscordUrlCommand}" 
                             Content="{x:Static assets:Strings.SettingsDiscord}" />
@@ -149,6 +152,7 @@
                         <Binding Path="ControllerSettingsMenuOpen" />
                         <Binding Path="AccessibilitySettingsMenuOpen" />
                         <Binding Path="LegalMenuOpen" />
+                        <Binding Path="FeedbackModalOpen" />
                     </MultiBinding>
                 </Grid.IsVisible>
                 <Grid IsVisible="{Binding DisplaySettingsMenuOpen}" Classes="submenucontainer" RowDefinitions="Auto,*,Auto,Auto"
@@ -241,6 +245,14 @@
                                 Command="{Binding SettingsBackCommand}"
                                 Content="{x:Static assets:Strings.SettingsBack}" />
                     </Grid>
+                </Grid>
+                <Grid IsVisible="{Binding FeedbackModalOpen}" Classes="submenucontainer"
+                      RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto,Auto"
+                      VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <Button Grid.Row="0" Grid.Column="0" Classes="feedback" Content="👍" Command="{Binding PositiveFeedbackCommand}" CommandParameter="{Binding #FeedbackCommentBox}"/>
+                    <Button Grid.Row="0" Grid.Column="1" Classes="feedback" Content="👎" Command="{Binding NegativeFeedbackCommand}" CommandParameter="{Binding #FeedbackCommentBox}"/>
+                    <Button Grid.Row="0" Grid.Column="2" Classes="feedback" Content="❗" Command="{Binding ProblemFeedbackCommand}" CommandParameter="{Binding #FeedbackCommentBox}"/>
+                    <TextBox x:Name="FeedbackCommentBox" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" PlaceholderText="Comment Here"/>
                 </Grid>
             </Grid>
             <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="{Binding BottomPadding}"/>

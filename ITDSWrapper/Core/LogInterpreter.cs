@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ITDSWrapper.Accessibility;
 using ITDSWrapper.Playtest;
+using SkiaSharp;
 
 namespace ITDSWrapper.Core;
 
@@ -29,12 +30,12 @@ public partial class LogInterpreter : IDisposable
 
     public string? Username
     {
-        get => _playtestApiClient.Username;
-        set => _playtestApiClient.Username = value;
+        get => PlaytestApiClient.Username;
+        set => PlaytestApiClient.Username = value;
     }
-
+    
+    public PlaytestApiClient PlaytestApiClient { get; } = new();
     private readonly List<string> _recentLogs = [];
-    private readonly PlaytestApiClient _playtestApiClient = new();
     private readonly object _recentLogsLock = new();
 
     public virtual int InterpretLog(string log)
@@ -50,7 +51,7 @@ public partial class LogInterpreter : IDisposable
             _recentLogs.Add($"{DateTimeOffset.UtcNow:u}: {log}");
             if (_recentLogs.Count >= 50 || abort)
             {
-                _playtestApiClient.QueueLogs(_recentLogs);
+                PlaytestApiClient.QueueLogs(_recentLogs);
                 _recentLogs.Clear();
             }
         }
@@ -108,11 +109,19 @@ public partial class LogInterpreter : IDisposable
         return wrapperPrefixLocation;
     }
 
+    public void AddRecentLog(string log)
+    {
+        lock (_recentLogsLock)
+        {
+            _recentLogs.Add($"{DateTimeOffset.UtcNow:u}: {log}\n");
+        }
+    }
+
     private void QueueRecentLogs()
     {
         lock (_recentLogsLock)
         {
-            _playtestApiClient.QueueLogs(_recentLogs);
+            PlaytestApiClient.QueueLogs(_recentLogs);
             _recentLogs.Clear();
         }
     }
@@ -120,7 +129,7 @@ public partial class LogInterpreter : IDisposable
     public async Task FlushLogs(bool wait = false)
     {
         QueueRecentLogs();
-        await _playtestApiClient.FlushLogs(wait);
+        await PlaytestApiClient.FlushLogs(wait);
     }
 
     public void Dispose()
