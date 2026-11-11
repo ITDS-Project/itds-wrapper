@@ -27,7 +27,7 @@ public class AndroidDualScreenBackend : IDualScreenBackend
     {
         _presentation = new(outerContext, dualScreen);
         _presentation.SetCancelable(false);
-        _presentation.Window?.AddFlags(WindowManagerFlags.NotFocusable);
+        _presentation.Window?.AddFlags(WindowManagerFlags.NotFocusable | WindowManagerFlags.KeepScreenOn);
         _presentation.Window?.SetBackgroundDrawable(new ColorDrawable(Color.Black));
         _view = new(_presentation.Context);
         _frame = Bitmap.CreateBitmap(256, 192, Bitmap.Config.Argb8888!);

@@ -99,6 +99,7 @@ public class MainActivity : AvaloniaMainActivity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
+        Window?.AddFlags(WindowManagerFlags.KeepScreenOn);
 
         if (savedInstanceState is not null)
             return;
