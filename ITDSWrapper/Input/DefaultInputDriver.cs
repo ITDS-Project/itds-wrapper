@@ -9,6 +9,7 @@ namespace ITDSWrapper.Input;
 public class DefaultInputDriver : IInputDriver
 {
     private readonly Dictionary<uint, object?> _bindings;
+    private readonly Dictionary<uint, Action> _specialActions = [];
 
     public bool RequestInputUpdate { get; set; }
 
@@ -65,6 +66,10 @@ public class DefaultInputDriver : IInputDriver
 
     public void SetSpecialAction(uint button, Action specialAction)
     {
+        if (!_specialActions.TryAdd(button, specialAction))
+        {
+            _specialActions[button] = specialAction;
+        }
         if (_bindings.TryGetValue(button, out object? input) && input is PhysicalKeyInput keyInput)
         {
             keyInput.SpecialAction = specialAction;
@@ -76,6 +81,11 @@ public class DefaultInputDriver : IInputDriver
         if (!_bindings.TryAdd(input, binding))
         {
             _bindings[input] = binding;
+        }
+
+        if (_specialActions.TryGetValue(input, out Action? specialAction))
+        {
+            SetSpecialAction(input, specialAction);
         }
     }
 

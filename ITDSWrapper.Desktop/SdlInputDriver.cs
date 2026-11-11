@@ -18,7 +18,7 @@ public class SdlInputDriver : IInputDriver
     private Action<IGamepad, Button>? _buttonUpHandler;
     private Action<IGamepad, Thumbstick>? _thumbstickMovedHandler;
     private Action<IGamepad, Trigger>? _triggerMovedHandler;
-    private Action? _specialAction;
+    private readonly Dictionary<uint, Action> _specialActions = [];
 
     private readonly Dictionary<uint, List<SdlControllerInput?>> _controlsDictionary = [];
 
@@ -153,7 +153,7 @@ public class SdlInputDriver : IInputDriver
                     _controlsDictionary[RetroBindings.RETRO_DEVICE_ID_JOYPAD_START].Add(new(button));
                     break;
                 case ButtonName.Back:
-                    _controlsDictionary[RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT].Add(new(button) { SpecialAction = _specialAction });
+                    _controlsDictionary[RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT].Add(new(button) { SpecialAction = _specialActions[RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT] });
                     break;
             }
         }
@@ -196,7 +196,10 @@ public class SdlInputDriver : IInputDriver
 
     public void SetSpecialAction(uint button, Action specialAction)
     {
-        _specialAction = specialAction;
+        if (!_specialActions.TryAdd(button, specialAction))
+        {
+            _specialActions[button] = specialAction;
+        }
     }
 
     public void SetBinding<T>(uint input, IGameInput<T>? binding)
