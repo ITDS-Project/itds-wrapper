@@ -598,8 +598,25 @@ public class MainViewModel : ViewModelBase
         _pauseDriver.PushPauseState(DisplayMenuOverlay);
         DisplaySettingsMenuOpen = ControllerSettingsMenuOpen =
             AccessibilitySettingsMenuOpen = LegalMenuOpen = FeedbackModalOpen = false;
-        ScreenEffect = ScreenEffect is null ? new BlurEffect { Radius = 50 } : null;
         ShowSidebar = true;
+
+        // Update blur effect (fade in/out)
+        ScreenEffect ??= new BlurEffect { Radius = DisplayMenuOverlay ? 0 : 50 };
+        var timer = new DispatcherTimer {  Interval = TimeSpan.FromMilliseconds(240.0 / 60) };
+        timer.Tick += (s, e) =>
+        {
+            if (ScreenEffect is not BlurEffect blur || (DisplayMenuOverlay && blur.Radius >= 50) || (!DisplayMenuOverlay && blur.Radius <= 0))
+            {
+                timer.Stop();
+                if (!DisplayMenuOverlay)
+                {
+                    ScreenEffect = null;
+                }
+                return;
+            }
+            blur.Radius += DisplayMenuOverlay ? 2 : -2;
+        };
+        timer.Start();
 
         if (!DisplayMenuOverlay)
         {
@@ -1045,7 +1062,6 @@ public class MainViewModel : ViewModelBase
                     // Sending a key press changes the input driver, so we have to reset it manually
                     CurrentInputDriver = currentInputDriver;
                 }
-
                 nextTick = DateTime.Now + interval;
             }
         }
