@@ -1,4 +1,7 @@
+using System;
 using ITDSWrapper.Audio;
+using NAudio.Dsp;
+using NAudio.Wave.SampleProviders;
 #if IS_LINUX
 using NAudio.Wave;
 using NAudio.Wave.Alsa;
@@ -20,7 +23,7 @@ public class AlsaAudioBackend : IAudioBackend
 #if IS_LINUX
         _waveProvider = new(new((int)sampleRate, 2));
         _wavePlayer = new();
-        _wavePlayer.Init(_waveProvider);
+        _wavePlayer.Init(new WdlResamplingSampleProvider(_waveProvider.ToSampleProvider(), 48000));
         _wavePlayer?.Play();
 #endif
     }
