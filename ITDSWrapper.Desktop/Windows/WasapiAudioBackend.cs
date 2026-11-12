@@ -21,7 +21,7 @@ public class WasapiAudioBackend : IAudioBackend
         _waveProvider = new(new((int)sampleRate, 2));
         _wavePlayer = new WasapiPlayerBuilder()
             .WithLowLatency(true)
-            .WithLatency(50)
+            .WithLatency(20)
             .WithCategory(AudioStreamCategory.GameEffects)
             .WithEventSync()
             .Build();
