@@ -1,9 +1,7 @@
 ﻿using ITDSWrapper.Audio;
-using NAudio.CoreAudioApi;
-using NAudio.Dsp;
-using NAudio.Wave.SampleProviders;
 #if IS_WINDOWS
-using System;
+using NAudio.CoreAudioApi;
+using NAudio.Wave.SampleProviders;
 using NAudio.Wave;
 #endif
 
