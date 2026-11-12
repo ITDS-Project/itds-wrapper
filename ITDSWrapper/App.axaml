@@ -180,7 +180,7 @@
                                     <Setter Property="Effect" Value="drop-shadow(0 0 15 #4A9484)" />
                                 </KeyFrame>
                                 <KeyFrame KeyTime="0:0:0.75">
-                                    <Setter Property="Effect" Value="drop-shadow(0 0 30 #4ff0cd)" />
+                                    <Setter Property="Effect" Value="drop-shadow(0 0 30 #55ad9a)" />
                                 </KeyFrame>
                                 <KeyFrame KeyTime="0:0:1.5">
                                     <Setter Property="Effect" Value="drop-shadow(0 0 15 #4A9484)" />
@@ -246,7 +246,7 @@
                                     <Setter Property="Effect" Value="drop-shadow(0 0 15 #4A9484)" />
                                 </KeyFrame>
                                 <KeyFrame KeyTime="0:0:0.75">
-                                    <Setter Property="Effect" Value="drop-shadow(0 0 30 #4ff0cd)" />
+                                    <Setter Property="Effect" Value="drop-shadow(0 0 30 #55ad9a)" />
                                 </KeyFrame>
                                 <KeyFrame KeyTime="0:0:1.5">
                                     <Setter Property="Effect" Value="drop-shadow(0 0 15 #4A9484)" />
@@ -294,7 +294,7 @@
                                     <Setter Property="Effect" Value="drop-shadow(0 0 15 #4A9484)" />
                                 </KeyFrame>
                                 <KeyFrame KeyTime="0:0:0.75">
-                                    <Setter Property="Effect" Value="drop-shadow(0 0 30 #4ff0cd)" />
+                                    <Setter Property="Effect" Value="drop-shadow(0 0 30 #55ad9a)" />
                                 </KeyFrame>
                                 <KeyFrame KeyTime="0:0:1.5">
                                     <Setter Property="Effect" Value="drop-shadow(0 0 15 #4A9484)" />

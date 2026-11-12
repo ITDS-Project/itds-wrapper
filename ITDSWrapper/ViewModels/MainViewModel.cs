@@ -247,6 +247,11 @@ public class MainViewModel : ViewModelBase
     [Reactive] public bool LegalMenuOpen { get; set; }
     [Reactive] public bool FeedbackModalOpen { get; set; }
     [Reactive] public bool ShowSidebar { get; set; }
+    
+    [Reactive] public bool ControllerIsPlayStation { get; set; }
+    [Reactive] public bool ControllerIsSwitch { get; set; }
+    [Reactive] public bool ControllerIsSteam { get; set; }
+    [Reactive] public bool ControllerIsXboxOrOther { get; set; }
 
     public Settings WrapperSettings { get; }
     private int _currentLangBit;
@@ -562,6 +567,7 @@ public class MainViewModel : ViewModelBase
         ControllerSettingsMenuOpen = true;
         LegalMenuOpen = DisplaySettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
+        ControllerIsXboxOrOther = true;
     }
 
     private void OpenAccessibilitySettings()
