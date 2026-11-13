@@ -65,7 +65,7 @@ public class ControllerDiagramViewModel : ViewModelBase
 
     private void OnControllerChanged()
     {
-        _logInterpreter.AddRecentLog($"[WRAPPER] CONTROLLER: {InputDriver?.GetControllerBrand()} ('{InputDriver?.GetControllerRawName()}')");
+        _logInterpreter.AddRecentLog($"[WRAPPER] CONTROLLER_CHG: {InputDriver?.GetControllerBrand()} ('{InputDriver?.GetControllerRawName()}')");
         Dispatcher.UIThread.Post(UpdateDiagram);
     }
 
