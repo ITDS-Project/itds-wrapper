@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Input;
+using ITDSWrapper.Assets;
 using Libretro.NET.Bindings;
 
 namespace ITDSWrapper.Input;
@@ -90,16 +91,9 @@ public class DefaultInputDriver : IInputDriver
         }
     }
 
-    public string GetLocalisedBinding<T>(IGameInput<T>? input)
+    public string GetLocalisedBinding(ControllerButton button)
     {
-        foreach ((uint a, object? b) in _bindings)
-        {
-            if (b == input)
-            {
-                return InputDescriptions.Descriptions[a];
-            }
-        }
-        return "Unknown";
+        return Strings.BindingUnknown;
     }
 
     public bool QueryInput(uint id)

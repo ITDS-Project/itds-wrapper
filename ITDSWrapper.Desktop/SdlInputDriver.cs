@@ -219,13 +219,11 @@ public class SdlInputDriver : IInputDriver
         }
     }
 
-    public string GetLocalisedBinding<T>(IGameInput<T>? input)
+    public string GetLocalisedBinding(ControllerButton button)
     {
-        if (input is not SdlControllerInput sdlInput)
-            return Strings.BindingUnknown;
-        foreach (var (a, b) in _controlsDictionary)
+        foreach ((uint a, List<SdlControllerInput?> b) in _controlsDictionary)
         {
-            if (b.Any(i => i is not null && i.GetInputId() == sdlInput.GetInputId()))
+            if (b.Any(i => i is not null && GetGenericButtonFromSdl(i) == button))
             {
                 return InputDescriptions.Descriptions[a];
             }
@@ -272,9 +270,9 @@ public class SdlInputDriver : IInputDriver
     
     public ControllerBrand GetControllerBrand()
     {
-        var gamepad = _gamepad;
+        IGamepad? gamepad = _gamepad;
         if (gamepad is null) return ControllerBrand.NONE;
-        var sdl = Sdl.GetApi();
+        Sdl sdl = Sdl.GetApi();
         if (sdl.IsGameController(gamepad.Index) == SdlBool.True)
         {
             return sdl.GameControllerTypeForIndex(gamepad.Index) switch
@@ -282,36 +280,72 @@ public class SdlInputDriver : IInputDriver
                 GameControllerType.Xbox360 or GameControllerType.Xboxone => ControllerBrand.XBOX,
                 GameControllerType.PS3 or GameControllerType.PS4 or GameControllerType.PS5 => ControllerBrand.PLAYSTATION,
                 GameControllerType.NintendoSwitchPro or GameControllerType.Virtual => ControllerBrand.NINTENDO_SWITCH, // Joy-Cons often map to Switch Pro or Virtual
-                _ => MatchControllerBrandByName(gamepad.Name),
+                _ => InputDescriptions.MatchControllerBrandByName(gamepad.Name),
             };
         }
-        return MatchControllerBrandByName(gamepad.Name);
+        return InputDescriptions.MatchControllerBrandByName(gamepad.Name);
     }
-    
-    private static ControllerBrand MatchControllerBrandByName(string name)
+
+    private static ControllerButton GetGenericButtonFromSdl(SdlControllerInput? input)
     {
-        if (string.IsNullOrWhiteSpace(name)) return ControllerBrand.GENERIC;
+        if (input == null)
+        {
+            return ControllerButton.Unknown;
+        }
+        object? id = input.GetInputId();
+        if (id is ButtonName buttonName)
+        {
+            return buttonName switch
+            {
+                ButtonName.A => ControllerButton.A,
+                ButtonName.B => ControllerButton.B,
+                ButtonName.X => ControllerButton.X,
+                ButtonName.Y => ControllerButton.Y,
+                ButtonName.DPadUp => ControllerButton.DPadUp,
+                ButtonName.DPadDown => ControllerButton.DPadDown,
+                ButtonName.DPadLeft => ControllerButton.DPadLeft,
+                ButtonName.DPadRight => ControllerButton.DPadRight,
+                ButtonName.LeftStick => ControllerButton.LeftStickClick,
+                ButtonName.RightStick => ControllerButton.RightStickClick,
+                ButtonName.LeftBumper => ControllerButton.LeftBumper,
+                ButtonName.RightBumper => ControllerButton.RightBumper,
+                ButtonName.Start => ControllerButton.Start,
+                ButtonName.Back => ControllerButton.Select,
+                _ => ControllerButton.Unknown,
+            };
+        }
+        if (id is ThumbstickWithDirection thumbstick)
+        {
+            return thumbstick.Index switch
+            {
+                1 => thumbstick.Direction switch
+                {
+                    ThumbstickDirection.NEGATIVE_X => ControllerButton.RightStickLeft,
+                    ThumbstickDirection.NEGATIVE_Y => ControllerButton.RightStickUp,
+                    ThumbstickDirection.POSITIVE_X => ControllerButton.RightStickRight,
+                    ThumbstickDirection.POSITIVE_Y => ControllerButton.RightStickDown,
+                    _ => ControllerButton.Unknown,
+                },
+                _ => thumbstick.Direction switch
+                {
+                    ThumbstickDirection.NEGATIVE_X => ControllerButton.LeftStickLeft,
+                    ThumbstickDirection.NEGATIVE_Y => ControllerButton.LeftStickUp,
+                    ThumbstickDirection.POSITIVE_X => ControllerButton.LeftStickRight,
+                    ThumbstickDirection.POSITIVE_Y => ControllerButton.LeftStickDown,
+                    _ => ControllerButton.Unknown,
+                },
+            };
+        }
+        if (id is int triggerIndex)
+        {
+            return triggerIndex switch
+            {
+                0 => ControllerButton.LeftTrigger,
+                1 => ControllerButton.RightTrigger,
+                _ => ControllerButton.Unknown,
+            };
+        }
 
-        if (name.Contains("Xbox", StringComparison.OrdinalIgnoreCase) || 
-            name.Contains("XInput", StringComparison.OrdinalIgnoreCase))
-            return ControllerBrand.XBOX;
-
-        if (name.Contains("PS4", StringComparison.OrdinalIgnoreCase) || 
-            name.Contains("PS5", StringComparison.OrdinalIgnoreCase) || 
-            name.Contains("DualShock", StringComparison.OrdinalIgnoreCase) || 
-            name.Contains("DualSense", StringComparison.OrdinalIgnoreCase) ||
-            name.Contains("Sony", StringComparison.OrdinalIgnoreCase))
-            return ControllerBrand.PLAYSTATION;
-
-        if (name.Contains("Switch", StringComparison.OrdinalIgnoreCase) || 
-            name.Contains("Joy-Con", StringComparison.OrdinalIgnoreCase) || 
-            name.Contains("Nintendo", StringComparison.OrdinalIgnoreCase))
-            return ControllerBrand.NINTENDO_SWITCH;
-
-        if (name.Contains("Steam Deck", StringComparison.OrdinalIgnoreCase) || 
-            name.Contains("Steam Virtual Gamepad", StringComparison.OrdinalIgnoreCase))
-            return ControllerBrand.STEAM_DECK;
-
-        return ControllerBrand.GENERIC;
+        return ControllerButton.Unknown;
     }
 }

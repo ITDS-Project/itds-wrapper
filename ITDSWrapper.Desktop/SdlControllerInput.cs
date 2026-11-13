@@ -1,6 +1,7 @@
 using System;
 using ITDSWrapper.Input;
 using Silk.NET.Input;
+using Silk.NET.Input.Sdl;
 
 namespace ITDSWrapper.Desktop;
 
@@ -11,6 +12,8 @@ public enum ThumbstickDirection
     NEGATIVE_X,
     NEGATIVE_Y,
 }
+
+public record ThumbstickWithDirection(int Index, ThumbstickDirection? Direction);
 
 public class SdlControllerInput : IGameInput<object>
 {
@@ -96,9 +99,9 @@ public class SdlControllerInput : IGameInput<object>
         {
             return button.Name;
         }
-        if (_input is Thumbstick)
+        if (_input is Thumbstick thumbstick)
         {
-            return _direction;
+            return new ThumbstickWithDirection(thumbstick.Index, _direction);
         }
         if (_input is Trigger trigger)
         {

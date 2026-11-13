@@ -4,6 +4,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
+using ITDSWrapper.Assets;
 using ITDSWrapper.Input;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -12,25 +13,24 @@ namespace ITDSWrapper.ViewModels.Controls;
 
 public class ControllerDiagramViewModel : ViewModelBase
 {
-
     private static readonly Dictionary<ControllerButton, Point> XboxControllerPoints = new()
     {
-        {ControllerButton.A, new(1837, 555)},
-        {ControllerButton.B, new(1837, 490)},
-        {ControllerButton.X, new(1837, 427)},
-        {ControllerButton.Y, new(1837, 363)},
-        {ControllerButton.DPadUp, new(30, 688)},
-        {ControllerButton.DPadDown, new(30, 880)},
-        {ControllerButton.DPadLeft, new(30, 818)},
-        {ControllerButton.DPadRight, new(30, 751)},
-        {ControllerButton.LeftBumper, new(121, 222)},
-        {ControllerButton.RightBumper, new(1744, 222)},
-        {ControllerButton.LeftStick, new(156, 427)},
-        {ControllerButton.RightStick, new(1468, 1008)},
-        {ControllerButton.Start, new(704, 938)},
-        {ControllerButton.Select, new(704, 1008)}
+        { ControllerButton.A, new(1837, 555) },
+        { ControllerButton.B, new(1837, 490) },
+        { ControllerButton.X, new(1837, 427) },
+        { ControllerButton.Y, new(1837, 363) },
+        { ControllerButton.DPadUp, new(30, 688) },
+        { ControllerButton.DPadDown, new(30, 880) },
+        { ControllerButton.DPadLeft, new(30, 818) },
+        { ControllerButton.DPadRight, new(30, 751) },
+        { ControllerButton.LeftBumper, new(121, 222) },
+        { ControllerButton.RightBumper, new(1744, 222) },
+        { ControllerButton.LeftStick, new(156, 427) },
+        { ControllerButton.RightStick, new(1468, 1008) },
+        { ControllerButton.Start, new(704, 938) },
+        { ControllerButton.Select, new(704, 1008) },
     };
-    
+
     [Reactive] public RenderTargetBitmap? DiagramImage { get; private set; }
     [Reactive] public bool HasDiagram { get; private set; }
 
@@ -87,22 +87,23 @@ public class ControllerDiagramViewModel : ViewModelBase
             {
                 Rect rect = new(0, 0, diagram.PixelSize.Width, diagram.PixelSize.Height);
                 context.DrawImage(diagram, rect);
-                
+
                 Typeface font = new(new FontFamily("avares://ITDSWrapper/Assets/Fonts#Gupter"));
                 foreach ((ControllerButton b, Point p) in XboxControllerPoints)
                 {
-                    // var binding = InputDriver.GetLocalisedBinding(b); - todo get what is bound here
+                    string? binding = InputDriver?.GetLocalisedBinding(b);
                     FormattedText formattedText = new(
-                        "Lorem ipsum tibi",
+                        binding ?? Strings.BindingUnknown,
                         System.Globalization.CultureInfo.CurrentCulture,
                         FlowDirection.LeftToRight,
                         font,
                         32,
-                        Brushes.White 
+                        Brushes.White
                     );
                     context.DrawText(formattedText, p);
                 }
             }
+
             HasDiagram = true;
         }
         else

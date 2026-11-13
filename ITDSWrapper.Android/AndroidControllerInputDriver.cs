@@ -77,20 +77,18 @@ public class AndroidControllerInputDriver : IInputDriver
         }
     }
 
-    public string GetLocalisedBinding<T>(IGameInput<T>? input)
+    public string GetLocalisedBinding(ControllerButton button)
     {
-        if (input is not AndroidControllerInput androidInput)
-            return Strings.BindingUnknown;
         foreach ((uint a, AndroidControllerInput? b) in _inputDictionary)
         {
-            if (b is not null && b == androidInput)
+            if (b is not null && button == b.GetGenericButtonName())
             {
                 return InputDescriptions.Descriptions[a];
             }
         }
         return Strings.BindingNotMapped;
     }
-
+    
     public bool QueryInput(uint id)
     {
         return _inputDictionary.ContainsKey(id) && (_inputDictionary[id]?.IsSet ?? false);
@@ -135,6 +133,6 @@ public class AndroidControllerInputDriver : IInputDriver
 
     public ControllerBrand GetControllerBrand()
     {
-        throw new NotImplementedException();
+        return InputDescriptions.MatchControllerBrandByName(Controller?.Name ?? string.Empty);
     }
 }

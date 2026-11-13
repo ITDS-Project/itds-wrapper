@@ -28,4 +28,5 @@ public enum ControllerButton
     RightStickClick,
     Start,
     Select,
+    Unknown,
 }

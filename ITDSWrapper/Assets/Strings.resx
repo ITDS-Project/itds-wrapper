@@ -199,7 +199,7 @@
         <value>Navigate/Move Down</value>
     </data>
     <data name="BindingDRightDescription" xml:space="preserve">
-        <value>Navigate/Move Righte Left</value>
+        <value>Navigate/Move Right</value>
     </data>
     <data name="BindingDLeftDescription" xml:space="preserve">
         <value>Navigate/Move Left</value>

@@ -94,7 +94,7 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Navigate/Move Righte Left.
+        ///   Looks up a localized string similar to Navigate/Move Right.
         /// </summary>
         public static string BindingDRightDescription {
             get {
