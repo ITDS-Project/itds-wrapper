@@ -76,6 +76,8 @@ public class ControllerDiagramViewModel : ViewModelBase
                 "avares://ITDSWrapper/Assets/ControllerDiagrams/SwitchPro.png",
             ControllerBrand.STEAM_DECK =>
                 "avares://ITDSWrapper/Assets/ControllerDiagrams/SteamDeck.png",
+            ControllerBrand.AYN_THOR => 
+                "avares://ITDSWrapper/Assets/ControllerDiagrams/AynThor.png",
             _ => null,
         };
 

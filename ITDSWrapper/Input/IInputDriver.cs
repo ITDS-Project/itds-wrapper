@@ -64,6 +64,9 @@ public static class InputDescriptions
             name.Contains("Steam Virtual Gamepad", StringComparison.OrdinalIgnoreCase))
             return ControllerBrand.STEAM_DECK;
 
+        if (name.Contains("Odin Controller", StringComparison.OrdinalIgnoreCase))
+            return ControllerBrand.AYN_THOR;
+
         return ControllerBrand.GENERIC;
     }
 }
@@ -76,4 +79,5 @@ public enum ControllerBrand
     PLAYSTATION,
     NINTENDO_SWITCH,
     STEAM_DECK,
+    AYN_THOR
 }
