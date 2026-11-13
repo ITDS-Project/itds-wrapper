@@ -12,11 +12,8 @@ using Android.Util;
 using Android.Views;
 using Avalonia;
 using Avalonia.Android;
-using Avalonia.Controls.Shapes;
 using Avalonia.ReactiveUI;
 using ITDSWrapper.Core;
-using Java.IO;
-using File = System.IO.File;
 
 namespace ITDSWrapper.Android;
 

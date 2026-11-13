@@ -58,6 +58,132 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Confirm/Advance Text.
+        /// </summary>
+        public static string BindingADescription {
+            get {
+                return ResourceManager.GetString("BindingADescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Back/Run.
+        /// </summary>
+        public static string BindingBDescription {
+            get {
+                return ResourceManager.GetString("BindingBDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Navigate/Move Down.
+        /// </summary>
+        public static string BindingDDownDescription {
+            get {
+                return ResourceManager.GetString("BindingDDownDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Navigate/Move Left.
+        /// </summary>
+        public static string BindingDLeftDescription {
+            get {
+                return ResourceManager.GetString("BindingDLeftDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Navigate/Move Righte Left.
+        /// </summary>
+        public static string BindingDRightDescription {
+            get {
+                return ResourceManager.GetString("BindingDRightDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Navigate/Move Up.
+        /// </summary>
+        public static string BindingDUpDescription {
+            get {
+                return ResourceManager.GetString("BindingDUpDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pan Cam Left.
+        /// </summary>
+        public static string BindingLDescription {
+            get {
+                return ResourceManager.GetString("BindingLDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not mapped.
+        /// </summary>
+        public static string BindingNotMapped {
+            get {
+                return ResourceManager.GetString("BindingNotMapped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pan Cam Right.
+        /// </summary>
+        public static string BindingRDescription {
+            get {
+                return ResourceManager.GetString("BindingRDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrapper Menu.
+        /// </summary>
+        public static string BindingSelectDescription {
+            get {
+                return ResourceManager.GetString("BindingSelectDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause.
+        /// </summary>
+        public static string BindingStartDescription {
+            get {
+                return ResourceManager.GetString("BindingStartDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown.
+        /// </summary>
+        public static string BindingUnknown {
+            get {
+                return ResourceManager.GetString("BindingUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Pouch.
+        /// </summary>
+        public static string BindingXDescription {
+            get {
+                return ResourceManager.GetString("BindingXDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggle Auto/Open Map.
+        /// </summary>
+        public static string BindingYDescription {
+            get {
+                return ResourceManager.GetString("BindingYDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Into the Dream Spring.
         /// </summary>
         public static string GameTitle {

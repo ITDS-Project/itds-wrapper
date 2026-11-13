@@ -27,7 +27,6 @@
     <PackageVersion Include="NAudio.Wasapi" Version="3.3.0" />
     <PackageVersion Include="PortAudioSharp2" Version="1.0.4" />
     <PackageVersion Include="ReactiveUI.Fody" Version="19.5.41" />
-    <PackageVersion Include="Silk.NET.Input.Common" Version="2.23.0" />
     <PackageVersion Include="Silk.NET.Input.Sdl" Version="2.23.0" />
     <PackageVersion Include="Silk.NET.OpenAL" Version="2.23.0" />
     <PackageVersion Include="Silk.NET.OpenAL.Extensions.EXT" Version="2.23.0" />

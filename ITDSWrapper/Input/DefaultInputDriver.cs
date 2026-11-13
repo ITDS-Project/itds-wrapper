@@ -92,11 +92,11 @@ public class DefaultInputDriver : IInputDriver
 
     public string GetLocalisedBinding<T>(IGameInput<T>? input)
     {
-        foreach (var (a, b) in _bindings)
+        foreach ((uint a, object? b) in _bindings)
         {
             if (b == input)
             {
-                return IInputDriver.InputDescriptions[a];
+                return InputDescriptions.Descriptions[a];
             }
         }
         return "Unknown";
@@ -127,8 +127,8 @@ public class DefaultInputDriver : IInputDriver
     {
     }
 
-    public IInputDriver.ControllerBrand GetControllerBrand()
+    public ControllerBrand GetControllerBrand()
     {
-        return IInputDriver.ControllerBrand.NONE;
+        return ControllerBrand.NONE;
     }
 }

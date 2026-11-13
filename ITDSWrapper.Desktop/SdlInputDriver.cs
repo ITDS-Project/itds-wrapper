@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Threading;
+using ITDSWrapper.Assets;
 using ITDSWrapper.Input;
 using Libretro.NET.Bindings;
 using Silk.NET.Input;
@@ -220,15 +221,16 @@ public class SdlInputDriver : IInputDriver
 
     public string GetLocalisedBinding<T>(IGameInput<T>? input)
     {
-        if (input is not SdlControllerInput sdlInput) return "Unknown";
+        if (input is not SdlControllerInput sdlInput)
+            return Strings.BindingUnknown;
         foreach (var (a, b) in _controlsDictionary)
         {
             if (b.Any(i => i is not null && i.GetInputId() == sdlInput.GetInputId()))
             {
-                return IInputDriver.InputDescriptions[a];
+                return InputDescriptions.Descriptions[a];
             }
         }
-        return "Not mapped";
+        return Strings.BindingNotMapped;
     }
 
     public bool QueryInput(uint id)
@@ -268,22 +270,48 @@ public class SdlInputDriver : IInputDriver
         return [];
     }
     
-    public IInputDriver.ControllerBrand GetControllerBrand()
+    public ControllerBrand GetControllerBrand()
     {
         var gamepad = _gamepad;
-        if (gamepad is null) return IInputDriver.ControllerBrand.NONE;
+        if (gamepad is null) return ControllerBrand.NONE;
         var sdl = Sdl.GetApi();
         if (sdl.IsGameController(gamepad.Index) == SdlBool.True)
         {
             return sdl.GameControllerTypeForIndex(gamepad.Index) switch
             {
-                GameControllerType.Xbox360 or GameControllerType.Xboxone => IInputDriver.ControllerBrand.XBOX,
-                GameControllerType.PS3 or GameControllerType.PS4 or GameControllerType.PS5 => IInputDriver.ControllerBrand.PLAYSTATION,
-                GameControllerType.NintendoSwitchPro or GameControllerType.Virtual => IInputDriver.ControllerBrand.NINTENDO_SWITCH, // Joy-Cons often map to Switch Pro or Virtual
-                _ => IInputDriver.MatchControllerBrandByName(gamepad.Name)
+                GameControllerType.Xbox360 or GameControllerType.Xboxone => ControllerBrand.XBOX,
+                GameControllerType.PS3 or GameControllerType.PS4 or GameControllerType.PS5 => ControllerBrand.PLAYSTATION,
+                GameControllerType.NintendoSwitchPro or GameControllerType.Virtual => ControllerBrand.NINTENDO_SWITCH, // Joy-Cons often map to Switch Pro or Virtual
+                _ => MatchControllerBrandByName(gamepad.Name),
             };
         }
-        return IInputDriver.MatchControllerBrandByName(gamepad.Name);
+        return MatchControllerBrandByName(gamepad.Name);
     }
+    
+    private static ControllerBrand MatchControllerBrandByName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return ControllerBrand.GENERIC;
 
+        if (name.Contains("Xbox", StringComparison.OrdinalIgnoreCase) || 
+            name.Contains("XInput", StringComparison.OrdinalIgnoreCase))
+            return ControllerBrand.XBOX;
+
+        if (name.Contains("PS4", StringComparison.OrdinalIgnoreCase) || 
+            name.Contains("PS5", StringComparison.OrdinalIgnoreCase) || 
+            name.Contains("DualShock", StringComparison.OrdinalIgnoreCase) || 
+            name.Contains("DualSense", StringComparison.OrdinalIgnoreCase) ||
+            name.Contains("Sony", StringComparison.OrdinalIgnoreCase))
+            return ControllerBrand.PLAYSTATION;
+
+        if (name.Contains("Switch", StringComparison.OrdinalIgnoreCase) || 
+            name.Contains("Joy-Con", StringComparison.OrdinalIgnoreCase) || 
+            name.Contains("Nintendo", StringComparison.OrdinalIgnoreCase))
+            return ControllerBrand.NINTENDO_SWITCH;
+
+        if (name.Contains("Steam Deck", StringComparison.OrdinalIgnoreCase) || 
+            name.Contains("Steam Virtual Gamepad", StringComparison.OrdinalIgnoreCase))
+            return ControllerBrand.STEAM_DECK;
+
+        return ControllerBrand.GENERIC;
+    }
 }

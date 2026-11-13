@@ -167,4 +167,46 @@
     <data name="SettingsFeedback" xml:space="preserve">
         <value>Feedback</value>
     </data>
+    <data name="BindingADescription" xml:space="preserve">
+        <value>Confirm/Advance Text</value>
+    </data>
+    <data name="BindingBDescription" xml:space="preserve">
+        <value>Back/Run</value>
+    </data>
+    <data name="BindingXDescription" xml:space="preserve">
+        <value>Open Pouch</value>
+    </data>
+    <data name="BindingYDescription" xml:space="preserve">
+        <value>Toggle Auto/Open Map</value>
+    </data>
+    <data name="BindingLDescription" xml:space="preserve">
+        <value>Pan Cam Left</value>
+    </data>
+    <data name="BindingRDescription" xml:space="preserve">
+        <value>Pan Cam Right</value>
+    </data>
+    <data name="BindingDUpDescription" xml:space="preserve">
+        <value>Navigate/Move Up</value>
+    </data>
+    <data name="BindingDDownDescription" xml:space="preserve">
+        <value>Navigate/Move Down</value>
+    </data>
+    <data name="BindingDRightDescription" xml:space="preserve">
+        <value>Navigate/Move Right</value>
+    </data>
+    <data name="BindingDLeftDescription" xml:space="preserve">
+        <value>Navigate/Move Left</value>
+    </data>
+    <data name="BindingStartDescription" xml:space="preserve">
+        <value>Pause</value>
+    </data>
+    <data name="BindingSelectDescription" xml:space="preserve">
+        <value>Wrapper Menu</value>
+    </data>
+    <data name="BindingNotMapped" xml:space="preserve">
+        <value>Not mapped</value>
+    </data>
+    <data name="BindingUnknown" xml:space="preserve">
+        <value>Unknown</value>
+    </data>
 </root>

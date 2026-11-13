@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Android.OS;
 using Android.Views;
+using ITDSWrapper.Assets;
 using ITDSWrapper.Input;
 using Libretro.NET.Bindings;
 
@@ -15,6 +16,7 @@ public class AndroidControllerInputDriver : IInputDriver
     private readonly Dictionary<uint, Action> _specialActions = [];
 
     public bool RequestInputUpdate { get; set; }
+    public event Action? ControllerChanged;
 
     public void SetController(InputDevice controller)
     {
@@ -75,6 +77,20 @@ public class AndroidControllerInputDriver : IInputDriver
         }
     }
 
+    public string GetLocalisedBinding<T>(IGameInput<T>? input)
+    {
+        if (input is not AndroidControllerInput androidInput)
+            return Strings.BindingUnknown;
+        foreach ((uint a, AndroidControllerInput? b) in _inputDictionary)
+        {
+            if (b is not null && b == androidInput)
+            {
+                return InputDescriptions.Descriptions[a];
+            }
+        }
+        return Strings.BindingNotMapped;
+    }
+
     public bool QueryInput(uint id)
     {
         return _inputDictionary.ContainsKey(id) && (_inputDictionary[id]?.IsSet ?? false);
@@ -115,5 +131,10 @@ public class AndroidControllerInputDriver : IInputDriver
         {
             Controller?.Vibrator?.Vibrate(VibrationEffect.CreateOneShot(1000, strength / 258 + 1));
         }
+    }
+
+    public ControllerBrand GetControllerBrand()
+    {
+        throw new NotImplementedException();
     }
 }

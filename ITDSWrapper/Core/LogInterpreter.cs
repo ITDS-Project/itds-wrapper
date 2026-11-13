@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ITDSWrapper.Accessibility;
 using ITDSWrapper.Playtest;
-using SkiaSharp;
 
 namespace ITDSWrapper.Core;
 

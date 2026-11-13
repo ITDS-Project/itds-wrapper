@@ -564,9 +564,9 @@ public class MainViewModel : ViewModelBase
         ControllerSettingsMenuOpen = true;
         LegalMenuOpen = DisplaySettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
-        var controllerDriver = _inputDrivers.Find(i => i.GetControllerBrand() != IInputDriver.ControllerBrand.NONE)
-                               ?? _inputDrivers.Find(i => i is not DefaultInputDriver)
-                               ?? _inputDrivers[CurrentInputDriver];
+        IInputDriver controllerDriver = _inputDrivers.Find(i => i.GetControllerBrand() != ControllerBrand.NONE)
+                                        ?? _inputDrivers.Find(i => i is not DefaultInputDriver)
+                                        ?? _inputDrivers[CurrentInputDriver];
         ControllerDiagram = new(controllerDriver);
     }
 
@@ -904,7 +904,7 @@ public class MainViewModel : ViewModelBase
         {
             return;
         }
-        if (ControllerDiagram is not null && _inputDrivers[CurrentInputDriver].GetControllerBrand() != IInputDriver.ControllerBrand.NONE)
+        if (ControllerDiagram is not null && _inputDrivers[CurrentInputDriver].GetControllerBrand() != ControllerBrand.NONE)
         {
             ControllerDiagram.InputDriver = _inputDrivers[CurrentInputDriver];
         }

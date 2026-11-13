@@ -1,6 +1,7 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Platform;
 using Avalonia.Input;
 using ITDSWrapper.ViewModels;
 
@@ -30,7 +31,7 @@ public partial class MainView : UserControl
     {
         ((MainViewModel)DataContext!).ResizeEmuScreen(e.NewSize.Width, e.NewSize.Height);
 
-        var insetsManager = TopLevel.GetTopLevel(this)?.InsetsManager;
+        IInsetsManager? insetsManager = TopLevel.GetTopLevel(this)?.InsetsManager;
         insetsManager?.DisplayEdgeToEdgePreference = true;
         insetsManager?.IsSystemBarVisible = false;
         ((MainViewModel)DataContext!).TopPadding = (int?)insetsManager?.SafeAreaPadding.Top ?? 0;
