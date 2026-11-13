@@ -218,8 +218,7 @@
                                 Command="{Binding SettingsBackCommand}"
                                 Content="{x:Static assets:Strings.SettingsBack}" />
                     </Grid>
-                    <Grid Grid.Row="0" RowDefinitions="*,Auto,Auto" ColumnDefinitions="*" VerticalAlignment="Top" HorizontalAlignment="Stretch"
-                          IsVisible="{Binding !IsMobile}">
+                    <Grid Grid.Row="0" RowDefinitions="*,Auto,Auto" ColumnDefinitions="*" VerticalAlignment="Top" HorizontalAlignment="Stretch">
                         <c:ControllerDiagramView Grid.Row="1" DataContext="{Binding ControllerDiagram}" />
                     </Grid>
                 </Grid>

@@ -187,10 +187,10 @@
         <value>Toggle Auto/Open Map</value>
     </data>
     <data name="BindingLDescription" xml:space="preserve">
-        <value>Pan Cam Left</value>
+        <value>Rotate Cam Left</value>
     </data>
     <data name="BindingRDescription" xml:space="preserve">
-        <value>Pan Cam Right</value>
+        <value>Rotate Cam Right</value>
     </data>
     <data name="BindingDUpDescription" xml:space="preserve">
         <value>Navigate/Move Up</value>

@@ -58,7 +58,7 @@ public class SdlControllerInput : IGameInput<object>
             if (_direction == ThumbstickDirection.NEGATIVE_X && inThumbstick.X <= -0.4f ||
                 _direction == ThumbstickDirection.POSITIVE_X && inThumbstick.X >= 0.4f ||
                 _direction == ThumbstickDirection.POSITIVE_Y && inThumbstick.Y >= 0.4f ||
-                _direction == ThumbstickDirection.NEGATIVE_Y && inThumbstick.Y < -0.4f)
+                _direction == ThumbstickDirection.NEGATIVE_Y && inThumbstick.Y <= -0.4f)
             {
                 IsSet = true;
                 SpecialAction?.Invoke();

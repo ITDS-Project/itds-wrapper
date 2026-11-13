@@ -247,7 +247,7 @@ public class MainViewModel : ViewModelBase
     [Reactive] public bool LegalMenuOpen { get; set; }
     [Reactive] public bool FeedbackModalOpen { get; set; }
     [Reactive] public bool ShowSidebar { get; set; }
-    
+
     [Reactive] public ControllerDiagramViewModel? ControllerDiagram { get; set; }
 
     public Settings WrapperSettings { get; }
@@ -608,18 +608,21 @@ public class MainViewModel : ViewModelBase
 
         // Update blur effect (fade in/out)
         ScreenEffect ??= new BlurEffect { Radius = DisplayMenuOverlay ? 0 : 50 };
-        var timer = new DispatcherTimer {  Interval = TimeSpan.FromMilliseconds(240.0 / 60) };
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(240.0 / 60) };
         timer.Tick += (s, e) =>
         {
-            if (ScreenEffect is not BlurEffect blur || (DisplayMenuOverlay && blur.Radius >= 50) || (!DisplayMenuOverlay && blur.Radius <= 0))
+            if (ScreenEffect is not BlurEffect blur || (DisplayMenuOverlay && blur.Radius >= 50) ||
+                (!DisplayMenuOverlay && blur.Radius <= 0))
             {
                 timer.Stop();
                 if (!DisplayMenuOverlay)
                 {
                     ScreenEffect = null;
                 }
+
                 return;
             }
+
             blur.Radius += DisplayMenuOverlay ? 2 : -2;
         };
         timer.Start();
@@ -904,7 +907,9 @@ public class MainViewModel : ViewModelBase
         {
             return;
         }
-        if (ControllerDiagram is not null && _inputDrivers[CurrentInputDriver].GetControllerBrand() != ControllerBrand.NONE)
+
+        if (ControllerDiagram is not null &&
+            _inputDrivers[CurrentInputDriver].GetControllerBrand() != ControllerBrand.NONE)
         {
             ControllerDiagram.InputDriver = _inputDrivers[CurrentInputDriver];
         }
@@ -1072,6 +1077,7 @@ public class MainViewModel : ViewModelBase
                     // Sending a key press changes the input driver, so we have to reset it manually
                     CurrentInputDriver = currentInputDriver;
                 }
+
                 nextTick = DateTime.Now + interval;
             }
         }
@@ -1339,7 +1345,8 @@ public class MainViewModel : ViewModelBase
 
     private void GiveFeedback(FeedbackSentiment sentiment, TextBox commentBox)
     {
-        PlaytestFeedback feedback = new(Guid.NewGuid().ToString(), sentiment.ToString(), commentBox.Text ?? string.Empty,
+        PlaytestFeedback feedback = new(Guid.NewGuid().ToString(), sentiment.ToString(),
+            commentBox.Text ?? string.Empty,
             CurrentFrame is not null);
         _logInterpreter?.AddRecentLog($"[WRAPPER] FEEDBACK: {JsonSerializer.Serialize(feedback)}");
         if (CurrentFrame is not null)

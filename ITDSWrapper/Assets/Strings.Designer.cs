@@ -112,7 +112,7 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Pan Cam Left.
+        ///   Looks up a localized string similar to Rotate Cam Left.
         /// </summary>
         public static string BindingLDescription {
             get {
@@ -130,7 +130,7 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Pan Cam Right.
+        ///   Looks up a localized string similar to Rotate Cam Right.
         /// </summary>
         public static string BindingRDescription {
             get {
