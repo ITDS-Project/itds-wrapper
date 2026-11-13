@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CoreHaptics;
 using GameController;
+using ITDSWrapper.Assets;
 using ITDSWrapper.Input;
 using Libretro.NET.Bindings;
 
@@ -12,27 +13,31 @@ public class IosControllerInputDriver : IInputDriver
 {
     public GCController? Controller { get; private set; }
     private CHHapticEngine? _hapticEngine;
-    private readonly Dictionary<uint, IosControllerInput?> _actionsDictionary = [];
+    private readonly Dictionary<uint, IosControllerInput?> _inputsDictionary = [];
+    private readonly Dictionary<uint, Action> _specialActions = [];
 
     public bool RequestInputUpdate { get; set; }
+    public event Action? ControllerChanged;
 
     public void SetController(GCController controller)
     {
         _hapticEngine = Controller?.Haptics?.CreateEngine(GCHapticsLocality.Default);
         Controller = controller;
-        _actionsDictionary.Clear();
-        _actionsDictionary.Add(RetroBindings.RETRO_DEVICE_ID_JOYPAD_A, new(Controller.ExtendedGamepad?.ButtonA));
-        _actionsDictionary.Add(RetroBindings.RETRO_DEVICE_ID_JOYPAD_B, new(Controller.ExtendedGamepad?.ButtonB));
-        _actionsDictionary.Add(RetroBindings.RETRO_DEVICE_ID_JOYPAD_X, new(Controller.ExtendedGamepad?.ButtonX));
-        _actionsDictionary.Add(RetroBindings.RETRO_DEVICE_ID_JOYPAD_Y, new(Controller.ExtendedGamepad?.ButtonY));
-        _actionsDictionary.Add(RetroBindings.RETRO_DEVICE_ID_JOYPAD_UP, new(Controller.ExtendedGamepad?.DPad.Up));
-        _actionsDictionary.Add(RetroBindings.RETRO_DEVICE_ID_JOYPAD_RIGHT, new(Controller.ExtendedGamepad?.DPad.Right));
-        _actionsDictionary.Add(RetroBindings.RETRO_DEVICE_ID_JOYPAD_DOWN, new(Controller.ExtendedGamepad?.DPad.Down));
-        _actionsDictionary.Add(RetroBindings.RETRO_DEVICE_ID_JOYPAD_LEFT, new(Controller.ExtendedGamepad?.DPad.Left));
-        _actionsDictionary.Add(RetroBindings.RETRO_DEVICE_ID_JOYPAD_L, new(Controller.ExtendedGamepad?.LeftShoulder));
-        _actionsDictionary.Add(RetroBindings.RETRO_DEVICE_ID_JOYPAD_R, new(Controller.ExtendedGamepad?.RightShoulder));
-        _actionsDictionary.Add(RetroBindings.RETRO_DEVICE_ID_JOYPAD_START, new(Controller.ExtendedGamepad?.ButtonMenu));
-        _actionsDictionary.Add(RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT, new(Controller.ExtendedGamepad?.ButtonOptions));
+        _inputsDictionary.Clear();
+        SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_A, new IosControllerInput(Controller.ExtendedGamepad?.ButtonA));
+        SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_B, new IosControllerInput(Controller.ExtendedGamepad?.ButtonB));
+        SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_X, new IosControllerInput(Controller.ExtendedGamepad?.ButtonX));
+        SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_Y, new IosControllerInput(Controller.ExtendedGamepad?.ButtonY));
+        SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_UP, new IosControllerInput(Controller.ExtendedGamepad?.DPad.Up));
+        SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_RIGHT, new IosControllerInput(Controller.ExtendedGamepad?.DPad.Right));
+        SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_DOWN, new IosControllerInput(Controller.ExtendedGamepad?.DPad.Down));
+        SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_LEFT, new IosControllerInput(Controller.ExtendedGamepad?.DPad.Left));
+        SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_L, new IosControllerInput(Controller.ExtendedGamepad?.LeftShoulder));
+        SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_R, new IosControllerInput(Controller.ExtendedGamepad?.RightShoulder));
+        SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_START, new IosControllerInput(Controller.ExtendedGamepad?.ButtonMenu));
+        SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT, new IosControllerInput(Controller.ExtendedGamepad?.ButtonOptions));
+        
+        ControllerChanged?.Invoke();
     }
     
     public void Shutdown()
@@ -41,12 +46,16 @@ public class IosControllerInputDriver : IInputDriver
 
     public uint[] GetInputKeys()
     {
-        return _actionsDictionary.Keys.ToArray();
+        return _inputsDictionary.Keys.ToArray();
     }
 
     public void SetSpecialAction(uint button, Action specialAction)
     {
-        if (_actionsDictionary.TryGetValue(button, out IosControllerInput? input))
+        if (!_specialActions.TryAdd(button, specialAction))
+        {
+            _specialActions[button] = specialAction;
+        }
+        if (_inputsDictionary.TryGetValue(button, out IosControllerInput? input))
         {
             input?.SpecialAction = specialAction;
         }
@@ -56,25 +65,44 @@ public class IosControllerInputDriver : IInputDriver
     {
         if (binding is IosControllerInput iosBinding)
         {
-            _actionsDictionary[input] = iosBinding;
+            if (!_inputsDictionary.TryAdd(input, iosBinding))
+            {
+                _inputsDictionary[input] = iosBinding;
+            }
+            if (_specialActions.TryGetValue(input, out Action? specialAction))
+            {
+                SetSpecialAction(input, specialAction);
+            }
         }
 
         if (binding is null)
         {
-            _actionsDictionary[input] = null;
+            _inputsDictionary[input] = null;
         }
+    }
+
+    public string GetLocalisedBinding(ControllerButton button)
+    {
+        foreach ((uint a, IosControllerInput? b) in _inputsDictionary)
+        {
+            if (b is not null && b.GetGenericButtonName() == button)
+            {
+                return InputDescriptions.Descriptions[a];
+            }
+        }
+        return Strings.BindingNotMapped;
     }
 
     public bool QueryInput(uint id)
     {
-        return _actionsDictionary.ContainsKey(id) && (_actionsDictionary[id]?.IsSet ?? false);
+        return _inputsDictionary.ContainsKey(id) && (_inputsDictionary[id]?.IsSet ?? false);
     }
 
     public void Push<T>(T binding)
     {
         if (binding is GCControllerElement iosBinding)
         {
-            foreach (IosControllerInput? input in _actionsDictionary.Values)
+            foreach (IosControllerInput? input in _inputsDictionary.Values)
             {
                 input?.Press(iosBinding);
             }
@@ -85,7 +113,7 @@ public class IosControllerInputDriver : IInputDriver
     {
         if (binding is GCControllerElement iosBinding)
         {
-            foreach (IosControllerInput? input in _actionsDictionary.Values)
+            foreach (IosControllerInput? input in _inputsDictionary.Values)
             {
                 input?.Release(iosBinding);
             }
@@ -95,5 +123,10 @@ public class IosControllerInputDriver : IInputDriver
     public void DoRumble(ushort strength)
     {
         // TODO: Implement haptic rumble
+    }
+
+    public ControllerBrand GetControllerBrand()
+    {
+        return InputDescriptions.MatchControllerBrandByName(Controller?.VendorName ?? string.Empty);
     }
 }
