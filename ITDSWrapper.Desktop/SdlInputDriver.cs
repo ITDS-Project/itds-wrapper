@@ -6,6 +6,7 @@ using ITDSWrapper.Input;
 using Libretro.NET.Bindings;
 using Silk.NET.Input;
 using Silk.NET.Input.Sdl;
+using Silk.NET.SDL;
 
 namespace ITDSWrapper.Desktop;
 
@@ -22,20 +23,8 @@ public class SdlInputDriver : IInputDriver
 
     private readonly Dictionary<uint, List<SdlControllerInput?>> _controlsDictionary = [];
 
-    private static readonly Dictionary<string, uint> ButtonNamesMap = new()
-    {
-        { "A", RetroBindings.RETRO_DEVICE_ID_JOYPAD_A },
-        { "B", RetroBindings.RETRO_DEVICE_ID_JOYPAD_B },
-        { "X", RetroBindings.RETRO_DEVICE_ID_JOYPAD_X },
-        { "Y", RetroBindings.RETRO_DEVICE_ID_JOYPAD_Y },
-        { "L", RetroBindings.RETRO_DEVICE_ID_JOYPAD_L },
-        { "R", RetroBindings.RETRO_DEVICE_ID_JOYPAD_R },
-        { "DPad", RetroBindings.RETRO_DEVICE_ID_JOYPAD_UP },
-        { "Start", RetroBindings.RETRO_DEVICE_ID_JOYPAD_START },
-        { "Select", RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT },
-    };
-
     public bool RequestInputUpdate { get; set; }
+    public event Action? ControllerChanged;
     private bool _requestControl;
 
     public SdlInputDriver(SdlInputContextHost contextHost)
@@ -57,10 +46,13 @@ public class SdlInputDriver : IInputDriver
         {
             _inputContext!.ConnectionChanged += (device, _) =>
             {
-                if (device is IGamepad { IsConnected: true } gamepad)
-                {
+                if (device is not IGamepad gamepad)
+                    return;
+
+                if (gamepad.IsConnected)
                     SetGamepad(gamepad);
-                }
+                else if (ReferenceEquals(_gamepad, gamepad))
+                    SetGamepad(null);
             };
             Dispatcher.UIThread.Invoke(() => _contextHost.View?.DoEvents());
             if (_inputContext.Gamepads.Count > 0)
@@ -98,6 +90,7 @@ public class SdlInputDriver : IInputDriver
         _buttonUpHandler = null;
         _thumbstickMovedHandler = null;
         _triggerMovedHandler = null;
+        ControllerChanged?.Invoke();
 
         if (_gamepad is null)
             return;
@@ -225,6 +218,19 @@ public class SdlInputDriver : IInputDriver
         }
     }
 
+    public string GetLocalisedBinding<T>(IGameInput<T>? input)
+    {
+        if (input is not SdlControllerInput sdlInput) return "Unknown";
+        foreach (var (a, b) in _controlsDictionary)
+        {
+            if (b.Any(i => i is not null && i.GetInputId() == sdlInput.GetInputId()))
+            {
+                return IInputDriver.InputDescriptions[a];
+            }
+        }
+        return "Not mapped";
+    }
+
     public bool QueryInput(uint id)
     {
         return _controlsDictionary.ContainsKey(id) && _controlsDictionary[id].Any(i => i?.IsSet ?? false);
@@ -261,4 +267,23 @@ public class SdlInputDriver : IInputDriver
     {
         return [];
     }
+    
+    public IInputDriver.ControllerBrand GetControllerBrand()
+    {
+        var gamepad = _gamepad;
+        if (gamepad is null) return IInputDriver.ControllerBrand.NONE;
+        var sdl = Sdl.GetApi();
+        if (sdl.IsGameController(gamepad.Index) == SdlBool.True)
+        {
+            return sdl.GameControllerTypeForIndex(gamepad.Index) switch
+            {
+                GameControllerType.Xbox360 or GameControllerType.Xboxone => IInputDriver.ControllerBrand.XBOX,
+                GameControllerType.PS3 or GameControllerType.PS4 or GameControllerType.PS5 => IInputDriver.ControllerBrand.PLAYSTATION,
+                GameControllerType.NintendoSwitchPro or GameControllerType.Virtual => IInputDriver.ControllerBrand.NINTENDO_SWITCH, // Joy-Cons often map to Switch Pro or Virtual
+                _ => IInputDriver.MatchControllerBrandByName(gamepad.Name)
+            };
+        }
+        return IInputDriver.MatchControllerBrandByName(gamepad.Name);
+    }
+
 }

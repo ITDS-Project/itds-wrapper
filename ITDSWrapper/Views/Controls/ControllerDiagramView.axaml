@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="using:ITDSWrapper.ViewModels.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" x:DataType="vm:ControllerDiagramViewModel"
+             x:Class="ITDSWrapper.Views.Controls.ControllerDiagramView">
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Stretch" MinWidth="300" Margin="0 70 0 0"
+          IsVisible="{Binding HasDiagram}">
+        <Image Source="{Binding DiagramImage}" Stretch="Uniform" ZIndex="10" />
+    </Grid>
+</UserControl>

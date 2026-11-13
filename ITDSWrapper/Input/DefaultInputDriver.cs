@@ -12,6 +12,7 @@ public class DefaultInputDriver : IInputDriver
     private readonly Dictionary<uint, Action> _specialActions = [];
 
     public bool RequestInputUpdate { get; set; }
+    public event Action? ControllerChanged;
 
     public DefaultInputDriver(bool isMobile, Action openSettings)
     {
@@ -89,6 +90,18 @@ public class DefaultInputDriver : IInputDriver
         }
     }
 
+    public string GetLocalisedBinding<T>(IGameInput<T>? input)
+    {
+        foreach (var (a, b) in _bindings)
+        {
+            if (b == input)
+            {
+                return IInputDriver.InputDescriptions[a];
+            }
+        }
+        return "Unknown";
+    }
+
     public bool QueryInput(uint id)
     {
         return _bindings.ContainsKey(id) && _bindings[id] is IGameInputSettable { IsSet: true };
@@ -112,5 +125,10 @@ public class DefaultInputDriver : IInputDriver
 
     public void DoRumble(ushort strength)
     {
+    }
+
+    public IInputDriver.ControllerBrand GetControllerBrand()
+    {
+        return IInputDriver.ControllerBrand.NONE;
     }
 }

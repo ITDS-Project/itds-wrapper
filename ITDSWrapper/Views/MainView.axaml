@@ -218,21 +218,9 @@
                                 Command="{Binding SettingsBackCommand}"
                                 Content="{x:Static assets:Strings.SettingsBack}" />
                     </Grid>
-                    <Grid Grid.Row="1" RowDefinitions="*,Auto,Auto" ColumnDefinitions="*"
-                          VerticalAlignment="Top" HorizontalAlignment="Stretch" IsVisible="{Binding !IsMobile}">
-                        
-                        <Grid Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" IsVisible="{Binding ControllerIsSwitch}" MinWidth="300">
-                            <Image Source="{SvgImage /Assets/ControllerDiagrams/SwitchPro.svg}"  Stretch="Uniform" />
-                        </Grid>
-                        <Grid Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" IsVisible="{Binding ControllerIsSteam}" MinWidth="300">
-                            <Image Source="{SvgImage /Assets/ControllerDiagrams/SteamDeck.svg}"  Stretch="Uniform" />
-                        </Grid>
-                        <Grid Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" IsVisible="{Binding ControllerIsPlayStation}" MinWidth="300">
-                            <Image Source="{SvgImage /Assets/ControllerDiagrams/PlayStation.svg}"  Stretch="Uniform" />
-                        </Grid>
-                        <Grid Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" IsVisible="{Binding ControllerIsXboxOrOther}" MinWidth="300">
-                            <Image Source="{SvgImage /Assets/ControllerDiagrams/Xbox.svg}"  Stretch="Uniform" />
-                        </Grid>
+                    <Grid Grid.Row="0" RowDefinitions="*,Auto,Auto" ColumnDefinitions="*" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                          IsVisible="{Binding !IsMobile}">
+                        <c:ControllerDiagramView Grid.Row="1" DataContext="{Binding ControllerDiagram}" />
                     </Grid>
                 </Grid>
                 <Grid IsVisible="{Binding AccessibilitySettingsMenuOpen}" Classes="submenucontainer" RowDefinitions="Auto,*,Auto"

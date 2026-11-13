@@ -25,6 +25,7 @@
         <PackageReference Include="Avalonia.ReactiveUI" />
         <PackageReference Include="AvaloniaUI.DiagnosticsSupport" />
         <PackageReference Include="ReactiveUI.Fody" />
+        <PackageReference Include="Silk.NET.Input.Common" />
         <PackageReference Include="Silk.NET.OpenAL" />
         <PackageReference Include="Silk.NET.OpenAL.Extensions.EXT" />
         <PackageReference Include="Silk.NET.OpenAL.Soft.Native" />

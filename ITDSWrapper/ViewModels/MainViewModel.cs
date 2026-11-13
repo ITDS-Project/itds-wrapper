@@ -248,10 +248,7 @@ public class MainViewModel : ViewModelBase
     [Reactive] public bool FeedbackModalOpen { get; set; }
     [Reactive] public bool ShowSidebar { get; set; }
     
-    [Reactive] public bool ControllerIsPlayStation { get; set; }
-    [Reactive] public bool ControllerIsSwitch { get; set; }
-    [Reactive] public bool ControllerIsSteam { get; set; }
-    [Reactive] public bool ControllerIsXboxOrOther { get; set; }
+    [Reactive] public ControllerDiagramViewModel? ControllerDiagram { get; set; }
 
     public Settings WrapperSettings { get; }
     private int _currentLangBit;
@@ -567,7 +564,10 @@ public class MainViewModel : ViewModelBase
         ControllerSettingsMenuOpen = true;
         LegalMenuOpen = DisplaySettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
-        ControllerIsXboxOrOther = true;
+        var controllerDriver = _inputDrivers.Find(i => i.GetControllerBrand() != IInputDriver.ControllerBrand.NONE)
+                               ?? _inputDrivers.Find(i => i is not DefaultInputDriver)
+                               ?? _inputDrivers[CurrentInputDriver];
+        ControllerDiagram = new(controllerDriver);
     }
 
     private void OpenAccessibilitySettings()
@@ -903,6 +903,10 @@ public class MainViewModel : ViewModelBase
         if (_inputDrivers[CurrentInputDriver] is not DefaultInputDriver)
         {
             return;
+        }
+        if (ControllerDiagram is not null && _inputDrivers[CurrentInputDriver].GetControllerBrand() != IInputDriver.ControllerBrand.NONE)
+        {
+            ControllerDiagram.InputDriver = _inputDrivers[CurrentInputDriver];
         }
 
         if (pressed)
