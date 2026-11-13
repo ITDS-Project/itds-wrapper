@@ -125,4 +125,9 @@ public class DefaultInputDriver : IInputDriver
     {
         return ControllerBrand.NONE;
     }
+
+    public string GetControllerRawName()
+    {
+        return "Default Input";
+    }
 }

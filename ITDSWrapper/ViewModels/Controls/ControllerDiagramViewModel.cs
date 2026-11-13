@@ -5,6 +5,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using ITDSWrapper.Assets;
+using ITDSWrapper.Core;
 using ITDSWrapper.Input;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -54,13 +55,17 @@ public class ControllerDiagramViewModel : ViewModelBase
         }
     }
 
-    public ControllerDiagramViewModel(IInputDriver inputDriver)
+    private readonly LogInterpreter _logInterpreter;
+
+    public ControllerDiagramViewModel(IInputDriver inputDriver, LogInterpreter logInterpreter)
     {
+        _logInterpreter = logInterpreter;
         InputDriver = inputDriver;
     }
 
     private void OnControllerChanged()
     {
+        _logInterpreter.AddRecentLog($"[WRAPPER] CONTROLLER: {InputDriver?.GetControllerBrand()} ('{InputDriver?.GetControllerRawName()}')");
         Dispatcher.UIThread.Post(UpdateDiagram);
     }
 

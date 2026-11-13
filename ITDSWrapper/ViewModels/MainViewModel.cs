@@ -321,8 +321,14 @@ public class MainViewModel : ViewModelBase
         get;
         set
         {
+            bool changed = field != value;
             this.RaiseAndSetIfChanged(ref field, value);
             this.RaisePropertyChanged(nameof(DisplayVirtualControls));
+            if (changed)
+            {
+                _logInterpreter!.AddRecentLog(
+                    $"[WRAPPER] CONTROLLER: {_inputDrivers[CurrentInputDriver].GetControllerBrand()} ('{_inputDrivers[CurrentInputDriver].GetControllerRawName()}')");
+            }
         }
     }
 
@@ -567,7 +573,7 @@ public class MainViewModel : ViewModelBase
         IInputDriver controllerDriver = _inputDrivers.Find(i => i.GetControllerBrand() != ControllerBrand.NONE)
                                         ?? _inputDrivers.Find(i => i is not DefaultInputDriver)
                                         ?? _inputDrivers[CurrentInputDriver];
-        ControllerDiagram = new(controllerDriver);
+        ControllerDiagram = new(controllerDriver, _logInterpreter!);
     }
 
     private void OpenAccessibilitySettings()

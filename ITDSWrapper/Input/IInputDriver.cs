@@ -20,6 +20,7 @@ public interface IInputDriver
     public void Release<T>(T binding);
     public void DoRumble(ushort strength);
     public ControllerBrand GetControllerBrand();
+    public string GetControllerRawName();
 }
 
 public static class InputDescriptions

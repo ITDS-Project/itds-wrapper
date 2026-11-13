@@ -129,4 +129,9 @@ public class IosControllerInputDriver : IInputDriver
     {
         return InputDescriptions.MatchControllerBrandByName(Controller?.VendorName ?? string.Empty);
     }
+    
+    public string GetControllerRawName()
+    {
+        return Controller?.VendorName ?? string.Empty;
+    }
 }

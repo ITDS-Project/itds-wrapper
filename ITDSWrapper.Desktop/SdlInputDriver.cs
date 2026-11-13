@@ -270,20 +270,20 @@ public class SdlInputDriver : IInputDriver
     
     public ControllerBrand GetControllerBrand()
     {
-        IGamepad? gamepad = _gamepad;
-        if (gamepad is null) return ControllerBrand.NONE;
+        if (_gamepad is null)
+            return ControllerBrand.NONE;
         Sdl sdl = Sdl.GetApi();
-        if (sdl.IsGameController(gamepad.Index) == SdlBool.True)
+        if (sdl.IsGameController(_gamepad.Index) == SdlBool.True)
         {
-            return sdl.GameControllerTypeForIndex(gamepad.Index) switch
+            return sdl.GameControllerTypeForIndex(_gamepad.Index) switch
             {
                 GameControllerType.Xbox360 or GameControllerType.Xboxone => ControllerBrand.XBOX,
                 GameControllerType.PS3 or GameControllerType.PS4 or GameControllerType.PS5 => ControllerBrand.PLAYSTATION,
                 GameControllerType.NintendoSwitchPro or GameControllerType.Virtual => ControllerBrand.NINTENDO_SWITCH, // Joy-Cons often map to Switch Pro or Virtual
-                _ => InputDescriptions.MatchControllerBrandByName(gamepad.Name),
+                _ => InputDescriptions.MatchControllerBrandByName(_gamepad.Name),
             };
         }
-        return InputDescriptions.MatchControllerBrandByName(gamepad.Name);
+        return InputDescriptions.MatchControllerBrandByName(_gamepad.Name);
     }
 
     private static ControllerButton GetGenericButtonFromSdl(SdlControllerInput? input)
@@ -347,5 +347,10 @@ public class SdlInputDriver : IInputDriver
         }
 
         return ControllerButton.Unknown;
+    }
+
+    public string GetControllerRawName()
+    {
+        return _gamepad?.Name ?? string.Empty;
     }
 }

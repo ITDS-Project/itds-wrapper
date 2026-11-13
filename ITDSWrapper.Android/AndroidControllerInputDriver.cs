@@ -34,6 +34,8 @@ public class AndroidControllerInputDriver : IInputDriver
         SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_R, new AndroidControllerInput(new(AndroidInputType.KEY, Keycode.ButtonR1, null)));
         SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_START, new AndroidControllerInput(new(AndroidInputType.KEY, Keycode.ButtonStart, null)));
         SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT, new AndroidControllerInput(new(AndroidInputType.KEY, Keycode.ButtonSelect, null)));
+        
+        ControllerChanged?.Invoke();
     }
     
     public void Shutdown()
@@ -134,5 +136,10 @@ public class AndroidControllerInputDriver : IInputDriver
     public ControllerBrand GetControllerBrand()
     {
         return InputDescriptions.MatchControllerBrandByName(Controller?.Name ?? string.Empty);
+    }
+
+    public string GetControllerRawName()
+    {
+        return Controller?.Name ?? string.Empty;
     }
 }
