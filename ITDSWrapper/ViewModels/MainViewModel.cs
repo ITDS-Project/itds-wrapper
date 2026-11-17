@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
@@ -11,10 +12,10 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using DynamicData;
+using HanumanInstitute.LibMpv;
 using ITDSWrapper.Assets;
 using ITDSWrapper.Audio;
 using ITDSWrapper.Core;
@@ -27,12 +28,12 @@ using ITDSWrapper.Views;
 using Libretro.NET;
 using Libretro.NET.Bindings;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using SkiaSharp;
 
 namespace ITDSWrapper.ViewModels;
 
-public class MainViewModel : ViewModelBase
+public partial class MainViewModel : ViewModelBase
 {
     public static bool IsMobile => OperatingSystem.IsAndroid() || OperatingSystem.IsIOS();
 
@@ -43,10 +44,10 @@ public class MainViewModel : ViewModelBase
         SCREEN_LAYOUT,
     }
 
-    [Reactive] public WindowState WindowState { get; set; }
-    [Reactive] public WindowDecorations Decorations { get; set; }
-    [Reactive] public bool ExtendClientArea { get; set; }
-    [Reactive] public string WindowingModeDesc { get; set; } = Strings.WindowStateFullScreen;
+    [Reactive] public partial WindowState WindowState { get; set; }
+    [Reactive] public partial WindowDecorations Decorations { get; set; }
+    [Reactive] public partial bool ExtendClientArea { get; set; }
+    [Reactive] public partial string WindowingModeDesc { get; set; } = Strings.WindowStateFullScreen;
 
     private bool _ignoreFullScreenReposition;
 
@@ -136,8 +137,8 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    [Reactive] public bool TargetScreenLayoutLocked { get; set; } = false;
-    [Reactive] public string TargetScreenLayoutDesc { get; set; } = Strings.ScreenLayoutTopBottom;
+    [Reactive] public partial bool TargetScreenLayoutLocked { get; set; } = false;
+    [Reactive] public partial string TargetScreenLayoutDesc { get; set; } = Strings.ScreenLayoutTopBottom;
 
     public int TargetScreenLayoutIdx
     {
@@ -155,7 +156,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    [Reactive] public string DualScreenModeDesc { get; set; } = Strings.SettingsDualScreenAuto;
+    [Reactive] public partial string DualScreenModeDesc { get; set; } = Strings.SettingsDualScreenAuto;
 
     public int DualScreenModeIdx
     {
@@ -173,7 +174,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    [Reactive] public string LinuxRenderingModeDesc { get; set; } = Strings.LinuxRenderingModeGlx;
+    [Reactive] public partial string LinuxRenderingModeDesc { get; set; } = Strings.LinuxRenderingModeGlx;
 
     public int LinuxRenderingModeIdx
     {
@@ -192,7 +193,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    [Reactive] public string MacOsRenderingModeDesc { get; set; } = Strings.MacOsRenderingModeMetal;
+    [Reactive] public partial string MacOsRenderingModeDesc { get; set; } = Strings.MacOsRenderingModeMetal;
 
     public int MacOsRenderingModeIdx
     {
@@ -211,7 +212,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    [Reactive] public string WindowsRenderingModeDesc { get; set; } = Strings.WindowsRenderingModeWgl;
+    [Reactive] public partial string WindowsRenderingModeDesc { get; set; } = Strings.WindowsRenderingModeWgl;
 
     public int WindowsRenderingModeIdx
     {
@@ -230,23 +231,23 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    [Reactive] public string BordersSettingDesc { get; set; }
+    [Reactive] public partial string BordersSettingDesc { get; set; }
 
-    [Reactive] public string ScreenReaderSettingDesc { get; set; }
-    [Reactive] public string VirtualButtonsLayoutSettingDesc { get; set; }
-    [Reactive] public string VirtualButtonsHapticsSettingDesc { get; set; }
+    [Reactive] public partial string ScreenReaderSettingDesc { get; set; }
+    [Reactive] public partial string VirtualButtonsLayoutSettingDesc { get; set; }
+    [Reactive] public partial string VirtualButtonsHapticsSettingDesc { get; set; }
 
     private readonly Dictionary<Setting, Action> _settingsChangesBuffer = [];
 
     public RetroWrapper Wrapper { get; }
-    [Reactive] public EmuImageSource? CurrentFrame { get; set; }
+    [Reactive] public partial EmuImageSource? CurrentFrame { get; set; }
 
-    [Reactive] public bool DisplaySettingsMenuOpen { get; set; }
-    [Reactive] public bool ControllerSettingsMenuOpen { get; set; }
-    [Reactive] public bool AccessibilitySettingsMenuOpen { get; set; }
-    [Reactive] public bool LegalMenuOpen { get; set; }
-    [Reactive] public bool FeedbackModalOpen { get; set; }
-    [Reactive] public bool ShowSidebar { get; set; }
+    [Reactive] public partial bool DisplaySettingsMenuOpen { get; set; }
+    [Reactive] public partial bool ControllerSettingsMenuOpen { get; set; }
+    [Reactive] public partial bool AccessibilitySettingsMenuOpen { get; set; }
+    [Reactive] public partial bool LegalMenuOpen { get; set; }
+    [Reactive] public partial bool FeedbackModalOpen { get; set; }
+    [Reactive] public partial bool ShowSidebar { get; set; }
 
     public Settings WrapperSettings { get; }
     private int _currentLangBit;
@@ -290,15 +291,13 @@ public class MainViewModel : ViewModelBase
 
     public bool DisplayVirtualControls => IsMobile && CurrentInputDriver == 0 && DualScreenBackend?.IsActive != true;
 
-    [Reactive] public Bitmap? CurrentBorder { get; set; }
-    [Reactive] public Bitmap? NextBorder { get; set; }
-    [Reactive] public double CurrentBorderOpacity { get; set; } = 1.0;
-    [Reactive] public double NextBorderOpacity { get; set; }
-    private System.Timers.Timer? _borderTimer;
-    private string _currentBorder = "BLACK_BG";
-    private int _currentBorderFrame;
-    private string _nextBorder = string.Empty;
-    private int _nextBorderFrame;
+    public ObservableCollection<double> BorderOpacities { get; set; } = [1.0, 0.0];
+    private string[] _borders = ["BLACK_BG", string.Empty];
+    private int _currentBorderIdx = 0;
+    private int _nextBorderIdx = 1;
+    private readonly System.Timers.Timer _borderFadeTimer = new(TimeSpan.FromMilliseconds(100));
+
+    public MpvContext[] BorderMpvContexts { get; set; } = [new(), new()];
 
     public bool Closing { get; set; }
 
@@ -371,9 +370,9 @@ public class MainViewModel : ViewModelBase
     public VirtualButtonViewModel? SelectButton { get; set; }
     public VirtualButtonViewModel? MenuButton { get; set; }
 
-    [Reactive] public bool DisplayMenuOverlay { get; set; }
-    [Reactive] public IEffect? ScreenEffect { get; set; }
-    [Reactive] public bool IsFullLayout { get; set; }
+    [Reactive] public partial bool DisplayMenuOverlay { get; set; }
+    [Reactive] public partial IEffect? ScreenEffect { get; set; }
+    [Reactive] public partial bool IsFullLayout { get; set; }
 
     public MainViewModel()
     {
@@ -398,7 +397,7 @@ public class MainViewModel : ViewModelBase
         _logInterpreter = ((App)Application.Current!).LogInterpreter ?? new();
         _logInterpreter.SetNextBorder = border =>
         {
-            _nextBorder = border;
+            _borders[_nextBorderIdx] = border;
             SetNextBorder();
         };
         if (WrapperSettings.ScreenReaderEnabled)
@@ -1198,60 +1197,61 @@ public class MainViewModel : ViewModelBase
 
     private void StartBorder()
     {
-        SetBorder();
-        _borderTimer = new(TimeSpan.FromMilliseconds(100)) { AutoReset = true };
-        _borderTimer.Elapsed += (_, _) =>
+        if (_borders[_currentBorderIdx] == "BLACK_BG")
         {
-            _currentBorderFrame = (_currentBorderFrame + 1) % 600;
-            SetBorder();
-        };
-        _borderTimer.Start();
-    }
+            BorderMpvContexts[_currentBorderIdx].Stop();
+        }
+        else
+        {
+            BorderMpvContexts[_currentBorderIdx].LoadFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Borders",
+                $"{_borders}.mp4")).Invoke();
+            BorderMpvContexts[_currentBorderIdx].LoopFile.Set("inf");
+        }
 
-    private void StopBorder()
-    {
-        CurrentBorder = null;
-        _borderTimer?.Stop();
-    }
-
-    private void SetBorder()
-    {
-        using Stream borderStream =
-            AssetLoader.Open(
-                new($"avares://ITDSWrapper/Assets/Borders/{_currentBorder}/{_currentBorderFrame + 1:0000}.jpg"));
-        CurrentBorder = new(borderStream);
-
-        if (NextBorder is not null)
+        if (!string.IsNullOrEmpty(_borders[_nextBorderIdx]))
         {
             SetNextBorder();
             FadeBorder();
         }
     }
 
+    private void StopBorder()
+    {
+        BorderMpvContexts[_currentBorderIdx].Stop();
+    }
+
     private void SetNextBorder()
     {
-        using Stream borderStream =
-            AssetLoader.Open(new($"avares://ITDSWrapper/Assets/Borders/{_nextBorder}/{_nextBorderFrame + 1:0000}.jpg"));
-        NextBorder = new(borderStream);
+        if (_borders[_nextBorderIdx] == "BLACK_BG")
+        {
+            BorderMpvContexts[_nextBorderIdx].Stop();
+        }
+        else
+        {
+            BorderMpvContexts[_nextBorderIdx].LoadFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Borders",
+                $"{_borders[_nextBorderIdx]}.mp4")).Invoke();
+            BorderMpvContexts[_nextBorderIdx].LoopFile.Set("inf");
+        }
+        _borderFadeTimer.Elapsed += (_, _) => FadeBorder();
+        _borderFadeTimer.Start();
     }
 
     private void FadeBorder()
     {
-        if (CurrentBorderOpacity < 0.02)
+        if (BorderOpacities[_currentBorderIdx] < 0.02)
         {
-            CurrentBorder = NextBorder;
-            NextBorder = null;
-            CurrentBorderOpacity = 1.0;
-            NextBorderOpacity = 0.0;
-            _currentBorder = _nextBorder;
-            _currentBorderFrame = _nextBorderFrame;
-            _nextBorder = string.Empty;
-            _nextBorderFrame = 0;
+            _borderFadeTimer.Stop();
+            _borders[_currentBorderIdx] = _borders[_nextBorderIdx];
+            _borders[_nextBorderIdx] = string.Empty;
+            (_currentBorderIdx, _nextBorderIdx) = (_nextBorderIdx, _currentBorderIdx);
+            BorderOpacities[_currentBorderIdx] = 1.0;
+            BorderOpacities[_nextBorderIdx] = 0.0;
+            BorderMpvContexts[_nextBorderIdx].Stop();
             return;
         }
 
-        CurrentBorderOpacity -= 0.02;
-        NextBorderOpacity += 0.02;
+        BorderOpacities[_currentBorderIdx] -= 0.02;
+        BorderOpacities[_nextBorderIdx] += 0.02;
     }
 
     private void AssignVirtualBindings()
@@ -1313,7 +1313,8 @@ public class MainViewModel : ViewModelBase
 
     private void GiveFeedback(FeedbackSentiment sentiment, TextBox commentBox)
     {
-        PlaytestFeedback feedback = new(Guid.NewGuid().ToString(), sentiment.ToString(), commentBox.Text ?? string.Empty,
+        PlaytestFeedback feedback = new(Guid.NewGuid().ToString(), sentiment.ToString(),
+            commentBox.Text ?? string.Empty,
             CurrentFrame is not null);
         _logInterpreter?.AddRecentLog($"[WRAPPER] FEEDBACK: {JsonSerializer.Serialize(feedback)}");
         if (CurrentFrame is not null)

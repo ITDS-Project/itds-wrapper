@@ -12,11 +12,8 @@ using Android.Util;
 using Android.Views;
 using Avalonia;
 using Avalonia.Android;
-using Avalonia.Controls.Shapes;
-using Avalonia.ReactiveUI;
 using ITDSWrapper.Core;
-using Java.IO;
-using File = System.IO.File;
+using ReactiveUI.Avalonia;
 
 namespace ITDSWrapper.Android;
 
@@ -164,7 +161,7 @@ public class AndroidApp : AvaloniaAndroidApplication<App>
 
         return base.CustomizeAppBuilder(builder)
             .WithInterFont()
-            .UseReactiveUI()
+            .UseReactiveUI(b => b.Build())
             .AfterSetup(b =>
             {
                 ((App)b.Instance!).AudioBackend = new AndroidAudioBackend();

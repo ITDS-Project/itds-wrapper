@@ -1,10 +1,8 @@
-using System;
 using ITDSWrapper.Audio;
-using NAudio.Dsp;
-using NAudio.Wave.SampleProviders;
 #if IS_LINUX
 using NAudio.Wave;
 using NAudio.Wave.Alsa;
+using NAudio.Wave.SampleProviders;
 #endif
 
 namespace ITDSWrapper.Desktop.Linux;

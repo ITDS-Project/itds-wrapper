@@ -22,9 +22,12 @@
         <PackageReference Include="Avalonia.Skia" />
         <PackageReference Include="Avalonia.Themes.Fluent" />
         <PackageReference Include="Avalonia.Fonts.Inter" />
-        <PackageReference Include="Avalonia.ReactiveUI" />
         <PackageReference Include="AvaloniaUI.DiagnosticsSupport" />
-        <PackageReference Include="ReactiveUI.Fody" />
+        <PackageReference Include="DynamicData" />
+        <PackageReference Include="HanumanInstitute.LibMpv.Avalonia" />
+        <PackageReference Include="libmpv-package" />
+        <PackageReference Include="ReactiveUI.Avalonia" />
+        <PackageReference Include="ReactiveUI.SourceGenerators" />
         <PackageReference Include="Silk.NET.OpenAL" />
         <PackageReference Include="Silk.NET.OpenAL.Extensions.EXT" />
         <PackageReference Include="Silk.NET.OpenAL.Soft.Native" />
@@ -68,5 +71,9 @@
             <LastGenOutput>Strings.Designer.cs</LastGenOutput>
             <LogicalName>ITDSWrapper.Assets.Strings.resources</LogicalName>
         </EmbeddedResource>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <None Include="Borders\*.mp4" TargetPath="Borders\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
     </ItemGroup>
 </Project>
