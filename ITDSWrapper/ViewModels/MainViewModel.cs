@@ -16,6 +16,8 @@ using Avalonia.Platform;
 using Avalonia.Threading;
 using DynamicData;
 using HanumanInstitute.LibMpv;
+using HanumanInstitute.LibMpv.Avalonia;
+using HanumanInstitute.LibMpv.Core;
 using ITDSWrapper.Assets;
 using ITDSWrapper.Audio;
 using ITDSWrapper.Core;
@@ -298,6 +300,7 @@ public partial class MainViewModel : ViewModelBase
     private readonly System.Timers.Timer _borderFadeTimer = new(TimeSpan.FromMilliseconds(100));
 
     public MpvContext[] BorderMpvContexts { get; set; } = [new(), new()];
+    public VideoRenderer Renderer { get; set; }
 
     public bool Closing { get; set; }
 
@@ -412,6 +415,45 @@ public partial class MainViewModel : ViewModelBase
         ndsStream.ReadExactly(data);
         Wrapper.LoadGame(data);
 
+        if (OperatingSystem.IsLinux())
+        {
+            Renderer = WrapperSettings.LinuxRenderingMode switch
+            {
+                LinuxRenderingMode.GLX or LinuxRenderingMode.EGL => VideoRenderer.OpenGl,
+                LinuxRenderingMode.VULKAN => VideoRenderer.Native,
+                _ => VideoRenderer.Software,
+            };
+        }
+        else if (OperatingSystem.IsMacOS())
+        {
+            Renderer = WrapperSettings.MacOsRenderingMode switch
+            {
+                MacOsRenderingMode.METAL => VideoRenderer.Native,
+                MacOsRenderingMode.OPENGL => VideoRenderer.OpenGl,
+                _ => VideoRenderer.Software,
+            };
+        }
+        else if (OperatingSystem.IsWindows())
+        {
+            Renderer = WrapperSettings.WindowsRenderingMode switch
+            {
+                WindowsRenderingMode.WINDOWS_GL or WindowsRenderingMode.ANGLE_EGL => VideoRenderer.OpenGl,
+                WindowsRenderingMode.VULKAN => VideoRenderer.Native,
+                _ => VideoRenderer.Software,
+            };
+        }
+        else if (OperatingSystem.IsAndroid())
+        {
+            Renderer = VideoRenderer.OpenGl;
+        }
+        else if (OperatingSystem.IsIOS())
+        {
+            Renderer = VideoRenderer.Native;
+        }
+        else
+        {
+            Renderer = VideoRenderer.Auto;
+        }
         if (WrapperSettings.BordersEnabled)
         {
             StartBorder();

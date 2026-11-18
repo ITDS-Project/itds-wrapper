@@ -21,9 +21,9 @@
         <!--        Opacity="{Binding CurrentBorderOpacity}"/> -->
         <!-- <Image Grid.Row="0" Grid.RowSpan="4" Stretch="UniformToFill" Source="{Binding NextBorder}" -->
         <!--        Opacity="{Binding NextBorderOpacity}"/> -->
-        <mpv:MpvView Grid.Row="0" Grid.RowSpan="4" Renderer="OpenGl" MpvContext="{Binding BorderMpvContexts[0]}"
+        <mpv:MpvView Grid.Row="0" Grid.RowSpan="4" Renderer="{Binding Renderer}" MpvContext="{Binding BorderMpvContexts[0]}"
                      Opacity="{Binding BorderOpacities[0]}" />
-        <mpv:MpvView Grid.Row="0" Grid.RowSpan="4" Renderer="OpenGl" MpvContext="{Binding BorderMpvContexts[1]}"
+        <mpv:MpvView Grid.Row="0" Grid.RowSpan="4" Renderer="{Binding Renderer}" MpvContext="{Binding BorderMpvContexts[1]}"
                      Opacity="{Binding BorderOpacities[1]}" />
 
         <Grid Row="0" Margin="0 0 23 0" MinHeight="{Binding TopPadding}" IsVisible="{Binding DisplayVirtualControls}">

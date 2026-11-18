@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using HanumanInstitute.LibMpv.Core;
 using ITDSWrapper.Accessibility;
 using ITDSWrapper.Audio;
 using ITDSWrapper.Core;
@@ -31,6 +34,7 @@ public partial class App : Application
 
     public override void Initialize()
     {
+        MpvApi.RootPath = Path.Combine(AppContext.BaseDirectory, "runtimes", RuntimeInformation.RuntimeIdentifier, "native");
         AvaloniaXamlLoader.Load(this);
     }
 
