@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using Avalonia.Input;
 using ITDSWrapper.Assets;
 using Libretro.NET.Bindings;
 
@@ -21,6 +23,8 @@ public interface IInputDriver
     public void DoRumble(ushort strength);
     public ControllerBrand GetControllerBrand();
     public string GetControllerRawName();
+    public ImmutableDictionary<uint, ControllerButton?> GetControllerBindings();
+    public ImmutableDictionary<uint, PhysicalKey?> GetKeyBindings();
 }
 
 public static class InputDescriptions

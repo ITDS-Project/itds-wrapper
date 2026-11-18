@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
@@ -243,11 +244,13 @@ public class MainViewModel : ViewModelBase
 
     [Reactive] public bool SystemSettingsMenuOpen { get; set; }
     [Reactive] public bool ControllerSettingsMenuOpen { get; set; }
+    [Reactive] public bool KeyBindingsSettingsMenuOpen { get; set; }
     [Reactive] public bool LegalMenuOpen { get; set; }
     [Reactive] public bool FeedbackModalOpen { get; set; }
     [Reactive] public bool ShowSidebar { get; set; }
 
     [Reactive] public ControllerDiagramViewModel? ControllerDiagram { get; set; }
+    [Reactive] public IAvaloniaList<InputBinding>?  InputBindings { get; set; }
 
     public Settings WrapperSettings { get; }
     private int _currentLangBit;
@@ -345,6 +348,7 @@ public class MainViewModel : ViewModelBase
     public ICommand OpenControllerSettingsMenuCommand { get; }
     public ICommand OpenFeedbackCommand { get; }
     public ICommand OpenLegalMenuCommand { get; }
+    public ICommand OpenKeyBindingsCommand { get; }
     public ICommand OpenDiscordUrlCommand { get; }
     public ICommand QuitToDesktopCommand { get; }
 
@@ -501,6 +505,7 @@ public class MainViewModel : ViewModelBase
         OpenControllerSettingsMenuCommand = ReactiveCommand.Create(OpenControllerSettings);
         OpenFeedbackCommand = ReactiveCommand.Create(OpenFeedback);
         OpenLegalMenuCommand = ReactiveCommand.Create(OpenLegal);
+        OpenKeyBindingsCommand = ReactiveCommand.Create(OpenKeyBindingsSettings);
         OpenDiscordUrlCommand = ReactiveCommand.Create(() => OpenUrl("https://discord.com"));
         QuitToDesktopCommand = ReactiveCommand.Create(CloseApplication);
 
@@ -556,14 +561,46 @@ public class MainViewModel : ViewModelBase
     private void OpenSystemSettings()
     {
         SystemSettingsMenuOpen = true;
-        LegalMenuOpen = ControllerSettingsMenuOpen = false;
+        LegalMenuOpen = ControllerSettingsMenuOpen = KeyBindingsSettingsMenuOpen = false;
+        ShowSidebar = !IsMobile;
+    }
+
+    private void OpenKeyBindingsSettings()
+    {
+        InputBindings = new AvaloniaList<InputBinding>();
+        Dictionary<uint, ControllerButton?> controllerBindings = new();
+        Dictionary<uint, PhysicalKey?> keyBindings = new();
+        foreach (var driver in _inputDrivers)
+        {
+            foreach (var b in driver.GetControllerBindings())
+            {
+                controllerBindings[b.Key] = b.Value;
+            }
+            foreach (var b in driver.GetKeyBindings())
+            {
+                keyBindings[b.Key] = b.Value;
+            }
+        }
+        foreach (uint inputKey in _inputDrivers[CurrentInputDriver].GetInputKeys())
+        {
+            if (inputKey == RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT) continue;
+            InputBindings.Add(new InputBinding
+            {
+                Action = inputKey, 
+                ControllerButton = controllerBindings.TryGetValue(inputKey, out var cb) ? cb : null,
+                KeyboardKey = keyBindings.TryGetValue(inputKey, out var kb) ? kb : null
+            });
+        }
+        
+        KeyBindingsSettingsMenuOpen = true;
+        LegalMenuOpen = SystemSettingsMenuOpen = ControllerSettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
     }
 
     private void OpenControllerSettings()
     {
         ControllerSettingsMenuOpen = true;
-        LegalMenuOpen = SystemSettingsMenuOpen = false;
+        LegalMenuOpen = SystemSettingsMenuOpen = KeyBindingsSettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
         IInputDriver controllerDriver = _inputDrivers.Find(i => i.GetControllerBrand() != ControllerBrand.NONE)
                                         ?? _inputDrivers.Find(i => i is not DefaultInputDriver)
@@ -574,20 +611,20 @@ public class MainViewModel : ViewModelBase
     private void OpenFeedback()
     {
         FeedbackModalOpen = true;
-        SystemSettingsMenuOpen = ControllerSettingsMenuOpen = LegalMenuOpen = false;
+        SystemSettingsMenuOpen = ControllerSettingsMenuOpen = KeyBindingsSettingsMenuOpen = LegalMenuOpen = false;
         ShowSidebar = false;
     }
 
     private void OpenLegal()
     {
         LegalMenuOpen = true;
-        SystemSettingsMenuOpen = ControllerSettingsMenuOpen = false;
+        SystemSettingsMenuOpen = ControllerSettingsMenuOpen = KeyBindingsSettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
     }
 
     private void CloseSubMenu()
     {
-        SystemSettingsMenuOpen = ControllerSettingsMenuOpen =
+        SystemSettingsMenuOpen = ControllerSettingsMenuOpen = KeyBindingsSettingsMenuOpen =
             LegalMenuOpen = FeedbackModalOpen = false;
         ShowSidebar = true;
     }
@@ -596,7 +633,7 @@ public class MainViewModel : ViewModelBase
     {
         DisplayMenuOverlay = !DisplayMenuOverlay;
         _pauseDriver.PushPauseState(DisplayMenuOverlay);
-        SystemSettingsMenuOpen = ControllerSettingsMenuOpen =
+        SystemSettingsMenuOpen = ControllerSettingsMenuOpen = KeyBindingsSettingsMenuOpen =
             LegalMenuOpen = FeedbackModalOpen = false;
         ShowSidebar = true;
 
@@ -1063,7 +1100,11 @@ public class MainViewModel : ViewModelBase
                         _menuInputTimer.Start();
                         Dispatcher.UIThread.Post(() =>
                         {
-                            if (SystemSettingsMenuOpen || ControllerSettingsMenuOpen || LegalMenuOpen)
+                            if (KeyBindingsSettingsMenuOpen)
+                            {
+                                OpenControllerSettings();
+                            }
+                            else if (SystemSettingsMenuOpen || ControllerSettingsMenuOpen || LegalMenuOpen)
                             {
                                 CloseSubMenu();
                             }

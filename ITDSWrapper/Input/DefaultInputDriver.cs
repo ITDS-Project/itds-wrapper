@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Avalonia.Input;
 using ITDSWrapper.Assets;
@@ -52,7 +53,10 @@ public class DefaultInputDriver : IInputDriver
                 { RetroBindings.RETRO_DEVICE_ID_JOYPAD_LEFT, new PhysicalKeyInput(PhysicalKey.ArrowLeft) },
                 { RetroBindings.RETRO_DEVICE_ID_JOYPAD_START, new PhysicalKeyInput(PhysicalKey.Enter) },
                 { RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT, new PhysicalKeyInput(PhysicalKey.ShiftRight) },
-                { RetroBindings.RETRO_DEVICE_ID_JOYPAD_R2, new PhysicalKeyInput(PhysicalKey.Escape) { SpecialAction = openSettings } },
+                {
+                    RetroBindings.RETRO_DEVICE_ID_JOYPAD_R2,
+                    new PhysicalKeyInput(PhysicalKey.Escape) { SpecialAction = openSettings }
+                },
             };
         }
     }
@@ -72,6 +76,7 @@ public class DefaultInputDriver : IInputDriver
         {
             _specialActions[button] = specialAction;
         }
+
         if (_bindings.TryGetValue(button, out object? input) && input is PhysicalKeyInput keyInput)
         {
             keyInput.SpecialAction = specialAction;
@@ -129,5 +134,16 @@ public class DefaultInputDriver : IInputDriver
     public string GetControllerRawName()
     {
         return "Default Input";
+    }
+
+    public ImmutableDictionary<uint, ControllerButton?> GetControllerBindings()
+    {
+        return ImmutableDictionary<uint, ControllerButton?>.Empty;
+    }
+
+    public ImmutableDictionary<uint, PhysicalKey?> GetKeyBindings()
+    {
+        return _bindings.ToImmutableDictionary(binding => binding.Key,
+            binding => ((PhysicalKeyInput?)binding.Value)?.PhysicalKey ?? null);
     }
 }

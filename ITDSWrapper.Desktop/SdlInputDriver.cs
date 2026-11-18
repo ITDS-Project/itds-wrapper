@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using Avalonia.Input;
 using Avalonia.Threading;
 using ITDSWrapper.Assets;
 using ITDSWrapper.Input;
@@ -352,5 +354,26 @@ public class SdlInputDriver : IInputDriver
     public string GetControllerRawName()
     {
         return _gamepad?.Name ?? string.Empty;
+    }
+
+    public ImmutableDictionary<uint, ControllerButton?> GetControllerBindings()
+    {
+        var bindings = new Dictionary<uint, ControllerButton?>();
+        foreach ((uint a, List<SdlControllerInput?> b) in _controlsDictionary)
+        {
+            foreach (SdlControllerInput? input in b)
+            {
+                if (b is not null)
+                {
+                    bindings[a] = GetGenericButtonFromSdl(input);
+                }
+            }
+        }
+        return bindings.ToImmutableDictionary();
+    }
+
+    public ImmutableDictionary<uint, PhysicalKey?> GetKeyBindings()
+    {
+        return ImmutableDictionary<uint, PhysicalKey?>.Empty;
     }
 }

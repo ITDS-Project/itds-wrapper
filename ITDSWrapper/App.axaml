@@ -136,7 +136,7 @@
                     </Style>
 
                     <Style Selector="Grid.submenucontainer">
-                        <Setter Property="Margin" Value="70 70 10 10" />
+                        <Setter Property="Margin" Value="70 70 70 10" />
                         <Setter Property="RowSpacing" Value="10" />
                     </Style>
 
@@ -196,10 +196,6 @@
                         <Setter Property="RenderTransform" Value="scale(0.98)" />
                     </Style>
                     
-                    <Style Selector="Grid.settingsgrid">
-                        <Setter Property="Margin" Value="0 0 52 0" />
-                    </Style>
-                    
                     <Style Selector="Grid.settingsgrid > Rectangle.divider">
                         <Setter Property="Height" Value="1" />
                         <Setter Property="VerticalAlignment" Value="Bottom" />
@@ -231,6 +227,20 @@
                         <Setter Property="FocusAdorner" Value="{x:Null}" />
                     </Style>
 
+                    <Style Selector="Label.binding">
+                        <Setter Property="FontFamily" Value="{StaticResource GupterFont}" />
+                        <Setter Property="FontSize" Value="28" />
+                        <Setter Property="Foreground" Value="#E0E0E0" />
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="Padding" Value="10 10" />
+                        <Setter Property="Margin" Value="0 0 10 0" />
+                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="FocusAdorner" Value="{x:Null}" />
+                    </Style>
+
                     <Style Selector="Label.setting-value">
                         <Setter Property="FontFamily" Value="{StaticResource GupterFont}" />
                         <Setter Property="FontSize" Value="34" />
@@ -243,6 +253,21 @@
                         <Setter Property="Background" Value="Transparent" />
                         <Setter Property="BorderThickness" Value="0" />
                         <Setter Property="Padding" Value="20 20" />
+                        <Setter Property="FocusAdorner" Value="{x:Null}" />
+                    </Style>
+
+                    <Style Selector="Label.binding-value">
+                        <Setter Property="FontFamily" Value="{StaticResource GupterFont}" />
+                        <Setter Property="FontSize" Value="28" />
+                        <Setter Property="MinWidth" Value="360" />
+                        <Setter Property="Margin" Value="0" />
+                        <Setter Property="HorizontalAlignment" Value="Center" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                        <Setter Property="Foreground" Value="#E0E0E0" />
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="Padding" Value="10 10" />
                         <Setter Property="FocusAdorner" Value="{x:Null}" />
                     </Style>
                     

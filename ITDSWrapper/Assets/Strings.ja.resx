@@ -192,7 +192,7 @@
         <value>Pause</value>
     </data>
     <data name="BindingSelectDescription" xml:space="preserve">
-        <value>Wrapper Menu</value>
+        <value>System Menu</value>
     </data>
     <data name="BindingNotMapped" xml:space="preserve">
         <value>Not mapped</value>
@@ -205,5 +205,26 @@
     </data>
     <data name="ModifyControlBindings" xml:space="preserve">
         <value>Modify Control Bindings</value>
+    </data>
+    <data name="ResetButton" xml:space="preserve">
+        <value>Reset</value>
+    </data>
+    <data name="DoneButton" xml:space="preserve">
+        <value>Done</value>
+    </data>
+    <data name="SettingsKeyBindingsHeader" xml:space="preserve">
+        <value>Input Bindings</value>
+    </data>
+    <data name="SettingsSystemHeader" xml:space="preserve">
+        <value>System Settings</value>
+    </data>
+    <data name="KeyBindingsActionHeader" xml:space="preserve">
+        <value>Action</value>
+    </data>
+    <data name="KeyBindingsButtonHeader" xml:space="preserve">
+        <value>Controller Binding</value>
+    </data>
+    <data name="KeyBindingsKeyHeader" xml:space="preserve">
+        <value>Keyboard Binding</value>
     </data>
 </root>

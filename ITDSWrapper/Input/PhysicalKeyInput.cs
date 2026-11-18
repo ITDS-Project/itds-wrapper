@@ -10,6 +10,7 @@ public class PhysicalKeyInput(PhysicalKey physicalKey) : IGameInput<PhysicalKey>
     public Action? SpecialAction { get; set; }
     
     private PhysicalKey _physicalKey = physicalKey;
+    public PhysicalKey PhysicalKey => _physicalKey;
 
     public void SetInput(PhysicalKey input)
     {

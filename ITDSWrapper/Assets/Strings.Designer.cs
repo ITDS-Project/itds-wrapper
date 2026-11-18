@@ -184,11 +184,47 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Done.
+        /// </summary>
+        public static string DoneButton {
+            get {
+                return ResourceManager.GetString("DoneButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Into the Dream Spring.
         /// </summary>
         public static string GameTitle {
             get {
                 return ResourceManager.GetString("GameTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Action.
+        /// </summary>
+        public static string KeyBindingsActionHeader {
+            get {
+                return ResourceManager.GetString("KeyBindingsActionHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Controller Binding.
+        /// </summary>
+        public static string KeyBindingsButtonHeader {
+            get {
+                return ResourceManager.GetString("KeyBindingsButtonHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keyboard Binding.
+        /// </summary>
+        public static string KeyBindingsKeyHeader {
+            get {
+                return ResourceManager.GetString("KeyBindingsKeyHeader", resourceCulture);
             }
         }
         
@@ -279,6 +315,15 @@ namespace ITDSWrapper.Assets {
         public static string NoControllerDetected {
             get {
                 return ResourceManager.GetString("NoControllerDetected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset.
+        /// </summary>
+        public static string ResetButton {
+            get {
+                return ResourceManager.GetString("ResetButton", resourceCulture);
             }
         }
         
@@ -441,6 +486,15 @@ namespace ITDSWrapper.Assets {
         public static string SettingsGraphicsBackend {
             get {
                 return ResourceManager.GetString("SettingsGraphicsBackend", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Input Bindings.
+        /// </summary>
+        public static string SettingsKeyBindingsHeader {
+            get {
+                return ResourceManager.GetString("SettingsKeyBindingsHeader", resourceCulture);
             }
         }
         
