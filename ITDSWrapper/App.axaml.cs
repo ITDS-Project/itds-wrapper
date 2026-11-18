@@ -34,7 +34,9 @@ public partial class App : Application
 
     public override void Initialize()
     {
-        MpvApi.RootPath = Path.Combine(AppContext.BaseDirectory, "runtimes", RuntimeInformation.RuntimeIdentifier, "native");
+        MpvApi.RootPath = OperatingSystem.IsMacOS()
+            ? Path.Combine(Directory.GetParent(AppContext.BaseDirectory)!.FullName, "MonoBundle")
+            : Path.Combine(AppContext.BaseDirectory, "runtimes", RuntimeInformation.RuntimeIdentifier, "native");
         AvaloniaXamlLoader.Load(this);
     }
 

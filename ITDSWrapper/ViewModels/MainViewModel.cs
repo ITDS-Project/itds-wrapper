@@ -1245,8 +1245,12 @@ public partial class MainViewModel : ViewModelBase
         }
         else
         {
-            BorderMpvContexts[_currentBorderIdx].LoadFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Borders",
-                $"{_borders}.mp4")).Invoke();
+            BorderMpvContexts[_currentBorderIdx].LoadFile(Path.Combine(
+                OperatingSystem.IsMacOS()
+                    ? Path.Combine(Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.FullName,
+                        "MonoBundle")
+                    : AppDomain.CurrentDomain.BaseDirectory, "Borders",
+                $"{_borders[_currentBorderIdx]}.mp4")).Invoke();
             BorderMpvContexts[_currentBorderIdx].LoopFile.Set("inf");
         }
 
@@ -1270,7 +1274,11 @@ public partial class MainViewModel : ViewModelBase
         }
         else
         {
-            BorderMpvContexts[_nextBorderIdx].LoadFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Borders",
+            BorderMpvContexts[_nextBorderIdx].LoadFile(Path.Combine(
+                OperatingSystem.IsMacOS()
+                    ? Path.Combine(Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.FullName,
+                        "MonoBundle")
+                    : AppDomain.CurrentDomain.BaseDirectory, "Borders",
                 $"{_borders[_nextBorderIdx]}.mp4")).Invoke();
             BorderMpvContexts[_nextBorderIdx].LoopFile.Set("inf");
         }
