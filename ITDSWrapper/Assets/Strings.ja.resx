@@ -14,8 +14,8 @@
     <data name="GameTitle" xml:space="preserve">
         <value>夢泉へ</value>
     </data>
-    <data name="SettingsDisplay" xml:space="preserve">
-        <value>Display Settings</value>
+    <data name="SystemSettings" xml:space="preserve">
+        <value>System Settings</value>
     </data>
     <data name="SettingsBackToGame" xml:space="preserve">
         <value>Back to Game</value>
@@ -62,9 +62,6 @@
     <data name="ScreenLayoutRightLeft" xml:space="preserve">
         <value>Horizontal (Bottom on Left)</value>
     </data>
-    <data name="SettingsAccessibility" xml:space="preserve">
-        <value>Accessibility Settings</value>
-    </data>
     <data name="SettingsGeneral" xml:space="preserve">
         <value>General Settings</value>
     </data>
@@ -74,14 +71,8 @@
     <data name="SettingSwitchOn" xml:space="preserve">
         <value>On</value>
     </data>
-    <data name="SettingsAccessibilityHeader" xml:space="preserve">
-        <value>Accessibility</value>
-    </data>
     <data name="SettingsControllerHeader" xml:space="preserve">
         <value>Controller</value>
-    </data>
-    <data name="SettingsDisplayHeader" xml:space="preserve">
-        <value>Display</value>
     </data>
     <data name="SettingsBorders" xml:space="preserve">
         <value>Screen Borders</value>
@@ -117,7 +108,7 @@
         <value>Graphics Backend</value>
     </data>
     <data name="WindowsRenderingModeAngleEgl" xml:space="preserve">
-        <value>ANGLE EGL</value>
+        <value>Angle EGL</value>
     </data>
     <data name="WindowsRenderingModeVulkan" xml:space="preserve">
         <value>Vulkan</value>
@@ -208,5 +199,11 @@
     </data>
     <data name="BindingUnknown" xml:space="preserve">
         <value>Unknown</value>
+    </data>
+    <data name="NoControllerDetected" xml:space="preserve">
+        <value>No Controller Detected</value>
+    </data>
+    <data name="ModifyControlBindings" xml:space="preserve">
+        <value>Modify Control Bindings</value>
     </data>
 </root>

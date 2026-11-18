@@ -265,6 +265,24 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Modify Control Bindings.
+        /// </summary>
+        public static string ModifyControlBindings {
+            get {
+                return ResourceManager.GetString("ModifyControlBindings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Controller Detected.
+        /// </summary>
+        public static string NoControllerDetected {
+            get {
+                return ResourceManager.GetString("NoControllerDetected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Horizontal (Bottom on Right).
         /// </summary>
         public static string ScreenLayoutLeftRight {
@@ -288,24 +306,6 @@ namespace ITDSWrapper.Assets {
         public static string ScreenLayoutTopBottom {
             get {
                 return ResourceManager.GetString("ScreenLayoutTopBottom", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Accessibility Settings.
-        /// </summary>
-        public static string SettingsAccessibility {
-            get {
-                return ResourceManager.GetString("SettingsAccessibility", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Accessibility.
-        /// </summary>
-        public static string SettingsAccessibilityHeader {
-            get {
-                return ResourceManager.GetString("SettingsAccessibilityHeader", resourceCulture);
             }
         }
         
@@ -337,7 +337,7 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Controller Settings.
+        ///   Looks up a localized string similar to Controls.
         /// </summary>
         public static string SettingsController {
             get {
@@ -346,7 +346,7 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Controller.
+        ///   Looks up a localized string similar to Controls.
         /// </summary>
         public static string SettingsControllerHeader {
             get {
@@ -369,24 +369,6 @@ namespace ITDSWrapper.Assets {
         public static string SettingsDiscord {
             get {
                 return ResourceManager.GetString("SettingsDiscord", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Display Settings.
-        /// </summary>
-        public static string SettingsDisplay {
-            get {
-                return ResourceManager.GetString("SettingsDisplay", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Display.
-        /// </summary>
-        public static string SettingsDisplayHeader {
-            get {
-                return ResourceManager.GetString("SettingsDisplayHeader", resourceCulture);
             }
         }
         
@@ -508,6 +490,15 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to System Settings.
+        /// </summary>
+        public static string SettingsSystemHeader {
+            get {
+                return ResourceManager.GetString("SettingsSystemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Button Layout.
         /// </summary>
         public static string SettingsVirtualButtonLayout {
@@ -580,7 +571,16 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ANGLE EGL.
+        ///   Looks up a localized string similar to System Settings.
+        /// </summary>
+        public static string SystemSettings {
+            get {
+                return ResourceManager.GetString("SystemSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Angle EGL.
         /// </summary>
         public static string WindowsRenderingModeAngleEgl {
             get {

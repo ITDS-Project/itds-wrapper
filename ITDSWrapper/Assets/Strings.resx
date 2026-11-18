@@ -21,8 +21,8 @@
     <data name="GameTitle" xml:space="preserve">
         <value>Into the Dream Spring</value>
     </data>
-    <data name="SettingsDisplay" xml:space="preserve">
-        <value>Display Settings</value>
+    <data name="SystemSettings" xml:space="preserve">
+        <value>System Settings</value>
     </data>
     <data name="SettingsBackToGame" xml:space="preserve">
         <value>Back to Game</value>
@@ -31,7 +31,7 @@
         <value>Menu</value>
     </data>
     <data name="SettingsController" xml:space="preserve">
-        <value>Controller Settings</value>
+        <value>Controls</value>
     </data>
     <data name="SettingsLegal" xml:space="preserve">
         <value>Legal</value>
@@ -72,17 +72,11 @@
     <data name="SettingsGeneral" xml:space="preserve">
         <value>General Settings</value>
     </data>
-    <data name="SettingsAccessibility" xml:space="preserve">
-        <value>Accessibility Settings</value>
-    </data>
     <data name="SettingsControllerHeader" xml:space="preserve">
-        <value>Controller</value>
+        <value>Controls</value>
     </data>
-    <data name="SettingsAccessibilityHeader" xml:space="preserve">
-        <value>Accessibility</value>
-    </data>
-    <data name="SettingsDisplayHeader" xml:space="preserve">
-        <value>Display</value>
+    <data name="SettingsSystemHeader" xml:space="preserve">
+        <value>System Settings</value>
     </data>
     <data name="SettingSwitchOff" xml:space="preserve">
         <value>Off</value>
@@ -124,7 +118,7 @@
         <value>Graphics Backend</value>
     </data>
     <data name="WindowsRenderingModeAngleEgl" xml:space="preserve">
-        <value>ANGLE EGL</value>
+        <value>Angle EGL</value>
     </data>
     <data name="WindowsRenderingModeVulkan" xml:space="preserve">
         <value>Vulkan</value>
@@ -215,5 +209,11 @@
     </data>
     <data name="BindingUnknown" xml:space="preserve">
         <value>Unknown</value>
+    </data>
+    <data name="NoControllerDetected" xml:space="preserve">
+        <value>No Controller Detected</value>
+    </data>
+    <data name="ModifyControlBindings" xml:space="preserve">
+        <value>Modify Control Bindings</value>
     </data>
 </root>

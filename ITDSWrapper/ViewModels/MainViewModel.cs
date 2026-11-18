@@ -241,9 +241,8 @@ public class MainViewModel : ViewModelBase
     public RetroWrapper Wrapper { get; }
     [Reactive] public EmuImageSource? CurrentFrame { get; set; }
 
-    [Reactive] public bool DisplaySettingsMenuOpen { get; set; }
+    [Reactive] public bool SystemSettingsMenuOpen { get; set; }
     [Reactive] public bool ControllerSettingsMenuOpen { get; set; }
-    [Reactive] public bool AccessibilitySettingsMenuOpen { get; set; }
     [Reactive] public bool LegalMenuOpen { get; set; }
     [Reactive] public bool FeedbackModalOpen { get; set; }
     [Reactive] public bool ShowSidebar { get; set; }
@@ -344,9 +343,7 @@ public class MainViewModel : ViewModelBase
     public ICommand CloseMenuOverlayCommand { get; }
     public ICommand OpenDisplaySettingsMenuCommand { get; }
     public ICommand OpenControllerSettingsMenuCommand { get; }
-    public ICommand OpenAccessibilitySettingsMenuCommand { get; }
     public ICommand OpenFeedbackCommand { get; }
-    public ICommand OpenSurveyUrlCommand { get; }
     public ICommand OpenLegalMenuCommand { get; }
     public ICommand OpenDiscordUrlCommand { get; }
     public ICommand QuitToDesktopCommand { get; }
@@ -500,11 +497,9 @@ public class MainViewModel : ViewModelBase
         _menuInputTimer.Elapsed += (_, _) => _acceptingMenuInput = true;
 
         CloseMenuOverlayCommand = ReactiveCommand.Create(ToggleMenuOverlay);
-        OpenDisplaySettingsMenuCommand = ReactiveCommand.Create(OpenDisplaySettings);
+        OpenDisplaySettingsMenuCommand = ReactiveCommand.Create(OpenSystemSettings);
         OpenControllerSettingsMenuCommand = ReactiveCommand.Create(OpenControllerSettings);
-        OpenAccessibilitySettingsMenuCommand = ReactiveCommand.Create(OpenAccessibilitySettings);
         OpenFeedbackCommand = ReactiveCommand.Create(OpenFeedback);
-        OpenSurveyUrlCommand = ReactiveCommand.Create(() => OpenUrl("https://google.com"));
         OpenLegalMenuCommand = ReactiveCommand.Create(OpenLegal);
         OpenDiscordUrlCommand = ReactiveCommand.Create(() => OpenUrl("https://discord.com"));
         QuitToDesktopCommand = ReactiveCommand.Create(CloseApplication);
@@ -558,17 +553,17 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private void OpenDisplaySettings()
+    private void OpenSystemSettings()
     {
-        DisplaySettingsMenuOpen = true;
-        LegalMenuOpen = ControllerSettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
+        SystemSettingsMenuOpen = true;
+        LegalMenuOpen = ControllerSettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
     }
 
     private void OpenControllerSettings()
     {
         ControllerSettingsMenuOpen = true;
-        LegalMenuOpen = DisplaySettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
+        LegalMenuOpen = SystemSettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
         IInputDriver controllerDriver = _inputDrivers.Find(i => i.GetControllerBrand() != ControllerBrand.NONE)
                                         ?? _inputDrivers.Find(i => i is not DefaultInputDriver)
@@ -576,31 +571,24 @@ public class MainViewModel : ViewModelBase
         ControllerDiagram = new(controllerDriver, _logInterpreter!);
     }
 
-    private void OpenAccessibilitySettings()
-    {
-        AccessibilitySettingsMenuOpen = true;
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = LegalMenuOpen = false;
-        ShowSidebar = !IsMobile;
-    }
-
     private void OpenFeedback()
     {
         FeedbackModalOpen = true;
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = AccessibilitySettingsMenuOpen = LegalMenuOpen = false;
+        SystemSettingsMenuOpen = ControllerSettingsMenuOpen = LegalMenuOpen = false;
         ShowSidebar = false;
     }
 
     private void OpenLegal()
     {
         LegalMenuOpen = true;
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
+        SystemSettingsMenuOpen = ControllerSettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
     }
 
     private void CloseSubMenu()
     {
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen =
-            AccessibilitySettingsMenuOpen = LegalMenuOpen = FeedbackModalOpen = false;
+        SystemSettingsMenuOpen = ControllerSettingsMenuOpen =
+            LegalMenuOpen = FeedbackModalOpen = false;
         ShowSidebar = true;
     }
 
@@ -608,8 +596,8 @@ public class MainViewModel : ViewModelBase
     {
         DisplayMenuOverlay = !DisplayMenuOverlay;
         _pauseDriver.PushPauseState(DisplayMenuOverlay);
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen =
-            AccessibilitySettingsMenuOpen = LegalMenuOpen = FeedbackModalOpen = false;
+        SystemSettingsMenuOpen = ControllerSettingsMenuOpen =
+            LegalMenuOpen = FeedbackModalOpen = false;
         ShowSidebar = true;
 
         // Update blur effect (fade in/out)
@@ -1070,14 +1058,20 @@ public class MainViewModel : ViewModelBase
                     }
                     else if (_inputDrivers[CurrentInputDriver].QueryInput(RetroBindings.RETRO_DEVICE_ID_JOYPAD_B))
                     {
-                        if (DisplaySettingsMenuOpen || ControllerSettingsMenuOpen || AccessibilitySettingsMenuOpen ||
-                            LegalMenuOpen)
-                            CloseSubMenu();
-                        else
-                            ToggleMenuOverlay();
                         _acceptingMenuInput = false;
                         _menuInputTimer.Stop();
                         _menuInputTimer.Start();
+                        Dispatcher.UIThread.Post(() =>
+                        {
+                            if (SystemSettingsMenuOpen || ControllerSettingsMenuOpen || LegalMenuOpen)
+                            {
+                                CloseSubMenu();
+                            }
+                            else if (DisplayMenuOverlay)
+                            {
+                                ToggleMenuOverlay();
+                            }
+                        });
                     }
 
                     // Sending a key press changes the input driver, so we have to reset it manually
