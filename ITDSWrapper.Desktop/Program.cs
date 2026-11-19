@@ -50,63 +50,28 @@ sealed class Program
             .WithInterFont()
             .UseReactiveUI(b => b.Build())
             .LogToTrace()
-            .With(() =>
+            .With(() => new Win32PlatformOptions
             {
-                Win32RenderingMode[] defaultModes =
+                RenderingMode = 
                 [
-                    Win32RenderingMode.AngleEgl, Win32RenderingMode.Vulkan, Win32RenderingMode.Wgl,
+                    Win32RenderingMode.AngleEgl,
                     Win32RenderingMode.Software,
-                ];
-                if (!Path.Exists(Path.Combine(AppContext.BaseDirectory, "settings", "settings.json")))
-                    return new() { RenderingMode = defaultModes };
-
-                var wrapperSettings = JsonSerializer.Deserialize<Settings>(
-                    File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "settings",
-                        "settings.json")))!;
-                return new Win32PlatformOptions
-                {
-                    RenderingMode = wrapperSettings.WindowsRenderingMode switch
-                    {
-                        WindowsRenderingMode.ANGLE_EGL => [Win32RenderingMode.AngleEgl],
-                        WindowsRenderingMode.WINDOWS_GL => [Win32RenderingMode.Wgl],
-                        WindowsRenderingMode.VULKAN => [Win32RenderingMode.Vulkan],
-                        _ => [Win32RenderingMode.Software],
-                    },
-                    CompositionMode = [Win32CompositionMode.LowLatencyDxgiSwapChain],
-                };
+                ],
+                CompositionMode = [Win32CompositionMode.LowLatencyDxgiSwapChain],
             })
-            .With(() =>
+            .With(() => new AvaloniaNativePlatformOptions
             {
-                AvaloniaNativeRenderingMode[] defaultModes =
-                [
+                RenderingMode = [
                     AvaloniaNativeRenderingMode.OpenGl,
                     AvaloniaNativeRenderingMode.Metal,
-                    AvaloniaNativeRenderingMode.Software,
-                ];
-                string settingsPath =
-                    Path.Combine(
-                        Directory.GetParent(
-                                Directory.GetParent(Directory.GetParent(AppContext.BaseDirectory)!.FullName)!.FullName)!
-                            .FullName, "settings", "settings.json");
-                if (!Path.Exists(settingsPath))
-                    return new() { RenderingMode = defaultModes };
-
-                var wrapperSettings = JsonSerializer.Deserialize<Settings>(File.ReadAllText(settingsPath))!;
-                return new AvaloniaNativePlatformOptions
-                {
-                    RenderingMode = wrapperSettings.MacOsRenderingMode switch
-                    {
-                        MacOsRenderingMode.METAL => [AvaloniaNativeRenderingMode.Metal],
-                        MacOsRenderingMode.OPENGL => [AvaloniaNativeRenderingMode.OpenGl],
-                        _ => [AvaloniaNativeRenderingMode.Software],
-                    },
-                };
+                ],
             })
             .With(() =>
             {
                 X11RenderingMode[] defaultModes =
                 [
-                    X11RenderingMode.Glx, X11RenderingMode.Egl, X11RenderingMode.Vulkan, X11RenderingMode.Software,
+                    X11RenderingMode.Glx,
+                    X11RenderingMode.Egl,
                 ];
                 if (!Path.Exists(Path.Combine(AppContext.BaseDirectory, "settings", "settings.json")))
                     return new() { RenderingMode = defaultModes };
@@ -119,9 +84,7 @@ sealed class Program
                     RenderingMode = wrapperSettings.LinuxRenderingMode switch
                     {
                         LinuxRenderingMode.EGL => [X11RenderingMode.Egl],
-                        LinuxRenderingMode.VULKAN => [X11RenderingMode.Vulkan],
-                        LinuxRenderingMode.GLX => [X11RenderingMode.Glx],
-                        _ => [X11RenderingMode.Software],
+                        _ => [X11RenderingMode.Glx],
                     },
                 };
             })

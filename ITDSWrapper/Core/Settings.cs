@@ -83,6 +83,4 @@ public enum LinuxRenderingMode
 {
     GLX,
     EGL,
-    VULKAN,
-    SOFTWARE,
 }

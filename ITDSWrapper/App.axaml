@@ -256,7 +256,7 @@
                         <Setter Property="FocusAdorner" Value="{x:Null}" />
                     </Style>
 
-                    <Style Selector="Label.binding-value">
+                    <Style Selector="Button.binding-value">
                         <Setter Property="FontFamily" Value="{StaticResource GupterFont}" />
                         <Setter Property="FontSize" Value="28" />
                         <Setter Property="MinWidth" Value="360" />
