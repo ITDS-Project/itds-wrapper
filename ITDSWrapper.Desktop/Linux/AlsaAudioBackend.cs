@@ -21,7 +21,7 @@ public class AlsaAudioBackend : IAudioBackend
     public void Initialize(double sampleRate)
     {
 #if IS_LINUX
-        _waveProvider = new(new((int)sampleRate, 2));
+        _waveProvider = new(new((int)sampleRate, 2), TimeSpan.FromMilliseconds(200));
         foreach (AlsaDeviceInfo device in AlsaDeviceEnumerator.GetPlaybackDevices())
         {
             try
@@ -62,7 +62,14 @@ public class AlsaAudioBackend : IAudioBackend
     public void PlaySamples(byte[] samples)
     {
 #if IS_LINUX
-        _waveProvider?.AddSamples(samples, 0, samples.Length);
+        try
+        {
+            _waveProvider?.AddSamples(samples, 0, samples.Length);
+        }
+        catch
+        {
+            _waveProvider?.ClearBuffer();
+        }
 #endif
     }
 
