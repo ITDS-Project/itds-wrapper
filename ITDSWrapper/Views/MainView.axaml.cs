@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Platform;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using ITDSWrapper.ViewModels;
 
 namespace ITDSWrapper.Views;
@@ -14,17 +15,23 @@ public partial class MainView : UserControl
         InitializeComponent();
     }
 
+    protected override void OnLoaded(RoutedEventArgs e)
+    {
+        base.OnLoaded(e);
+        ((MainViewModel)DataContext!).MarkShown();
+    }
+
     private void MainView_OnSizeChanged(object? sender, SizeChangedEventArgs e)
     {
         if (e.NewSize.Width > e.NewSize.Height)
         {
             ((MainViewModel)DataContext!).BorderWidth = e.NewSize.Width;
-            ((MainViewModel)DataContext).BorderHeight = (2160.0 / 3840.0) * e.NewSize.Width;
+            ((MainViewModel)DataContext).BorderHeight = 2160.0 / 3840.0 * e.NewSize.Width;
         }
         else
         {
             ((MainViewModel)DataContext!).BorderHeight = e.NewSize.Height;
-            ((MainViewModel)DataContext).BorderWidth = (3840.0 / 2160.0) * e.NewSize.Height;
+            ((MainViewModel)DataContext).BorderWidth = 3840.0 / 2160.0 * e.NewSize.Height;
         }
         ((MainViewModel)DataContext).PanScanBorders(e.NewSize.Width, e.NewSize.Height);
         

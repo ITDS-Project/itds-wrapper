@@ -40,6 +40,7 @@ namespace ITDSWrapper.ViewModels;
 public partial class MainViewModel : ViewModelBase
 {
     public static bool IsMobile => OperatingSystem.IsAndroid() || OperatingSystem.IsIOS();
+    private bool _shown;
 
     public Control? Top { get; set; }
 
@@ -321,6 +322,7 @@ public partial class MainViewModel : ViewModelBase
 
     public MpvContext[] BorderMpvContexts { get; set; } = [new(), new()];
     public VideoRenderer Renderer { get; set; }
+    private readonly List<Action> _borderQueuedActions = [];
 
     public bool Closing { get; set; }
 
@@ -427,6 +429,7 @@ public partial class MainViewModel : ViewModelBase
         Wrapper = new();
         _borderLocator = ((App)Application.Current!).BorderLocator ?? new DefaultBorderLocator();
         _borderFadeTimer.Elapsed += (_, _) => FadeBorder();
+        _borderFadeTimer.Stop();
         _logInterpreter = ((App)Application.Current!).LogInterpreter ?? new();
         _logInterpreter.SetNextBorder = border =>
         {
@@ -450,7 +453,6 @@ public partial class MainViewModel : ViewModelBase
             Renderer = WrapperSettings.LinuxRenderingMode switch
             {
                 LinuxRenderingMode.GLX or LinuxRenderingMode.EGL => VideoRenderer.OpenGl,
-                LinuxRenderingMode.VULKAN => VideoRenderer.Native,
                 _ => VideoRenderer.Software,
             };
         }
@@ -613,13 +615,24 @@ public partial class MainViewModel : ViewModelBase
 
     public void PanScanBorders(double width, double height)
     {
-        if (height > width)
+        foreach (MpvContext mpv in BorderMpvContexts)
         {
-            foreach (MpvContext mpv in BorderMpvContexts)
+            if (height > width)
             {
                 mpv.PanScan.Set(width / height);
             }
+            else
+            {
+                mpv.PanScan.Set(1.0);
+            }
         }
+    }
+
+    public void MarkShown()
+    {
+        _shown = true;
+        _borderQueuedActions.ForEach(a => a.Invoke());
+        _borderQueuedActions.Clear();
     }
 
     private void CloseApplication()
@@ -1352,8 +1365,7 @@ public partial class MainViewModel : ViewModelBase
         }
         else
         {
-            BorderMpvContexts[_currentBorderIdx].LoadFile(_borderLocator!.GetBorderPath(_borders[_currentBorderIdx])).Invoke();
-            BorderMpvContexts[_currentBorderIdx].LoopFile.Set("inf");
+            SetBorder(_currentBorderIdx);
         }
 
         if (!string.IsNullOrEmpty(_borders[_nextBorderIdx]))
@@ -1376,8 +1388,7 @@ public partial class MainViewModel : ViewModelBase
         }
         else
         {
-            BorderMpvContexts[_nextBorderIdx].LoadFile(_borderLocator!.GetBorderPath(_borders[_nextBorderIdx])).Invoke();
-            BorderMpvContexts[_nextBorderIdx].LoopFile.Set("inf");
+            SetBorder(_nextBorderIdx);
         }
         
         _borderFadeTimer.Start();
@@ -1399,6 +1410,30 @@ public partial class MainViewModel : ViewModelBase
 
         BorderOpacities[_currentBorderIdx] -= 0.02;
         BorderOpacities[_nextBorderIdx] += 0.02;
+    }
+
+    private void SetBorder(int idx)
+    {
+        string video = _borderLocator!.GetBorderPath(_borders[idx]);
+        if (!File.Exists(video))
+        {
+            _logInterpreter?.AddRecentLog($"[WRAPPER] WARNING: border video not found ({video})");
+            return;
+        }
+
+        if (!_shown)
+        {
+            _borderQueuedActions.Add(() =>
+            {
+                BorderMpvContexts[idx].LoadFile(video).Invoke();
+                BorderMpvContexts[idx].LoopFile.Set("inf");
+            });
+        }
+        else
+        {
+            BorderMpvContexts[idx].LoadFile(video).Invoke();
+            BorderMpvContexts[idx].LoopFile.Set("inf");
+        }
     }
 
     private void AssignVirtualBindings()
