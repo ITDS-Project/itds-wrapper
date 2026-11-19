@@ -144,6 +144,14 @@ public class DefaultInputDriver : IInputDriver
     public ImmutableDictionary<uint, PhysicalKey?> GetKeyBindings()
     {
         return _bindings.ToImmutableDictionary(binding => binding.Key,
-            binding => ((PhysicalKeyInput?)binding.Value)?.PhysicalKey ?? null);
+            binding =>
+            {
+                if (binding.Value is PhysicalKeyInput keyInput)
+                {
+                    return keyInput.PhysicalKey;
+                }
+
+                return (PhysicalKey?)null;
+            });
     }
 }

@@ -20,6 +20,7 @@ public partial class MainView : UserControl
         {
             ((MainViewModel)DataContext!).BorderWidth = e.NewSize.Width;
             ((MainViewModel)DataContext).BorderHeight = (2160.0 / 3840.0) * e.NewSize.Width;
+            ((MainViewModel)DataContext).PanScanBorders(e.NewSize.Width, e.NewSize.Height);
         }
         else
         {

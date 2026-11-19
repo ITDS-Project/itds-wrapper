@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Android.OS;
 using Android.Views;
+using Avalonia.Input;
 using ITDSWrapper.Assets;
 using ITDSWrapper.Input;
 using Libretro.NET.Bindings;
@@ -141,5 +143,15 @@ public class AndroidControllerInputDriver : IInputDriver
     public string GetControllerRawName()
     {
         return Controller?.Name ?? string.Empty;
+    }
+
+    public ImmutableDictionary<uint, ControllerButton?> GetControllerBindings()
+    {
+        return _inputDictionary.ToImmutableDictionary(i => i.Key, i => i.Value?.GetGenericButtonName());
+    }
+
+    public ImmutableDictionary<uint, PhysicalKey?> GetKeyBindings()
+    {
+        return [];
     }
 }

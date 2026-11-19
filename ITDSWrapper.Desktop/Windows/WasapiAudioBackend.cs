@@ -1,4 +1,5 @@
-﻿using ITDSWrapper.Audio;
+﻿using System.Collections.Generic;
+using ITDSWrapper.Audio;
 #if IS_WINDOWS
 using NAudio.CoreAudioApi;
 using NAudio.Wave.SampleProviders;
@@ -50,6 +51,21 @@ public class WasapiAudioBackend : IAudioBackend
     {
 #if IS_WINDOWS
         _waveProvider?.AddSamples(samples, 0, samples.Length);
+#endif
+    }
+
+    public void SelectDevice(string device)
+    {
+#if IS_WINDOWS
+#endif
+    }
+
+    public List<string> GetDeviceNames()
+    {
+#if IS_WINDOWS
+        return [];
+#else
+        return [];
 #endif
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading;
@@ -52,7 +54,7 @@ public partial class MainViewModel : ViewModelBase
     [Reactive] public partial string WindowingModeDesc { get; set; } = Strings.WindowStateFullScreen;
 
     private bool _ignoreFullScreenReposition;
-    
+
     public int WindowingModeIdx
     {
         get => (int)WrapperSettings.WindowingMode;
@@ -147,14 +149,13 @@ public partial class MainViewModel : ViewModelBase
         get;
         set
         {
+            if (value < 0 || value >= Enum.GetNames<ScreenLayout>().Length)
+                return;
             field = value;
-            if (value >= 0 && value < Enum.GetNames<ScreenLayout>().Length)
+            TargetScreenLayoutDesc = new[]
             {
-                TargetScreenLayoutDesc = new[]
-                {
-                    Strings.ScreenLayoutTopBottom, Strings.ScreenLayoutLeftRight, Strings.ScreenLayoutRightLeft
-                }[value];
-            }
+                Strings.ScreenLayoutTopBottom, Strings.ScreenLayoutLeftRight, Strings.ScreenLayoutRightLeft
+            }[value];
         }
     }
 
@@ -165,14 +166,13 @@ public partial class MainViewModel : ViewModelBase
         get;
         set
         {
+            if (value < 0 || value >= Enum.GetNames<DualScreenSettings>().Length)
+                return;
             field = value;
-            if (value >= 0 && value < Enum.GetNames<DualScreenSettings>().Length)
+            DualScreenModeDesc = new[]
             {
-                DualScreenModeDesc = new[]
-                {
-                    Strings.SettingsDualScreenAuto, Strings.SettingsDualScreenOn, Strings.SettingsDualScreenOff,
-                }[value];
-            }
+                Strings.SettingsDualScreenAuto, Strings.SettingsDualScreenOn, Strings.SettingsDualScreenOff,
+            }[value];
         }
     }
 
@@ -183,15 +183,14 @@ public partial class MainViewModel : ViewModelBase
         get;
         set
         {
+            if (value < 0 || value >= Enum.GetNames<LinuxRenderingMode>().Length)
+                return;
             field = value;
-            if (value >= 0 && value < Enum.GetNames<LinuxRenderingMode>().Length)
+            LinuxRenderingModeDesc = new[]
             {
-                LinuxRenderingModeDesc = new[]
-                {
-                    Strings.LinuxRenderingModeGlx, Strings.LinuxRenderingModeEgl,
-                    Strings.LinuxRenderingModeVulkan, Strings.LinuxRenderingModeSoftware,
-                }[value];
-            }
+                Strings.LinuxRenderingModeGlx, Strings.LinuxRenderingModeEgl,
+                Strings.LinuxRenderingModeVulkan, Strings.LinuxRenderingModeSoftware,
+            }[value];
         }
     }
 
@@ -202,15 +201,14 @@ public partial class MainViewModel : ViewModelBase
         get;
         set
         {
+            if (value < 0 || value >= Enum.GetNames<MacOsRenderingMode>().Length)
+                return;
             field = value;
-            if (value >= 0 && value < Enum.GetNames<MacOsRenderingMode>().Length)
+            MacOsRenderingModeDesc = new[]
             {
-                MacOsRenderingModeDesc = new[]
-                {
-                    Strings.MacOsRenderingModeMetal, Strings.MacOsRenderingModeOpenGl,
-                    Strings.MacOsRenderingModeSoftware,
-                }[value];
-            }
+                Strings.MacOsRenderingModeMetal, Strings.MacOsRenderingModeOpenGl,
+                Strings.MacOsRenderingModeSoftware,
+            }[value];
         }
     }
 
@@ -235,6 +233,21 @@ public partial class MainViewModel : ViewModelBase
 
     [Reactive] public partial string BordersSettingDesc { get; set; }
 
+    private readonly List<string> _audioDevices = [];
+    [Reactive] public partial string? CurrentAudioDevice { get; set; }
+
+    public int CurrentAudioDeviceIdx
+    {
+        get;
+        set
+        {
+            if (value < 0 || value >= _audioDevices.Count)
+                return;
+            field = value;
+            CurrentAudioDevice = _audioDevices[value];
+        }
+    }
+
     [Reactive] public partial string ScreenReaderSettingDesc { get; set; }
     [Reactive] public partial string VirtualButtonsLayoutSettingDesc { get; set; }
     [Reactive] public partial string VirtualButtonsHapticsSettingDesc { get; set; }
@@ -247,12 +260,14 @@ public partial class MainViewModel : ViewModelBase
     [Reactive] public partial bool SystemSettingsMenuOpen { get; set; }
     [Reactive] public partial bool ControllerSettingsMenuOpen { get; set; }
     [Reactive] public partial bool KeyBindingsSettingsMenuOpen { get; set; }
+    [Reactive] public partial bool HasControllerBindings { get; set; }
+    [Reactive] public partial bool HasKeyBindings { get; set; }
     [Reactive] public partial bool LegalMenuOpen { get; set; }
     [Reactive] public partial bool FeedbackModalOpen { get; set; }
     [Reactive] public partial bool ShowSidebar { get; set; }
 
-    [Reactive] public ControllerDiagramViewModel? ControllerDiagram { get; set; }
-    [Reactive] public IAvaloniaList<InputBinding>?  InputBindings { get; set; }
+    [Reactive] public partial ControllerDiagramViewModel? ControllerDiagram { get; set; }
+    public AvaloniaList<InputBinding> InputBindings { get; } = [];
 
     public Settings WrapperSettings { get; }
     private int _currentLangBit;
@@ -311,6 +326,8 @@ public partial class MainViewModel : ViewModelBase
 
     private IUpdater? _updater;
 
+    private IBorderLocator? _borderLocator;
+
     private readonly PauseDriver _pauseDriver;
     private readonly LogInterpreter? _logInterpreter;
 
@@ -362,6 +379,7 @@ public partial class MainViewModel : ViewModelBase
     public ICommand ChangeRenderingModeCommand { get; }
     public ICommand ChangeBorderSettingsCommand { get; }
     public ICommand ChangeScreenReaderSettingsCommand { get; }
+    public ICommand ChangeAudioDeviceSettingsCommand { get; }
     public ICommand ChangeControlPadHapticsSettingsCommand { get; }
     public ICommand ChangeVirtualButtonsLayoutSettingsCommand { get; }
 
@@ -407,6 +425,7 @@ public partial class MainViewModel : ViewModelBase
             ? Strings.SettingsVirtualButtonLayoutFull
             : Strings.SettingsVirtualButtonLayoutRecommended;
         Wrapper = new();
+        _borderLocator = ((App)Application.Current!).BorderLocator ?? new DefaultBorderLocator();
         _logInterpreter = ((App)Application.Current!).LogInterpreter ?? new();
         _logInterpreter.SetNextBorder = border =>
         {
@@ -452,18 +471,15 @@ public partial class MainViewModel : ViewModelBase
                 _ => VideoRenderer.Software,
             };
         }
-        else if (OperatingSystem.IsAndroid())
+        else if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
         {
             Renderer = VideoRenderer.OpenGl;
-        }
-        else if (OperatingSystem.IsIOS())
-        {
-            Renderer = VideoRenderer.Native;
         }
         else
         {
             Renderer = VideoRenderer.Auto;
         }
+
         if (WrapperSettings.BordersEnabled)
         {
             StartBorder();
@@ -478,6 +494,9 @@ public partial class MainViewModel : ViewModelBase
         {
             _audioBackend = new SilkNetOpenALBackend(Wrapper.SampleRate, 32);
         }
+
+        _audioDevices = _audioBackend.GetDeviceNames();
+        CurrentAudioDeviceIdx = 0;
 
         if (((App)Application.Current).HapticsBackend is not null)
         {
@@ -558,6 +577,7 @@ public partial class MainViewModel : ViewModelBase
         ChangeRenderingModeCommand = ReactiveCommand.Create<bool>(ChangeRenderingMode);
         ChangeBorderSettingsCommand = ReactiveCommand.Create(ToggleBorderSettings);
         ChangeScreenReaderSettingsCommand = ReactiveCommand.Create(ToggleScreenReader);
+        ChangeAudioDeviceSettingsCommand = ReactiveCommand.Create<bool>(ChangeAudioDevice);
         ChangeVirtualButtonsLayoutSettingsCommand = ReactiveCommand.Create(ToggleVirtualButtonsLayout);
         ChangeControlPadHapticsSettingsCommand = ReactiveCommand.Create(ToggleControlPadHaptics);
 
@@ -590,6 +610,17 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    public void PanScanBorders(double width, double height)
+    {
+        if (height > width)
+        {
+            foreach (MpvContext mpv in BorderMpvContexts)
+            {
+                mpv.PanScan.Set(width / height);
+            }
+        }
+    }
+
     private void CloseApplication()
     {
         // todo a modal warning?
@@ -609,31 +640,25 @@ public partial class MainViewModel : ViewModelBase
 
     private void OpenKeyBindingsSettings()
     {
-        InputBindings = new AvaloniaList<InputBinding>();
-        Dictionary<uint, ControllerButton?> controllerBindings = new();
-        Dictionary<uint, PhysicalKey?> keyBindings = new();
-        foreach (var driver in _inputDrivers)
-        {
-            foreach (var b in driver.GetControllerBindings())
-            {
-                controllerBindings[b.Key] = b.Value;
-            }
-            foreach (var b in driver.GetKeyBindings())
-            {
-                keyBindings[b.Key] = b.Value;
-            }
-        }
+        InputBindings.Clear();
+        ImmutableDictionary<uint, ControllerButton?> controllerBindings =
+            _inputDrivers[CurrentInputDriver].GetControllerBindings();
+        ImmutableDictionary<uint, PhysicalKey?> keyBindings = _inputDrivers[CurrentInputDriver].GetKeyBindings();
         foreach (uint inputKey in _inputDrivers[CurrentInputDriver].GetInputKeys())
         {
-            if (inputKey == RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT) continue;
-            InputBindings.Add(new InputBinding
+            if (inputKey == RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT)
+                continue;
+            InputBindings.Add(new()
             {
-                Action = inputKey, 
-                ControllerButton = controllerBindings.TryGetValue(inputKey, out var cb) ? cb : null,
-                KeyboardKey = keyBindings.TryGetValue(inputKey, out var kb) ? kb : null
+                Action = inputKey,
+                ControllerButton = controllerBindings.TryGetValue(inputKey, out ControllerButton? cb) ? cb : null,
+                KeyboardKey = keyBindings.TryGetValue(inputKey, out PhysicalKey? kb) ? kb : null,
             });
         }
-        
+
+        HasControllerBindings = controllerBindings.Any(c => c.Value is not null);
+        HasKeyBindings = keyBindings.Any(c => c.Value is not null);
+
         KeyBindingsSettingsMenuOpen = true;
         LegalMenuOpen = SystemSettingsMenuOpen = ControllerSettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
@@ -884,6 +909,13 @@ public partial class MainViewModel : ViewModelBase
         }
 
         WrapperSettings.ScreenReaderEnabled = !WrapperSettings.ScreenReaderEnabled;
+    }
+
+    private void ChangeAudioDevice(bool forward)
+    {
+        if (forward)
+        {
+        }
     }
 
     private void ToggleVirtualButtonsLayout()
@@ -1315,16 +1347,11 @@ public partial class MainViewModel : ViewModelBase
     {
         if (_borders[_currentBorderIdx] == "BLACK_BG")
         {
-            BorderMpvContexts[_currentBorderIdx].Stop();
+            BorderMpvContexts[_currentBorderIdx].Stop().Invoke();
         }
         else
         {
-            BorderMpvContexts[_currentBorderIdx].LoadFile(Path.Combine(
-                OperatingSystem.IsMacOS()
-                    ? Path.Combine(Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.FullName,
-                        "MonoBundle")
-                    : AppDomain.CurrentDomain.BaseDirectory, "Borders",
-                $"{_borders[_currentBorderIdx]}.mp4")).Invoke();
+            BorderMpvContexts[_currentBorderIdx].LoadFile(_borderLocator!.GetBorderPath(_borders[_currentBorderIdx])).Invoke();
             BorderMpvContexts[_currentBorderIdx].LoopFile.Set("inf");
         }
 
@@ -1337,25 +1364,21 @@ public partial class MainViewModel : ViewModelBase
 
     private void StopBorder()
     {
-        BorderMpvContexts[_currentBorderIdx].Stop();
+        BorderMpvContexts[_currentBorderIdx].Stop().Invoke();
     }
 
     private void SetNextBorder()
     {
         if (_borders[_nextBorderIdx] == "BLACK_BG")
         {
-            BorderMpvContexts[_nextBorderIdx].Stop();
+            BorderMpvContexts[_nextBorderIdx].Stop().Invoke();
         }
         else
         {
-            BorderMpvContexts[_nextBorderIdx].LoadFile(Path.Combine(
-                OperatingSystem.IsMacOS()
-                    ? Path.Combine(Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.FullName,
-                        "MonoBundle")
-                    : AppDomain.CurrentDomain.BaseDirectory, "Borders",
-                $"{_borders[_nextBorderIdx]}.mp4")).Invoke();
+            BorderMpvContexts[_nextBorderIdx].LoadFile(_borderLocator!.GetBorderPath(_borders[_nextBorderIdx])).Invoke();
             BorderMpvContexts[_nextBorderIdx].LoopFile.Set("inf");
         }
+
         _borderFadeTimer.Elapsed += (_, _) => FadeBorder();
         _borderFadeTimer.Start();
     }
@@ -1370,7 +1393,7 @@ public partial class MainViewModel : ViewModelBase
             (_currentBorderIdx, _nextBorderIdx) = (_nextBorderIdx, _currentBorderIdx);
             BorderOpacities[_currentBorderIdx] = 1.0;
             BorderOpacities[_nextBorderIdx] = 0.0;
-            BorderMpvContexts[_nextBorderIdx].Stop();
+            BorderMpvContexts[_nextBorderIdx].Stop().Invoke();
             return;
         }
 

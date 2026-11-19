@@ -17,7 +17,7 @@ public class AndroidDualScreenBackend : IDualScreenBackend
     private ImageView? _view;
     private Bitmap? _frame;
     private ByteBuffer? _pixBuffer;
-    private int prevLength;
+    private int _prevLength;
     
     public bool IsActive { get; set; } = false;
     public event Action? ActiveChanged;
@@ -60,8 +60,11 @@ public class AndroidDualScreenBackend : IDualScreenBackend
     
     public void SetSecondFrame(byte[] pixels, uint width, uint height)
     {
-        if (_pixBuffer is null || pixels.Length != prevLength)
+        if (_pixBuffer is null || pixels.Length != _prevLength)
+        {
             _pixBuffer = ByteBuffer.Allocate(pixels.Length);
+            _prevLength = pixels.Length;
+        }
         for (int y = 0; y < height / 2; y++)
         {
             for (int x = 0; x < width; x++)

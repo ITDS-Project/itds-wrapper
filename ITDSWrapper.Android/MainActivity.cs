@@ -98,6 +98,8 @@ public class MainActivity : AvaloniaMainActivity
         base.OnCreate(savedInstanceState);
         Window?.AddFlags(WindowManagerFlags.KeepScreenOn);
 
+        ((AndroidBorderLocator)App!.BorderLocator!).Activity = this;
+
         if (savedInstanceState is not null)
             return;
 
@@ -162,12 +164,17 @@ public class AndroidApp : AvaloniaAndroidApplication<App>
         return base.CustomizeAppBuilder(builder)
             .WithInterFont()
             .UseReactiveUI(b => b.Build())
+            .With(() => new AndroidPlatformOptions
+            {
+                RenderingMode = [AndroidRenderingMode.Egl],
+            })
             .AfterSetup(b =>
             {
                 ((App)b.Instance!).AudioBackend = new AndroidAudioBackend();
                 ((App)b.Instance).PauseDriver = new();
                 ((App)b.Instance).HapticsBackend = new AndroidHapticsBackend();
                 ((App)b.Instance).BatteryMonitor = new AndroidBatteryMonitor();
+                ((App)b.Instance).BorderLocator = new AndroidBorderLocator();
                 ((App)b.Instance).LogInterpreter = new();
                 ((App)b.Instance).ScreenReader = new AndroidScreenReader(this,
                     CultureInfo.CurrentUICulture.TwoLetterISOLanguageName switch

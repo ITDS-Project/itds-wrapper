@@ -158,7 +158,7 @@
                 <Grid IsVisible="{Binding SystemSettingsMenuOpen}" Classes="submenucontainer" RowDefinitions="Auto,*,Auto,Auto"
                       RowSpacing="5" ColumnSpacing="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <Label Grid.Row="0" Classes="header" Content="{x:Static assets:Strings.SettingsSystemHeader}" />
-                    <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto,Auto,Auto,Auto"
+                    <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto,Auto,Auto,Auto"
                           VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Classes="settingsgrid">
                         <Label Grid.Row="0" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.WindowStateSettingsLabel}" IsVisible="{Binding !IsMobile}"/>
                         <Button Grid.Row="0" Grid.Column="1" Classes="setting-button" Content="◁" Command="{Binding ChangeWindowingSettingsCommand}"
@@ -206,7 +206,7 @@
                         <Label Grid.Row="5" Grid.Column="2" Classes="setting-value" Content="{Binding ScreenReaderSettingDesc}"/>
                         <Button Grid.Row="5" Grid.Column="3" Classes="setting-button" Content="▷" Command="{Binding ChangeScreenReaderSettingsCommand}"/>
                         
-                        <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" Classes="menuitem"  IsVisible="{Binding IsMobile}"
+                        <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Classes="menuitem"  IsVisible="{Binding IsMobile}"
                                 Command="{Binding SettingsBackCommand}"
                                 Content="{x:Static assets:Strings.SettingsBack}" />
                     </Grid>
@@ -254,8 +254,12 @@
                                 <DataTemplate>
                                     <Grid ColumnDefinitions="*,Auto,Auto" Classes="settingsgrid">
                                         <Label Grid.Column="0" Classes="binding" Content="{Binding ActionDescription}" />
-                                        <Label Grid.Column="1" Classes="binding-value" Content="{Binding KeyDescription}" />
-                                        <Label Grid.Column="2" Classes="binding-value" Content="{Binding ButtonDescription}" />
+                                        <Label Grid.Column="1" Classes="binding-value"
+                                               Content="{Binding KeyDescription}"
+                                               IsVisible="{Binding #View.((vm:MainViewModel)DataContext)?.HasKeyBindings}" />
+                                        <Label Grid.Column="2" Classes="binding-value"
+                                               Content="{Binding ButtonDescription}"
+                                               IsVisible="{Binding #View.((vm:MainViewModel)DataContext)?.HasControllerBindings}" />
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>

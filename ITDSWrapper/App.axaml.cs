@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
@@ -24,6 +25,7 @@ public partial class App : Application
     public List<IInputDriver>? InputDrivers { get; set; }
     public IHapticsBackend? HapticsBackend { get; set; }
     public IUpdater? Updater { get; set; }
+    public IBorderLocator? BorderLocator { get; set; }
     public LogInterpreter? LogInterpreter { get; set; }
     public PauseDriver? PauseDriver { get; set; }
     public IBatteryMonitor? BatteryMonitor { get; set; }
@@ -34,9 +36,14 @@ public partial class App : Application
 
     public override void Initialize()
     {
-        MpvApi.RootPath = OperatingSystem.IsMacOS()
-            ? Path.Combine(Directory.GetParent(AppContext.BaseDirectory)!.FullName, "MonoBundle")
-            : Path.Combine(AppContext.BaseDirectory, "runtimes", RuntimeInformation.RuntimeIdentifier, "native");
+        if (OperatingSystem.IsMacOS())
+        {
+            MpvApi.RootPath = Path.Combine(Directory.GetParent(AppContext.BaseDirectory)!.FullName, "MonoBundle");
+        }
+        else if (!OperatingSystem.IsAndroid())
+        {
+            MpvApi.RootPath = Path.Combine(AppContext.BaseDirectory, "runtimes", RuntimeInformation.RuntimeIdentifier, "native");
+        }
         AvaloniaXamlLoader.Load(this);
     }
 
