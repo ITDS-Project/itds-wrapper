@@ -78,15 +78,19 @@ sealed class Program
             {
                 AvaloniaNativeRenderingMode[] defaultModes =
                 [
-                    AvaloniaNativeRenderingMode.Metal, AvaloniaNativeRenderingMode.OpenGl,
+                    AvaloniaNativeRenderingMode.OpenGl,
+                    AvaloniaNativeRenderingMode.Metal,
                     AvaloniaNativeRenderingMode.Software,
                 ];
-                if (!Path.Exists(Path.Combine(AppContext.BaseDirectory, "settings", "settings.json")))
+                string settingsPath =
+                    Path.Combine(
+                        Directory.GetParent(
+                                Directory.GetParent(Directory.GetParent(AppContext.BaseDirectory)!.FullName)!.FullName)!
+                            .FullName, "settings", "settings.json");
+                if (!Path.Exists(settingsPath))
                     return new() { RenderingMode = defaultModes };
 
-                var wrapperSettings = JsonSerializer.Deserialize<Settings>(
-                    File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "settings",
-                        "settings.json")))!;
+                var wrapperSettings = JsonSerializer.Deserialize<Settings>(File.ReadAllText(settingsPath))!;
                 return new AvaloniaNativePlatformOptions
                 {
                     RenderingMode = wrapperSettings.MacOsRenderingMode switch

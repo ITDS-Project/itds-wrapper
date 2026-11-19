@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using Avalonia.Input;
 using CoreHaptics;
 using GameController;
 using ITDSWrapper.Assets;
@@ -133,5 +135,16 @@ public class IosControllerInputDriver : IInputDriver
     public string GetControllerRawName()
     {
         return Controller?.VendorName ?? string.Empty;
+    }
+
+    public ImmutableDictionary<uint, ControllerButton?> GetControllerBindings()
+    {
+        return _inputsDictionary.Select(i => (i.Key, i.Value?.GetGenericButtonName()))
+            .ToImmutableDictionary(i => i.Key, i => i.Item2);
+    }
+
+    public ImmutableDictionary<uint, PhysicalKey?> GetKeyBindings()
+    {
+        return [];
     }
 }

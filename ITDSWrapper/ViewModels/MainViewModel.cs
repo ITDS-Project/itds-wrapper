@@ -437,7 +437,7 @@ public partial class MainViewModel : ViewModelBase
         {
             Renderer = WrapperSettings.MacOsRenderingMode switch
             {
-                MacOsRenderingMode.METAL => VideoRenderer.Native,
+                MacOsRenderingMode.METAL => VideoRenderer.Software,
                 MacOsRenderingMode.OPENGL => VideoRenderer.OpenGl,
                 _ => VideoRenderer.Software,
             };

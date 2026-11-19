@@ -8,11 +8,11 @@ using ITDSWrapper.Assets;
 using ITDSWrapper.Core;
 using ITDSWrapper.Input;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 
 namespace ITDSWrapper.ViewModels.Controls;
 
-public class ControllerDiagramViewModel : ViewModelBase
+public partial class ControllerDiagramViewModel : ViewModelBase
 {
     private static readonly Dictionary<ControllerButton, Point> XboxControllerPoints = new()
     {
@@ -32,8 +32,8 @@ public class ControllerDiagramViewModel : ViewModelBase
         { ControllerButton.Select, new(704, 1008) },
     };
 
-    [Reactive] public RenderTargetBitmap? DiagramImage { get; private set; }
-    [Reactive] public bool HasDiagram { get; private set; }
+    [Reactive] public partial RenderTargetBitmap? DiagramImage { get; private set; }
+    [Reactive] public partial bool HasDiagram { get; private set; }
 
     public IInputDriver? InputDriver
     {
