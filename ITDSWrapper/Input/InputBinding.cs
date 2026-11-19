@@ -5,7 +5,7 @@ using ReactiveUI;
 
 namespace ITDSWrapper.Input;
 
-public partial class InputBinding : ViewModelBase
+public class InputBinding : ViewModelBase
 {
     public uint Action { get; set; }
 

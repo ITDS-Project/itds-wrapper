@@ -256,9 +256,18 @@
                     <Label Grid.Row="0" Classes="header" Content="{x:Static assets:Strings.SettingsKeyBindingsHeader}" />
                     <Grid Margin="10 0 0 0" Grid.Row="1" RowDefinitions="*,Auto,Auto" ColumnDefinitions="*"
                           VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Classes="settingsgrid">
-                        <ItemsControl Grid.Row="0" Grid.Column="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                        <HeaderedItemsControl Grid.Row="0" Grid.Column="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                                       ItemsSource="{Binding InputBindings}">
-                            <ItemsControl.ItemTemplate>
+                            <HeaderedItemsControl.Header>
+                                <Grid ColumnDefinitions="*,Auto,Auto" Classes="settingsgrid">
+                                    <Label Grid.Column="0" Classes="binding" Content="{x:Static assets:Strings.KeyBindingsActionHeader}" />
+                                    <Label Grid.Column="1" Classes="binding"
+                                            Content="{x:Static assets:Strings.KeyBindingsKeyHeader}"/>
+                                    <Label Grid.Column="2" Classes="binding"
+                                            Content="{x:Static assets:Strings.KeyBindingsButtonHeader}" />
+                                </Grid>
+                            </HeaderedItemsControl.Header>
+                            <HeaderedItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Grid ColumnDefinitions="*,Auto,Auto" Classes="settingsgrid">
                                         <Label Grid.Column="0" Classes="binding" Content="{Binding ActionDescription}" />
@@ -272,8 +281,8 @@
                                                 CommandParameter="{Binding $self}" Tag="Controller" />
                                     </Grid>
                                 </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                            </HeaderedItemsControl.ItemTemplate>
+                        </HeaderedItemsControl>
                         <Rectangle Grid.Row="1" Grid.Column="0" Classes="divider"  />
                         <Grid Grid.Row="2" Grid.Column="0" ColumnDefinitions="Auto,Auto" HorizontalAlignment="Center" Margin="0 40" ColumnSpacing="30">
                             <Button Grid.Row="0" Grid.Column="0" Classes="primary-button"

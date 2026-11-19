@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Input;
 using ITDSWrapper.Assets;
+using ITDSWrapper.Core;
 using Libretro.NET.Bindings;
 
 namespace ITDSWrapper.Input;
@@ -135,14 +135,14 @@ public class DefaultInputDriver : IInputDriver
         return "Default Input";
     }
 
-    public ImmutableDictionary<uint, ControllerButton?> GetControllerBindings()
+    public Dictionary<uint, ControllerButton?> GetControllerBindings()
     {
-        return ImmutableDictionary<uint, ControllerButton?>.Empty;
+        return [];
     }
 
-    public ImmutableDictionary<uint, PhysicalKey?> GetKeyBindings()
+    public Dictionary<uint, PhysicalKey?> GetKeyBindings()
     {
-        return _bindings.ToImmutableDictionary(binding => binding.Key,
+        return _bindings.ToDictionary(binding => binding.Key,
             binding =>
             {
                 if (binding.Value is PhysicalKeyInput keyInput)
@@ -172,6 +172,17 @@ public class DefaultInputDriver : IInputDriver
         IsRecordingInput = false;
         
         return keyInput?.PhysicalKey;
+    }
+
+    public void RestoreInputs(Settings settings)
+    {
+        if (settings.KeyBindings.Count <= 0)
+            return;
+        foreach (var keyBinding in settings.KeyBindings)
+        {
+            SetBinding(keyBinding.Key,
+                keyBinding.Value is not null ? new PhysicalKeyInput((PhysicalKey)keyBinding.Value) : null);
+        }
     }
 
     public void KeyPressed(object? sender, KeyEventArgs eventArgs)

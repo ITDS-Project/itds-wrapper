@@ -26,8 +26,8 @@ public partial class ControllerDiagramViewModel : ViewModelBase
         { ControllerButton.DPadRight, new(30, 751) },
         { ControllerButton.LeftBumper, new(121, 222) },
         { ControllerButton.RightBumper, new(1744, 222) },
-        { ControllerButton.LeftStick, new(156, 427) },
-        { ControllerButton.RightStick, new(1468, 1008) },
+        { ControllerButton.LeftStickClick, new(156, 427) },
+        { ControllerButton.RightStickClick, new(1468, 1008) },
         { ControllerButton.Start, new(704, 938) },
         { ControllerButton.Select, new(704, 1008) },
     };

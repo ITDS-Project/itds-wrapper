@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Input;
 using Avalonia.Threading;
 using ITDSWrapper.Assets;
+using ITDSWrapper.Core;
 using ITDSWrapper.Input;
 using Libretro.NET.Bindings;
 using Silk.NET.Input;
@@ -366,7 +366,7 @@ public class SdlInputDriver : IInputDriver
         return _gamepad?.Name ?? string.Empty;
     }
 
-    public ImmutableDictionary<uint, ControllerButton?> GetControllerBindings()
+    public Dictionary<uint, ControllerButton?> GetControllerBindings()
     {
         var bindings = new Dictionary<uint, ControllerButton?>();
         foreach ((uint a, List<SdlControllerInput?> b) in _controlsDictionary)
@@ -379,12 +379,12 @@ public class SdlInputDriver : IInputDriver
                 }
             }
         }
-        return bindings.ToImmutableDictionary();
+        return bindings.ToDictionary();
     }
 
-    public ImmutableDictionary<uint, PhysicalKey?> GetKeyBindings()
+    public Dictionary<uint, PhysicalKey?> GetKeyBindings()
     {
-        return ImmutableDictionary<uint, PhysicalKey?>.Empty;
+        return [];
     }
 
     public async Task<object?> RecordInput(InputBinding binding)
@@ -405,5 +405,46 @@ public class SdlInputDriver : IInputDriver
         _recordedInput = null;
         
         return GetGenericButtonFromSdl(sdlInput);
+    }
+
+    public void RestoreInputs(Settings settings)
+    {
+        if (settings.ControllerBindings.Count <= 0)
+            return;
+        foreach (var controllerBinding in settings.ControllerBindings)
+        {
+            SdlControllerInput? input = controllerBinding.Value switch
+            {
+                ControllerButton.A => new(_gamepad?.Buttons.FirstOrDefault(b => b.Name == ButtonName.A)),
+                ControllerButton.B => new(_gamepad?.Buttons.FirstOrDefault(b => b.Name == ButtonName.B)),
+                ControllerButton.X => new(_gamepad?.Buttons.FirstOrDefault(b => b.Name == ButtonName.X)),
+                ControllerButton.Y => new(_gamepad?.Buttons.FirstOrDefault(b => b.Name == ButtonName.Y)),
+                ControllerButton.DPadUp => new(_gamepad?.Buttons.FirstOrDefault(b => b.Name == ButtonName.DPadUp)),
+                ControllerButton.DPadRight => new(_gamepad?.Buttons.FirstOrDefault(b => b.Name == ButtonName.DPadRight)),
+                ControllerButton.DPadDown => new(_gamepad?.Buttons.FirstOrDefault(b => b.Name == ButtonName.DPadDown)),
+                ControllerButton.DPadLeft => new(_gamepad?.Buttons.FirstOrDefault(b => b.Name == ButtonName.DPadLeft)),
+                ControllerButton.LeftBumper => new(_gamepad?.Buttons.FirstOrDefault(b => b.Name == ButtonName.LeftBumper)),
+                ControllerButton.RightBumper => new(_gamepad?.Buttons.FirstOrDefault(b => b.Name == ButtonName.RightBumper)),
+                ControllerButton.LeftTrigger => new(_gamepad?.Triggers.FirstOrDefault(t => t.Index == 0)),
+                ControllerButton.RightTrigger => new(_gamepad?.Triggers.FirstOrDefault(t => t.Index == 1)),
+                ControllerButton.LeftStickUp => new((_gamepad?.Thumbsticks.FirstOrDefault(s => s.Index == 0), ThumbstickDirection.NEGATIVE_Y)),
+                ControllerButton.LeftStickRight => new((_gamepad?.Thumbsticks.FirstOrDefault(s => s.Index == 0), ThumbstickDirection.POSITIVE_X)),
+                ControllerButton.LeftStickDown => new((_gamepad?.Thumbsticks.FirstOrDefault(s => s.Index == 0), ThumbstickDirection.POSITIVE_Y)),
+                ControllerButton.LeftStickLeft => new((_gamepad?.Thumbsticks.FirstOrDefault(s => s.Index == 0), ThumbstickDirection.NEGATIVE_X)),
+                ControllerButton.LeftStickClick => new(_gamepad?.Buttons.FirstOrDefault(b => b.Name == ButtonName.LeftStick)),
+                ControllerButton.RightStickUp => new((_gamepad?.Thumbsticks.FirstOrDefault(s => s.Index == 1), ThumbstickDirection.NEGATIVE_Y)),
+                ControllerButton.RightStickRight => new((_gamepad?.Thumbsticks.FirstOrDefault(s => s.Index == 1), ThumbstickDirection.POSITIVE_X)),
+                ControllerButton.RightStickDown => new((_gamepad?.Thumbsticks.FirstOrDefault(s => s.Index == 1), ThumbstickDirection.POSITIVE_Y)),
+                ControllerButton.RightStickLeft => new((_gamepad?.Thumbsticks.FirstOrDefault(s => s.Index == 1), ThumbstickDirection.NEGATIVE_X)),
+                ControllerButton.RightStickClick => new(_gamepad?.Buttons.FirstOrDefault(b => b.Name == ButtonName.RightStick)),
+                ControllerButton.Select => new(_gamepad?.Buttons.FirstOrDefault(b => b.Name == ButtonName.Back)),
+                ControllerButton.Start => new(_gamepad?.Buttons.FirstOrDefault(b => b.Name == ButtonName.Start)),
+                _ => null,
+            };
+            SetBinding(controllerBinding.Key,
+                controllerBinding.Value is not null
+                    ? new SdlControllerInput(input)
+                    : null);
+        }
     }
 }

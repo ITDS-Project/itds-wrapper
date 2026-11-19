@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.OS;
 using Android.Views;
 using Avalonia.Input;
 using ITDSWrapper.Assets;
+using ITDSWrapper.Core;
 using ITDSWrapper.Input;
 using Libretro.NET.Bindings;
 
@@ -150,12 +150,12 @@ public class AndroidControllerInputDriver : IInputDriver
         return Controller?.Name ?? string.Empty;
     }
 
-    public ImmutableDictionary<uint, ControllerButton?> GetControllerBindings()
+    public Dictionary<uint, ControllerButton?> GetControllerBindings()
     {
-        return _inputDictionary.ToImmutableDictionary(i => i.Key, i => i.Value?.GetGenericButtonName());
+        return _inputDictionary.ToDictionary(i => i.Key, i => i.Value?.GetGenericButtonName());
     }
 
-    public ImmutableDictionary<uint, PhysicalKey?> GetKeyBindings()
+    public Dictionary<uint, PhysicalKey?> GetKeyBindings()
     {
         return [];
     }
@@ -178,5 +178,33 @@ public class AndroidControllerInputDriver : IInputDriver
         _recordedInput = null;
         
         return androidInput?.GetGenericButtonName();
+    }
+
+    public void RestoreInputs(Settings settings)
+    {
+        if (settings.ControllerBindings.Count <= 0)
+            return;
+        foreach (var controllerBinding in settings.ControllerBindings)
+        {
+            AndroidInputContainer? input = controllerBinding.Value switch
+            {
+                ControllerButton.A => new(AndroidInputType.KEY, Keycode.ButtonA, null),
+                ControllerButton.B => new(AndroidInputType.KEY, Keycode.ButtonB, null),
+                ControllerButton.X => new(AndroidInputType.KEY, Keycode.ButtonX, null),
+                ControllerButton.Y => new(AndroidInputType.KEY, Keycode.ButtonY, null),
+                ControllerButton.DPadUp => new(AndroidInputType.KEY, Keycode.DpadUp, null),
+                ControllerButton.DPadRight => new(AndroidInputType.KEY, Keycode.DpadRight, null),
+                ControllerButton.DPadDown => new(AndroidInputType.KEY, Keycode.DpadDown, null),
+                ControllerButton.DPadLeft => new(AndroidInputType.KEY, Keycode.DpadLeft, null),
+                ControllerButton.LeftBumper => new(AndroidInputType.KEY, Keycode.ButtonL1, null),
+                ControllerButton.RightBumper => new(AndroidInputType.KEY, Keycode.ButtonR1, null),
+                ControllerButton.LeftStickClick => new(AndroidInputType.KEY, Keycode.ButtonL2, null),
+                ControllerButton.RightStickClick => new(AndroidInputType.KEY, Keycode.ButtonR2, null),
+                ControllerButton.Select => new(AndroidInputType.KEY, Keycode.ButtonSelect, null),
+                ControllerButton.Start => new(AndroidInputType.KEY, Keycode.ButtonStart, null),
+                _ => null,
+            };
+            SetBinding(controllerBinding.Key, input is not null ? new AndroidControllerInput(input) : null);
+        }
     }
 }

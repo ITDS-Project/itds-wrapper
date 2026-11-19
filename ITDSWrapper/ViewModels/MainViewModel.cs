@@ -965,8 +965,6 @@ public partial class MainViewModel : ViewModelBase
             button.Background = Brushes.AliceBlue;
             button.Foreground = Brushes.Black;
         });
-        binding.KeyboardKey = null;
-        binding.ControllerButton = null;
 
         object? newBinding = null;
         if (button.Tag?.Equals("Keyboard") == true)
@@ -989,17 +987,10 @@ public partial class MainViewModel : ViewModelBase
         if (newBinding is PhysicalKey newKey)
         {
             binding.KeyboardKey = newKey;
-            binding.ControllerButton = controllerButton;
         }
         else if (newBinding is ControllerButton newButton)
         {
             binding.ControllerButton = newButton;
-            binding.KeyboardKey = keyboardKey;
-        }
-        else
-        {
-            binding.KeyboardKey = keyboardKey;
-            binding.ControllerButton = controllerButton;
         }
         
         Dispatcher.UIThread.Invoke(() =>
@@ -1007,6 +998,15 @@ public partial class MainViewModel : ViewModelBase
             button.Background = oldBg;
             button.Foreground = oldFg;
         });
+
+        if (_inputDrivers.FirstOrDefault(d => d is DefaultInputDriver) is DefaultInputDriver defaultDriver)
+        {
+            WrapperSettings.KeyBindings = defaultDriver.GetKeyBindings();
+        }
+        else if (_inputDrivers.FirstOrDefault(d => d is not DefaultInputDriver) is { } controllerDriver)
+        {
+            WrapperSettings.ControllerBindings = controllerDriver.GetControllerBindings();
+        }
     }
 
     private void ToggleVirtualButtonsLayout()

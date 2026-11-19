@@ -14,8 +14,6 @@ public enum ControllerButton
     RightBumper,
     LeftTrigger,
     RightTrigger,
-    LeftStick,
-    RightStick,
     LeftStickUp,
     LeftStickDown,
     LeftStickLeft,

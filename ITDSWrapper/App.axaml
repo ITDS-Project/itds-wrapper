@@ -18,6 +18,23 @@
     <Application.Styles>
         <FluentTheme />
 
+        <Style Selector="HeaderedItemsControl">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <DockPanel>
+                        <ContentPresenter Name="PART_HeaderPresenter"
+                                          DockPanel.Dock="Top"
+                                          Content="{TemplateBinding Header}"
+                                          ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                          HorizontalAlignment="Stretch" />
+
+                        <ItemsPresenter Name="PART_ItemsPresenter"
+                                        ItemsPanel="{TemplateBinding ItemsPanel}" />
+                    </DockPanel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
         <Style Selector=":is(Button)">
             <Setter Property="(PlatformFeedback.FeedbackType)" Value="None" />
         </Style>
