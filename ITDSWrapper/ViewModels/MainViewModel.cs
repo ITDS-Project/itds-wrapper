@@ -426,6 +426,7 @@ public partial class MainViewModel : ViewModelBase
             : Strings.SettingsVirtualButtonLayoutRecommended;
         Wrapper = new();
         _borderLocator = ((App)Application.Current!).BorderLocator ?? new DefaultBorderLocator();
+        _borderFadeTimer.Elapsed += (_, _) => FadeBorder();
         _logInterpreter = ((App)Application.Current!).LogInterpreter ?? new();
         _logInterpreter.SetNextBorder = border =>
         {
@@ -1378,8 +1379,7 @@ public partial class MainViewModel : ViewModelBase
             BorderMpvContexts[_nextBorderIdx].LoadFile(_borderLocator!.GetBorderPath(_borders[_nextBorderIdx])).Invoke();
             BorderMpvContexts[_nextBorderIdx].LoopFile.Set("inf");
         }
-
-        _borderFadeTimer.Elapsed += (_, _) => FadeBorder();
+        
         _borderFadeTimer.Start();
     }
 

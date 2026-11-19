@@ -20,13 +20,13 @@ public partial class MainView : UserControl
         {
             ((MainViewModel)DataContext!).BorderWidth = e.NewSize.Width;
             ((MainViewModel)DataContext).BorderHeight = (2160.0 / 3840.0) * e.NewSize.Width;
-            ((MainViewModel)DataContext).PanScanBorders(e.NewSize.Width, e.NewSize.Height);
         }
         else
         {
             ((MainViewModel)DataContext!).BorderHeight = e.NewSize.Height;
             ((MainViewModel)DataContext).BorderWidth = (3840.0 / 2160.0) * e.NewSize.Height;
         }
+        ((MainViewModel)DataContext).PanScanBorders(e.NewSize.Width, e.NewSize.Height);
         
         if (!MainViewModel.IsMobile || ((MainViewModel)DataContext!).DualScreenBackend?.IsActive == true)
             return;
