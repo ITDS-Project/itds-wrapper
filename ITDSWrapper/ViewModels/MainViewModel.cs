@@ -18,7 +18,6 @@ using Avalonia.Threading;
 using DynamicData;
 using HanumanInstitute.LibMpv;
 using HanumanInstitute.LibMpv.Avalonia;
-using HanumanInstitute.LibMpv.Core;
 using ITDSWrapper.Assets;
 using ITDSWrapper.Audio;
 using ITDSWrapper.Core;
@@ -53,7 +52,7 @@ public partial class MainViewModel : ViewModelBase
     [Reactive] public partial string WindowingModeDesc { get; set; } = Strings.WindowStateFullScreen;
 
     private bool _ignoreFullScreenReposition;
-
+    
     public int WindowingModeIdx
     {
         get => (int)WrapperSettings.WindowingMode;
@@ -297,8 +296,10 @@ public partial class MainViewModel : ViewModelBase
 
     public bool DisplayVirtualControls => IsMobile && CurrentInputDriver == 0 && DualScreenBackend?.IsActive != true;
 
+    public double BorderWidth { get; set; } = 3840;
+    public double BorderHeight { get; set; } = 2160;
     public ObservableCollection<double> BorderOpacities { get; set; } = [1.0, 0.0];
-    private string[] _borders = ["BLACK_BG", string.Empty];
+    private readonly string[] _borders = ["BLACK_BG", string.Empty];
     private int _currentBorderIdx = 0;
     private int _nextBorderIdx = 1;
     private readonly System.Timers.Timer _borderFadeTimer = new(TimeSpan.FromMilliseconds(100));

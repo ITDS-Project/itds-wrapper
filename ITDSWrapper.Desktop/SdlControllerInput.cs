@@ -1,7 +1,6 @@
 using System;
 using ITDSWrapper.Input;
 using Silk.NET.Input;
-using Silk.NET.Input.Sdl;
 
 namespace ITDSWrapper.Desktop;
 

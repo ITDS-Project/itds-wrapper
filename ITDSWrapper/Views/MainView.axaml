@@ -22,9 +22,9 @@
         <!-- <Image Grid.Row="0" Grid.RowSpan="4" Stretch="UniformToFill" Source="{Binding NextBorder}" -->
         <!--        Opacity="{Binding NextBorderOpacity}"/> -->
         <mpv:MpvView Grid.Row="0" Grid.RowSpan="4" Renderer="{Binding Renderer}" MpvContext="{Binding BorderMpvContexts[0]}"
-                     Opacity="{Binding BorderOpacities[0]}" />
+                     Opacity="{Binding BorderOpacities[0]}" Width="{Binding BorderWidth}" Height="{Binding BorderHeight}" />
         <mpv:MpvView Grid.Row="0" Grid.RowSpan="4" Renderer="{Binding Renderer}" MpvContext="{Binding BorderMpvContexts[1]}"
-                     Opacity="{Binding BorderOpacities[1]}" />
+                     Opacity="{Binding BorderOpacities[1]}" Width="{Binding BorderWidth}" Height="{Binding BorderHeight}"  />
 
         <Grid Row="0" Margin="0 0 23 0" MinHeight="{Binding TopPadding}" IsVisible="{Binding DisplayVirtualControls}">
             <Grid Grid.Row="0" Grid.Column="0" RowDefinitions="*" ColumnDefinitions="*" Width="46" Height="46" HorizontalAlignment="Right">
