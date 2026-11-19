@@ -4,8 +4,8 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using Avalonia;
-using Avalonia.ReactiveUI;
 using ITDSWrapper.Core;
+using ReactiveUI.Avalonia;
 #if IS_LINUX
 using ITDSWrapper.Desktop.Linux;
 #endif
@@ -48,7 +48,7 @@ sealed class Program
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
-            .UseReactiveUI()
+            .UseReactiveUI(b => b.Build())
             .LogToTrace()
             .With(() =>
             {

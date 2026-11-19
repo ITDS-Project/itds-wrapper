@@ -2,10 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:ITDSWrapper.ViewModels"
+             xmlns:vm="using:ITDSWrapper.ViewModels"
              xmlns:c="using:ITDSWrapper.Views.Controls"
              xmlns:g="using:ITDSWrapper.Graphics"
-             xmlns:assets="clr-namespace:ITDSWrapper.Assets"
+             xmlns:assets="using:ITDSWrapper.Assets"
+             xmlns:mpv="using:HanumanInstitute.LibMpv.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="ITDSWrapper.Views.MainView"
              x:DataType="vm:MainViewModel"
@@ -16,10 +17,14 @@
     <Grid RowDefinitions="Auto,*,Auto,Auto" PointerPressed="MainScreen_OnPointerPressed" 
           VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         
-        <Image Grid.Row="0" Grid.RowSpan="4" Stretch="UniformToFill" Source="{Binding CurrentBorder}"
-               Opacity="{Binding CurrentBorderOpacity}"/>
-        <Image Grid.Row="0" Grid.RowSpan="4" Stretch="UniformToFill" Source="{Binding NextBorder}"
-               Opacity="{Binding NextBorderOpacity}"/>
+        <!-- <Image Grid.Row="0" Grid.RowSpan="4" Stretch="UniformToFill" Source="{Binding CurrentBorder}" -->
+        <!--        Opacity="{Binding CurrentBorderOpacity}"/> -->
+        <!-- <Image Grid.Row="0" Grid.RowSpan="4" Stretch="UniformToFill" Source="{Binding NextBorder}" -->
+        <!--        Opacity="{Binding NextBorderOpacity}"/> -->
+        <mpv:MpvView Grid.Row="0" Grid.RowSpan="4" Renderer="{Binding Renderer}" MpvContext="{Binding BorderMpvContexts[0]}"
+                     Opacity="{Binding BorderOpacities[0]}" />
+        <mpv:MpvView Grid.Row="0" Grid.RowSpan="4" Renderer="{Binding Renderer}" MpvContext="{Binding BorderMpvContexts[1]}"
+                     Opacity="{Binding BorderOpacities[1]}" />
 
         <Grid Row="0" Margin="0 0 23 0" MinHeight="{Binding TopPadding}" IsVisible="{Binding DisplayVirtualControls}">
             <Grid Grid.Row="0" Grid.Column="0" RowDefinitions="*" ColumnDefinitions="*" Width="46" Height="46" HorizontalAlignment="Right">
