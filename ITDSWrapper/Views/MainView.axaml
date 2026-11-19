@@ -201,11 +201,11 @@
                                 Command="{Binding ChangeRenderingModeCommand}" CommandParameter="{x:True}"/>
                         <Rectangle Grid.Row="4" Grid.Column="0" Classes="divider"  />
                         
-                        <Label IsVisible="{Binding !IsMobile}" Grid.Row="5" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsAudioDevice}"/>
-                        <Button IsVisible="{Binding !IsMobile}" Grid.Row="5" Grid.Column="1" Classes="setting-button" Content="◁"
+                        <Label IsVisible="{Binding CanSelectAudioDevice}" Grid.Row="5" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsAudioDevice}"/>
+                        <Button IsVisible="{Binding CanSelectAudioDevice}" Grid.Row="5" Grid.Column="1" Classes="setting-button" Content="◁"
                                 Command="{Binding ChangeAudioDeviceSettingsCommand}" CommandParameter="{x:False}"/>
-                        <Label IsVisible="{Binding !IsMobile}" Grid.Row="5" Grid.Column="2" Classes="setting-value" Content="{Binding CurrentAudioDevice}"/>
-                        <Button IsVisible="{Binding !IsMobile}" Grid.Row="5" Grid.Column="3" Classes="setting-button" Content="▷"
+                        <Label IsVisible="{Binding CanSelectAudioDevice}" Grid.Row="5" Grid.Column="2" Classes="setting-value" Content="{Binding CurrentAudioDevice}"/>
+                        <Button IsVisible="{Binding CanSelectAudioDevice}" Grid.Row="5" Grid.Column="3" Classes="setting-button" Content="▷"
                                 Command="{Binding ChangeAudioDeviceSettingsCommand}" CommandParameter="{x:True}"/>
                         <Rectangle Grid.Row="5" Grid.Column="0" Classes="divider"  />
                         

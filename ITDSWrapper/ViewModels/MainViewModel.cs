@@ -40,6 +40,7 @@ namespace ITDSWrapper.ViewModels;
 public partial class MainViewModel : ViewModelBase
 {
     public static bool IsMobile => OperatingSystem.IsAndroid() || OperatingSystem.IsIOS();
+    public static bool CanSelectAudioDevice => !IsMobile && !OperatingSystem.IsMacOS();
     private bool _shown;
 
     public Control? Top { get; set; }
