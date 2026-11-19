@@ -24,7 +24,7 @@
         <value>Menu</value>
     </data>
     <data name="SettingsController" xml:space="preserve">
-        <value>Controller Settings</value>
+        <value>Controls</value>
     </data>
     <data name="SettingsDiscord" xml:space="preserve">
         <value>Discord</value>
@@ -72,7 +72,7 @@
         <value>On</value>
     </data>
     <data name="SettingsControllerHeader" xml:space="preserve">
-        <value>Controller</value>
+        <value>Controls</value>
     </data>
     <data name="SettingsBorders" xml:space="preserve">
         <value>Screen Borders</value>
@@ -226,5 +226,8 @@
     </data>
     <data name="KeyBindingsKeyHeader" xml:space="preserve">
         <value>Keyboard Binding</value>
+    </data>
+    <data name="SettingsAudioDevice" xml:space="preserve">
+        <value>Audio Device</value>
     </data>
 </root>

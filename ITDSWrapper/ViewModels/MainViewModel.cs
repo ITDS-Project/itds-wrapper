@@ -234,7 +234,7 @@ public partial class MainViewModel : ViewModelBase
 
     [Reactive] public partial string BordersSettingDesc { get; set; }
 
-    private readonly List<string> _audioDevices = [];
+    private readonly List<string> _audioDevices;
     [Reactive] public partial string? CurrentAudioDevice { get; set; }
 
     public int CurrentAudioDeviceIdx
@@ -929,7 +929,16 @@ public partial class MainViewModel : ViewModelBase
     {
         if (forward)
         {
+            CurrentAudioDeviceIdx = (CurrentAudioDeviceIdx + 1) % _audioDevices.Count;
         }
+        else
+        {
+            if (CurrentAudioDeviceIdx == 0)
+                CurrentAudioDeviceIdx = _audioDevices.Count - 1;
+            else
+                CurrentAudioDeviceIdx--;
+        }
+        _audioBackend.SelectDevice(CurrentAudioDevice!);
     }
 
     private void ToggleVirtualButtonsLayout()

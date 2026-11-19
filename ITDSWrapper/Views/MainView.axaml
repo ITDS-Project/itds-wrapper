@@ -158,7 +158,7 @@
                 <Grid IsVisible="{Binding SystemSettingsMenuOpen}" Classes="submenucontainer" RowDefinitions="Auto,*,Auto,Auto"
                       RowSpacing="5" ColumnSpacing="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <Label Grid.Row="0" Classes="header" Content="{x:Static assets:Strings.SettingsSystemHeader}" />
-                    <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto,Auto,Auto,Auto"
+                    <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto,Auto,Auto,Auto"
                           VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Classes="settingsgrid">
                         <Label Grid.Row="0" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.WindowStateSettingsLabel}" IsVisible="{Binding !IsMobile}"/>
                         <Button Grid.Row="0" Grid.Column="1" Classes="setting-button" Content="◁" Command="{Binding ChangeWindowingSettingsCommand}"
@@ -201,12 +201,20 @@
                                 Command="{Binding ChangeRenderingModeCommand}" CommandParameter="{x:True}"/>
                         <Rectangle Grid.Row="4" Grid.Column="0" Classes="divider"  />
                         
-                        <Label Grid.Row="5" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsScreenReader}"/>
-                        <Button Grid.Row="5" Grid.Column="1" Classes="setting-button" Content="◁" Command="{Binding ChangeScreenReaderSettingsCommand}"/>
-                        <Label Grid.Row="5" Grid.Column="2" Classes="setting-value" Content="{Binding ScreenReaderSettingDesc}"/>
-                        <Button Grid.Row="5" Grid.Column="3" Classes="setting-button" Content="▷" Command="{Binding ChangeScreenReaderSettingsCommand}"/>
+                        <Label IsVisible="{Binding !IsMobile}" Grid.Row="5" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsAudioDevice}"/>
+                        <Button IsVisible="{Binding !IsMobile}" Grid.Row="5" Grid.Column="1" Classes="setting-button" Content="◁"
+                                Command="{Binding ChangeAudioDeviceSettingsCommand}" CommandParameter="{x:False}"/>
+                        <Label IsVisible="{Binding !IsMobile}" Grid.Row="5" Grid.Column="2" Classes="setting-value" Content="{Binding CurrentAudioDevice}"/>
+                        <Button IsVisible="{Binding !IsMobile}" Grid.Row="5" Grid.Column="3" Classes="setting-button" Content="▷"
+                                Command="{Binding ChangeAudioDeviceSettingsCommand}" CommandParameter="{x:True}"/>
+                        <Rectangle Grid.Row="5" Grid.Column="0" Classes="divider"  />
                         
-                        <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Classes="menuitem"  IsVisible="{Binding IsMobile}"
+                        <Label Grid.Row="6" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsScreenReader}"/>
+                        <Button Grid.Row="6" Grid.Column="1" Classes="setting-button" Content="◁" Command="{Binding ChangeScreenReaderSettingsCommand}"/>
+                        <Label Grid.Row="6" Grid.Column="2" Classes="setting-value" Content="{Binding ScreenReaderSettingDesc}"/>
+                        <Button Grid.Row="6" Grid.Column="3" Classes="setting-button" Content="▷" Command="{Binding ChangeScreenReaderSettingsCommand}"/>
+                        
+                        <Button Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="4" Classes="menuitem"  IsVisible="{Binding IsMobile}"
                                 Command="{Binding SettingsBackCommand}"
                                 Content="{x:Static assets:Strings.SettingsBack}" />
                     </Grid>
