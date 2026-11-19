@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.OS;
 using Android.Views;
 using Avalonia.Input;
@@ -17,7 +18,11 @@ public class AndroidControllerInputDriver : IInputDriver
     private readonly Dictionary<uint, AndroidControllerInput?> _inputDictionary = [];
     private readonly Dictionary<uint, Action> _specialActions = [];
 
+    private Action<AndroidInputContainer?>? _recordInput;
+    private AndroidInputContainer? _recordedInput;
+
     public bool RequestInputUpdate { get; set; }
+    public bool IsRecordingInput => _recordInput is not null;
     public event Action? ControllerChanged;
 
     public void SetController(InputDevice controller)
@@ -153,5 +158,25 @@ public class AndroidControllerInputDriver : IInputDriver
     public ImmutableDictionary<uint, PhysicalKey?> GetKeyBindings()
     {
         return [];
+    }
+
+    public async Task<object?> RecordInput(InputBinding binding)
+    {
+        _recordInput = b => _recordedInput = b;
+        AndroidControllerInput? androidInput = null;
+        for (int i = 0; i < 50; i++)
+        {
+            if (_recordedInput is not null)
+            {
+                androidInput = new(_recordedInput);
+                SetBinding(binding.Action, androidInput);
+                break;
+            }
+            await Task.Delay(TimeSpan.FromSeconds(0.1));
+        }
+        _recordInput = null;
+        _recordedInput = null;
+        
+        return androidInput?.GetGenericButtonName();
     }
 }

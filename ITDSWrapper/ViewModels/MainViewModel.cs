@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -262,8 +261,6 @@ public partial class MainViewModel : ViewModelBase
     [Reactive] public partial bool SystemSettingsMenuOpen { get; set; }
     [Reactive] public partial bool ControllerSettingsMenuOpen { get; set; }
     [Reactive] public partial bool KeyBindingsSettingsMenuOpen { get; set; }
-    [Reactive] public partial bool HasControllerBindings { get; set; }
-    [Reactive] public partial bool HasKeyBindings { get; set; }
     [Reactive] public partial bool LegalMenuOpen { get; set; }
     [Reactive] public partial bool FeedbackModalOpen { get; set; }
     [Reactive] public partial bool ShowSidebar { get; set; }
@@ -383,6 +380,7 @@ public partial class MainViewModel : ViewModelBase
     public ICommand ChangeBorderSettingsCommand { get; }
     public ICommand ChangeScreenReaderSettingsCommand { get; }
     public ICommand ChangeAudioDeviceSettingsCommand { get; }
+    public ICommand RecordControllerBindingCommand { get; }
     public ICommand ChangeControlPadHapticsSettingsCommand { get; }
     public ICommand ChangeVirtualButtonsLayoutSettingsCommand { get; }
 
@@ -582,6 +580,7 @@ public partial class MainViewModel : ViewModelBase
         ChangeBorderSettingsCommand = ReactiveCommand.Create(ToggleBorderSettings);
         ChangeScreenReaderSettingsCommand = ReactiveCommand.Create(ToggleScreenReader);
         ChangeAudioDeviceSettingsCommand = ReactiveCommand.Create<bool>(ChangeAudioDevice);
+        RecordControllerBindingCommand = ReactiveCommand.CreateFromTask<Button>(RecordControllerBinding);
         ChangeVirtualButtonsLayoutSettingsCommand = ReactiveCommand.Create(ToggleVirtualButtonsLayout);
         ChangeControlPadHapticsSettingsCommand = ReactiveCommand.Create(ToggleControlPadHaptics);
 
@@ -656,23 +655,35 @@ public partial class MainViewModel : ViewModelBase
     private void OpenKeyBindingsSettings()
     {
         InputBindings.Clear();
-        ImmutableDictionary<uint, ControllerButton?> controllerBindings =
-            _inputDrivers[CurrentInputDriver].GetControllerBindings();
-        ImmutableDictionary<uint, PhysicalKey?> keyBindings = _inputDrivers[CurrentInputDriver].GetKeyBindings();
+        Dictionary<uint, PhysicalKey?> keyBindings = [];
+        Dictionary<uint, ControllerButton?> controllerBindings = [];
+        ControllerBrand? controllerBrand = null;
+
+        foreach (IInputDriver driver in _inputDrivers)
+        {
+            foreach (var keyBind in driver.GetKeyBindings())
+            {
+                keyBindings.Add(keyBind.Key, keyBind.Value);
+            }
+
+            foreach (var controllerBind in driver.GetControllerBindings())
+            {
+                controllerBindings.Add(controllerBind.Key, controllerBind.Value);
+            }
+
+            controllerBrand ??= driver.GetControllerBrand() != ControllerBrand.NONE ? driver.GetControllerBrand() : controllerBrand;
+        }
+        
         foreach (uint inputKey in _inputDrivers[CurrentInputDriver].GetInputKeys())
         {
-            if (inputKey == RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT)
-                continue;
             InputBindings.Add(new()
             {
                 Action = inputKey,
+                Controller = controllerBrand ?? ControllerBrand.NONE,
                 ControllerButton = controllerBindings.TryGetValue(inputKey, out ControllerButton? cb) ? cb : null,
                 KeyboardKey = keyBindings.TryGetValue(inputKey, out PhysicalKey? kb) ? kb : null,
             });
         }
-
-        HasControllerBindings = controllerBindings.Any(c => c.Value is not null);
-        HasKeyBindings = keyBindings.Any(c => c.Value is not null);
 
         KeyBindingsSettingsMenuOpen = true;
         LegalMenuOpen = SystemSettingsMenuOpen = ControllerSettingsMenuOpen = false;
@@ -942,6 +953,62 @@ public partial class MainViewModel : ViewModelBase
         _audioBackend.SelectDevice(CurrentAudioDevice!);
     }
 
+    private async Task RecordControllerBinding(Button button)
+    {
+        InputBinding binding = (InputBinding)button.DataContext!;
+        PhysicalKey? keyboardKey = binding.KeyboardKey;
+        ControllerButton? controllerButton = binding.ControllerButton;
+        IBrush? oldBg = button.Background;
+        IBrush? oldFg = button.Foreground;
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            button.Background = Brushes.AliceBlue;
+            button.Foreground = Brushes.Black;
+        });
+        binding.KeyboardKey = null;
+        binding.ControllerButton = null;
+
+        object? newBinding = null;
+        if (button.Tag?.Equals("Keyboard") == true)
+        {
+            if (_inputDrivers.FirstOrDefault(d => d is DefaultInputDriver) is DefaultInputDriver driver)
+            {
+                TopLevel.GetTopLevel(Top)!.AddHandler(InputElement.KeyDownEvent, driver.KeyPressed);
+                newBinding = await driver.RecordInput(binding);
+                TopLevel.GetTopLevel(Top)!.RemoveHandler(InputElement.KeyDownEvent, driver.KeyPressed);
+            }
+        }
+        else
+        {
+            if (_inputDrivers.FirstOrDefault(d => d is not DefaultInputDriver) is { } driver)
+            {
+                newBinding = await driver.RecordInput(binding);
+            }
+        }
+        
+        if (newBinding is PhysicalKey newKey)
+        {
+            binding.KeyboardKey = newKey;
+            binding.ControllerButton = controllerButton;
+        }
+        else if (newBinding is ControllerButton newButton)
+        {
+            binding.ControllerButton = newButton;
+            binding.KeyboardKey = keyboardKey;
+        }
+        else
+        {
+            binding.KeyboardKey = keyboardKey;
+            binding.ControllerButton = controllerButton;
+        }
+        
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            button.Background = oldBg;
+            button.Foreground = oldFg;
+        });
+    }
+
     private void ToggleVirtualButtonsLayout()
     {
         WrapperSettings.VirtualButtonFullLayout = !WrapperSettings.VirtualButtonFullLayout;
@@ -1191,7 +1258,7 @@ public partial class MainViewModel : ViewModelBase
                         _menuInputTimer.Stop();
                         _menuInputTimer.Start();
                     }
-                    else if (_inputDrivers[CurrentInputDriver].QueryInput(RetroBindings.RETRO_DEVICE_ID_JOYPAD_B))
+                    else if (!_inputDrivers[CurrentInputDriver].IsRecordingInput && _inputDrivers[CurrentInputDriver].QueryInput(RetroBindings.RETRO_DEVICE_ID_JOYPAD_B))
                     {
                         _acceptingMenuInput = false;
                         _menuInputTimer.Stop();

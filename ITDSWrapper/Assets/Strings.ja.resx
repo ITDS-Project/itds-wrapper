@@ -230,4 +230,7 @@
     <data name="SettingsAudioDevice" xml:space="preserve">
         <value>Audio Device</value>
     </data>
+    <data name="InputBindingPressToRecordPrompt" xml:space="preserve">
+        <value>[Press to Record]</value>
+    </data>
 </root>

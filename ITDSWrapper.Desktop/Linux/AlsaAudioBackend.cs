@@ -21,7 +21,7 @@ public class AlsaAudioBackend : IAudioBackend
     public void Initialize(double sampleRate)
     {
 #if IS_LINUX
-        _waveProvider = new(new((int)sampleRate, 2), TimeSpan.FromMilliseconds(200));
+        _waveProvider = new(new((int)sampleRate, 2), TimeSpan.FromMilliseconds(150));
         foreach (AlsaDeviceInfo device in AlsaDeviceEnumerator.GetPlaybackDevices())
         {
             try

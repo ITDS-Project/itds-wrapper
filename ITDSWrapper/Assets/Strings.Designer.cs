@@ -202,6 +202,15 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to [Press to Record].
+        /// </summary>
+        public static string InputBindingPressToRecordPrompt {
+            get {
+                return ResourceManager.GetString("InputBindingPressToRecordPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Action.
         /// </summary>
         public static string KeyBindingsActionHeader {

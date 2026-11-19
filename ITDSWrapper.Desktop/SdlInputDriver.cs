@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Input;
 using Avalonia.Threading;
 using ITDSWrapper.Assets;
@@ -24,9 +25,13 @@ public class SdlInputDriver : IInputDriver
     private Action<IGamepad, Trigger>? _triggerMovedHandler;
     private readonly Dictionary<uint, Action> _specialActions = [];
 
+    private Action<object?>? _recordInput;
+    private object? _recordedInput;
+
     private readonly Dictionary<uint, List<SdlControllerInput?>> _controlsDictionary = [];
 
     public bool RequestInputUpdate { get; set; }
+    public bool IsRecordingInput => _recordInput is not null;
     public event Action? ControllerChanged;
     private bool _requestControl;
 
@@ -81,10 +86,14 @@ public class SdlInputDriver : IInputDriver
     {
         if (_gamepad is not null)
         {
-            if (_buttonDownHandler is not null) _gamepad.ButtonDown -= _buttonDownHandler;
-            if (_buttonUpHandler is not null) _gamepad.ButtonUp -= _buttonUpHandler;
-            if (_thumbstickMovedHandler is not null) _gamepad.ThumbstickMoved -= _thumbstickMovedHandler;
-            if (_triggerMovedHandler is not null) _gamepad.TriggerMoved -= _triggerMovedHandler;
+            if (_buttonDownHandler is not null)
+                _gamepad.ButtonDown -= _buttonDownHandler;
+            if (_buttonUpHandler is not null)
+                _gamepad.ButtonUp -= _buttonUpHandler;
+            if (_thumbstickMovedHandler is not null)
+                _gamepad.ThumbstickMoved -= _thumbstickMovedHandler;
+            if (_triggerMovedHandler is not null)
+                _gamepad.TriggerMoved -= _triggerMovedHandler;
         }
 
         _gamepad = gamepad;
@@ -240,6 +249,7 @@ public class SdlInputDriver : IInputDriver
 
     public void Push<T>(T binding)
     {
+        _recordInput?.Invoke(binding);
         _requestControl = true;
         foreach (List<SdlControllerInput?> list in _controlsDictionary.Values)
         {
@@ -375,5 +385,25 @@ public class SdlInputDriver : IInputDriver
     public ImmutableDictionary<uint, PhysicalKey?> GetKeyBindings()
     {
         return ImmutableDictionary<uint, PhysicalKey?>.Empty;
+    }
+
+    public async Task<object?> RecordInput(InputBinding binding)
+    {
+        _recordInput = b => _recordedInput = b;
+        SdlControllerInput? sdlInput = null;
+        for (int i = 0; i < 50; i++)
+        {
+            if (_recordedInput is not null)
+            {
+                sdlInput = new(_recordedInput);
+                SetBinding(binding.Action, sdlInput);
+                break;
+            }
+            await Task.Delay(TimeSpan.FromSeconds(0.1));
+        }
+        _recordInput = null;
+        _recordedInput = null;
+        
+        return GetGenericButtonFromSdl(sdlInput);
     }
 }

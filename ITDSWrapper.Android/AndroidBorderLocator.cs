@@ -1,7 +1,6 @@
 using System.IO;
 using Android.App;
 using Android.Content;
-using Android.Content.Res;
 using ITDSWrapper.Graphics;
 
 namespace ITDSWrapper.Android;

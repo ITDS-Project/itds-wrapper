@@ -263,11 +263,13 @@
                                     <Grid ColumnDefinitions="*,Auto,Auto" Classes="settingsgrid">
                                         <Label Grid.Column="0" Classes="binding" Content="{Binding ActionDescription}" />
                                         <Button Grid.Column="1" Classes="binding-value"
-                                               Content="{Binding KeyDescription}"
-                                               IsVisible="{Binding #View.((vm:MainViewModel)DataContext)?.HasKeyBindings}" />
+                                                Content="{Binding KeyDescription}"
+                                                Command="{Binding #View.((vm:MainViewModel)DataContext)?.RecordControllerBindingCommand}"
+                                                CommandParameter="{Binding $self}" Tag="Keyboard" />
                                         <Button Grid.Column="2" Classes="binding-value"
-                                               Content="{Binding ButtonDescription}"
-                                               IsVisible="{Binding #View.((vm:MainViewModel)DataContext)?.HasControllerBindings}" />
+                                                Content="{Binding ButtonDescription}"
+                                                Command="{Binding #View.((vm:MainViewModel)DataContext)?.RecordControllerBindingCommand}"
+                                                CommandParameter="{Binding $self}" Tag="Controller" />
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
