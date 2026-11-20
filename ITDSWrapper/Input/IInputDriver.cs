@@ -185,8 +185,8 @@ public static class InputDescriptions
                 {
                     ControllerButton.Start => "\ue029",
                     ControllerButton.Select => "\ue028",
-                    ControllerButton.A => "\ue021",
-                    ControllerButton.B => "\ue020",
+                    ControllerButton.A => "\ue020",
+                    ControllerButton.B => "\ue021",
                     ControllerButton.X => "\ue01f",
                     ControllerButton.Y => "\ue01e",
                     ControllerButton.LeftBumper => "\ue01b",

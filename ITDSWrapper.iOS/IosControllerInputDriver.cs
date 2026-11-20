@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Input;
 using CoreHaptics;
 using GameController;
 using ITDSWrapper.Assets;
+using ITDSWrapper.Core;
 using ITDSWrapper.Input;
 using Libretro.NET.Bindings;
 
@@ -18,7 +20,11 @@ public class IosControllerInputDriver : IInputDriver
     private readonly Dictionary<uint, IosControllerInput?> _inputsDictionary = [];
     private readonly Dictionary<uint, Action> _specialActions = [];
 
+    private Action<GCControllerElement?>? _recordInput;
+    private GCControllerElement? _recordedInput;
+    
     public bool RequestInputUpdate { get; set; }
+    public bool IsRecordingInput { get; }
     public event Action? ControllerChanged;
 
     public void SetController(GCController controller)
@@ -137,14 +143,60 @@ public class IosControllerInputDriver : IInputDriver
         return Controller?.VendorName ?? string.Empty;
     }
 
-    public ImmutableDictionary<uint, ControllerButton?> GetControllerBindings()
+    Dictionary<uint, ControllerButton?> IInputDriver.GetControllerBindings()
     {
-        return _inputsDictionary.Select(i => (i.Key, i.Value?.GetGenericButtonName()))
-            .ToImmutableDictionary(i => i.Key, i => i.Item2);
+        return _inputsDictionary.ToDictionary(i => i.Key, i => i.Value?.GetGenericButtonName());
     }
 
-    public ImmutableDictionary<uint, PhysicalKey?> GetKeyBindings()
+    Dictionary<uint, PhysicalKey?> IInputDriver.GetKeyBindings()
     {
         return [];
+    }
+
+    public async Task<object?> RecordInput(InputBinding binding)
+    {
+        _recordInput = b => _recordedInput = b;
+        IosControllerInput? iosInput = null;
+        for (int i = 0; i < 50; i++)
+        {
+            if (_recordedInput is not null)
+            {
+                iosInput = new(_recordedInput);
+                SetBinding(binding.Action, iosInput);
+                break;
+            }
+            await Task.Delay(TimeSpan.FromSeconds(0.1));
+        }
+        _recordInput = null;
+        _recordedInput = null;
+        
+        return iosInput?.GetGenericButtonName();
+    }
+
+    public void RestoreInputs(Settings settings)
+    {if (settings.ControllerBindings.Count <= 0)
+            return;
+        foreach (var controllerBinding in settings.ControllerBindings)
+        {
+            GCControllerElement? input = controllerBinding.Value switch
+            {
+                ControllerButton.A => Controller?.ExtendedGamepad?.ButtonA,
+                ControllerButton.B => Controller?.ExtendedGamepad?.ButtonB,
+                ControllerButton.X => Controller?.ExtendedGamepad?.ButtonX,
+                ControllerButton.Y => Controller?.ExtendedGamepad?.ButtonY,
+                ControllerButton.DPadUp => Controller?.ExtendedGamepad?.DPad.Up,
+                ControllerButton.DPadRight => Controller?.ExtendedGamepad?.DPad.Right,
+                ControllerButton.DPadDown => Controller?.ExtendedGamepad?.DPad.Down,
+                ControllerButton.DPadLeft => Controller?.ExtendedGamepad?.DPad.Left,
+                ControllerButton.LeftBumper => Controller?.ExtendedGamepad?.LeftShoulder,
+                ControllerButton.RightBumper => Controller?.ExtendedGamepad?.RightShoulder,
+                ControllerButton.LeftStickClick => Controller?.ExtendedGamepad?.LeftThumbstickButton,
+                ControllerButton.RightStickClick => Controller?.ExtendedGamepad?.RightThumbstickButton,
+                ControllerButton.Select => Controller?.ExtendedGamepad?.ButtonOptions,
+                ControllerButton.Start => Controller?.ExtendedGamepad?.ButtonMenu,
+                _ => null,
+            };
+            SetBinding(controllerBinding.Key, input is not null ? new IosControllerInput(input) : null);
+        }
     }
 }
