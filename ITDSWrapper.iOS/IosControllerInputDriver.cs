@@ -114,6 +114,8 @@ public class IosControllerInputDriver : IInputDriver
             {
                 input?.Press(iosBinding);
             }
+
+            _recordInput?.Invoke(iosBinding);
         }
     }
 

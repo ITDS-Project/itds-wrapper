@@ -37,7 +37,6 @@ public class DefaultInputDriver : IInputDriver
                 { RetroBindings.RETRO_DEVICE_ID_JOYPAD_LEFT, null },
                 { RetroBindings.RETRO_DEVICE_ID_JOYPAD_START, null },
                 { RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT, null },
-                { RetroBindings.RETRO_DEVICE_ID_JOYPAD_R2, null },
             };
         }
         else
@@ -57,6 +56,7 @@ public class DefaultInputDriver : IInputDriver
                 { RetroBindings.RETRO_DEVICE_ID_JOYPAD_START, new PhysicalKeyInput(PhysicalKey.Enter) },
                 { RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT, new PhysicalKeyInput(PhysicalKey.Escape) { SpecialAction = openSettings } },
             };
+            SetSpecialAction(RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT, openSettings);
         }
     }
 

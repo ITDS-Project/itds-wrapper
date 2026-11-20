@@ -403,7 +403,7 @@ public partial class MainViewModel : ViewModelBase
     public VirtualButtonViewModel? MenuButton { get; set; }
 
     private bool _menuBButtonDisabled = false;
-    private System.Timers.Timer _menuBButtonTimer = new(TimeSpan.FromMilliseconds(500));
+    private readonly System.Timers.Timer _menuBButtonTimer = new(TimeSpan.FromSeconds(5));
 
     [Reactive] public partial bool DisplayMenuOverlay { get; set; }
     [Reactive] public partial IEffect? ScreenEffect { get; set; }
@@ -574,7 +574,7 @@ public partial class MainViewModel : ViewModelBase
         foreach (IInputDriver inputDriver in _inputDrivers)
         {
             if (inputDriver is DefaultInputDriver)
-                continue;
+                inputDriver.RestoreInputs(WrapperSettings);
             inputDriver.ControllerChanged += () => inputDriver.RestoreInputs(WrapperSettings);
         }
 
@@ -998,6 +998,9 @@ public partial class MainViewModel : ViewModelBase
                 newBinding = await driver.RecordInput(binding);
             }
         }
+        
+        _menuBButtonTimer.Stop();
+        _menuBButtonDisabled = false;
         
         if (newBinding is PhysicalKey newKey)
         {
