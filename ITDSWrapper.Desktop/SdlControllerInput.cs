@@ -16,6 +16,8 @@ public record ThumbstickWithDirection(int Index, ThumbstickDirection? Direction)
 
 public class SdlControllerInput : IGameInput<object>
 {
+    public const float InputSensitivity = 0.4f;
+    
     private object? _input;
     private ThumbstickDirection? _direction;
 
@@ -92,15 +94,15 @@ public class SdlControllerInput : IGameInput<object>
         }
         else if (input is Thumbstick inThumbstick && _input is Thumbstick thumbstick && inThumbstick.Index == thumbstick.Index)
         {
-            if (_direction == ThumbstickDirection.NEGATIVE_X && inThumbstick.X > -0.4f ||
-                _direction == ThumbstickDirection.POSITIVE_X && inThumbstick.X < 0.4f ||
-                _direction == ThumbstickDirection.POSITIVE_Y && inThumbstick.Y < 0.4f ||
-                _direction == ThumbstickDirection.NEGATIVE_Y && inThumbstick.Y > -0.4f)
+            if (_direction == ThumbstickDirection.NEGATIVE_X && inThumbstick.X > -InputSensitivity ||
+                _direction == ThumbstickDirection.POSITIVE_X && inThumbstick.X < InputSensitivity ||
+                _direction == ThumbstickDirection.POSITIVE_Y && inThumbstick.Y < InputSensitivity ||
+                _direction == ThumbstickDirection.NEGATIVE_Y && inThumbstick.Y > -InputSensitivity)
             {
                 IsSet = false;
             }
         }
-        else if (input is Trigger { Position: < 0.4f } inTrigger && _input is Trigger trigger && inTrigger.Index == trigger.Index)
+        else if (input is Trigger { Position: < InputSensitivity } inTrigger && _input is Trigger trigger && inTrigger.Index == trigger.Index)
         {
             IsSet = false;
         }

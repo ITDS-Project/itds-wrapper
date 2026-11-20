@@ -222,22 +222,20 @@ public class SdlInputDriver : IInputDriver
             case SdlControllerInput sdlInput:
                 if (!_controlsDictionary.TryGetValue(input, out List<SdlControllerInput?>? existingInput))
                 {
+                    _controlsDictionary.Add(input, [sdlInput]);
                     if (_specialActions.TryGetValue(input, out Action? specialAction))
                     {
                         sdlInput.SpecialAction = specialAction;
                     }
-                    _controlsDictionary.Add(input, [sdlInput]);
-                    return;
-                }
-                int inputIdx = existingInput
-                    .FindIndex(i => i is not null && i.GetInputId() == sdlInput.GetInputId());
-                if (inputIdx >= 0)
-                {
-                    _controlsDictionary[input].RemoveAt(inputIdx);
                 }
                 else
                 {
+                    _controlsDictionary[input].Clear();
                     _controlsDictionary[input].Add(sdlInput);
+                    if (_specialActions.TryGetValue(input, out Action? specialAction))
+                    {
+                        sdlInput.SpecialAction = specialAction;
+                    }
                 }
                 break;
                 
@@ -275,7 +273,26 @@ public class SdlInputDriver : IInputDriver
             }
         }
 
-        if (SdlControllerInput.CheckPressed(binding))
+        if (binding is Thumbstick thumbstick)
+        {
+            if (thumbstick.X > SdlControllerInput.InputSensitivity)
+            {
+                _recordInput?.Invoke((thumbstick, ThumbstickDirection.POSITIVE_X));
+            }
+            else if (thumbstick.X < -SdlControllerInput.InputSensitivity)
+            {
+                _recordInput?.Invoke((thumbstick, ThumbstickDirection.NEGATIVE_X));
+            }
+            else if (thumbstick.Y > SdlControllerInput.InputSensitivity)
+            {
+                _recordInput?.Invoke((thumbstick, ThumbstickDirection.POSITIVE_Y));
+            }
+            else if (thumbstick.Y < -SdlControllerInput.InputSensitivity)
+            {
+                _recordInput?.Invoke((thumbstick, ThumbstickDirection.NEGATIVE_Y));
+            }
+        }
+        else if (SdlControllerInput.CheckPressed(binding))
         {
             _recordInput?.Invoke(binding);
         }

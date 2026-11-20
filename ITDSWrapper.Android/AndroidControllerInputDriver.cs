@@ -110,9 +110,9 @@ public class AndroidControllerInputDriver : IInputDriver
             foreach (AndroidControllerInput? input in _inputDictionary.Values)
             {
                 input?.Press(androidInput);
-                if (input?.IsSet == true)
-                    _recordInput?.Invoke(androidInput);
             }
+            
+            _recordInput?.Invoke(androidInput);
         }
     }
 
@@ -200,8 +200,8 @@ public class AndroidControllerInputDriver : IInputDriver
                 ControllerButton.DPadLeft => new(AndroidInputType.KEY, Keycode.DpadLeft, null),
                 ControllerButton.LeftBumper => new(AndroidInputType.KEY, Keycode.ButtonL1, null),
                 ControllerButton.RightBumper => new(AndroidInputType.KEY, Keycode.ButtonR1, null),
-                ControllerButton.LeftStickClick => new(AndroidInputType.KEY, Keycode.ButtonL2, null),
-                ControllerButton.RightStickClick => new(AndroidInputType.KEY, Keycode.ButtonR2, null),
+                ControllerButton.LeftStickClick => new(AndroidInputType.KEY, Keycode.ButtonThumbl, null),
+                ControllerButton.RightStickClick => new(AndroidInputType.KEY, Keycode.ButtonThumbr, null),
                 ControllerButton.Select => new(AndroidInputType.KEY, Keycode.ButtonSelect, null),
                 ControllerButton.Start => new(AndroidInputType.KEY, Keycode.ButtonStart, null),
                 _ => null,
