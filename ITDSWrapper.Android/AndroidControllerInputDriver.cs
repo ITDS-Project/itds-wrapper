@@ -110,6 +110,8 @@ public class AndroidControllerInputDriver : IInputDriver
             foreach (AndroidControllerInput? input in _inputDictionary.Values)
             {
                 input?.Press(androidInput);
+                if (input?.IsSet == true)
+                    _recordInput?.Invoke(androidInput);
             }
         }
     }

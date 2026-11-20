@@ -402,6 +402,9 @@ public partial class MainViewModel : ViewModelBase
     public VirtualButtonViewModel? SelectButton { get; set; }
     public VirtualButtonViewModel? MenuButton { get; set; }
 
+    private bool _menuBButtonDisabled = false;
+    private System.Timers.Timer _menuBButtonTimer = new(TimeSpan.FromMilliseconds(500));
+
     [Reactive] public partial bool DisplayMenuOverlay { get; set; }
     [Reactive] public partial IEffect? ScreenEffect { get; set; }
     [Reactive] public partial bool IsFullLayout { get; set; }
@@ -562,6 +565,18 @@ public partial class MainViewModel : ViewModelBase
 
         _menuInputTimer = new(TimeSpan.FromMilliseconds(300)) { AutoReset = false };
         _menuInputTimer.Elapsed += (_, _) => _acceptingMenuInput = true;
+
+        _menuBButtonTimer.Elapsed += (_, _) =>
+        {
+            _menuBButtonTimer.Stop();
+            _menuBButtonDisabled = false;
+        };
+        foreach (IInputDriver inputDriver in _inputDrivers)
+        {
+            if (inputDriver is DefaultInputDriver)
+                continue;
+            inputDriver.ControllerChanged += () => inputDriver.RestoreInputs(WrapperSettings);
+        }
 
         CloseMenuOverlayCommand = ReactiveCommand.Create(ToggleMenuOverlay);
         OpenDisplaySettingsMenuCommand = ReactiveCommand.Create(OpenSystemSettings);
@@ -956,8 +971,8 @@ public partial class MainViewModel : ViewModelBase
     private async Task RecordControllerBinding(Button button)
     {
         InputBinding binding = (InputBinding)button.DataContext!;
-        PhysicalKey? keyboardKey = binding.KeyboardKey;
-        ControllerButton? controllerButton = binding.ControllerButton;
+        _menuBButtonDisabled = true;
+        _menuBButtonTimer.Start();
         IBrush? oldBg = button.Background;
         IBrush? oldFg = button.Foreground;
         Dispatcher.UIThread.Invoke(() =>
@@ -1003,7 +1018,7 @@ public partial class MainViewModel : ViewModelBase
         {
             WrapperSettings.KeyBindings = defaultDriver.GetKeyBindings();
         }
-        else if (_inputDrivers.FirstOrDefault(d => d is not DefaultInputDriver) is { } controllerDriver)
+        if (_inputDrivers.FirstOrDefault(d => d is not DefaultInputDriver) is { } controllerDriver)
         {
             WrapperSettings.ControllerBindings = controllerDriver.GetControllerBindings();
         }
@@ -1258,7 +1273,7 @@ public partial class MainViewModel : ViewModelBase
                         _menuInputTimer.Stop();
                         _menuInputTimer.Start();
                     }
-                    else if (!_inputDrivers[CurrentInputDriver].IsRecordingInput && _inputDrivers[CurrentInputDriver].QueryInput(RetroBindings.RETRO_DEVICE_ID_JOYPAD_B))
+                    else if (!_menuBButtonDisabled && _inputDrivers[CurrentInputDriver].QueryInput(RetroBindings.RETRO_DEVICE_ID_JOYPAD_B))
                     {
                         _acceptingMenuInput = false;
                         _menuInputTimer.Stop();
