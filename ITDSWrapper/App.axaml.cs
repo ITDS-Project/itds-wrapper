@@ -35,16 +35,6 @@ public partial class App : Application
 
     public override void Initialize()
     {
-        if (OperatingSystem.IsMacOS())
-        {
-            MpvApi.RootPath = Path.Combine(Directory.GetParent(AppContext.BaseDirectory)!.FullName, "MonoBundle");
-        }
-        else if (!OperatingSystem.IsAndroid())
-        {
-            string debugPath = Path.Combine(AppContext.BaseDirectory, "runtimes", RuntimeInformation.RuntimeIdentifier,
-                "native");
-            MpvApi.RootPath = Path.Exists(debugPath) ? debugPath : AppContext.BaseDirectory;
-        }
         AvaloniaXamlLoader.Load(this);
     }
 

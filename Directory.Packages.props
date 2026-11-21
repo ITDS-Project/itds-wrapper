@@ -19,7 +19,7 @@
     <PackageVersion Include="Facepunch.Steamworks.Package" Version="1.0.6" />
     <PackageVersion Include="Facepunch.Steamworks.Posix" Version="2.4.6" />
     <PackageVersion Include="Facepunch.Steamworks.Win64" Version="2.4.6" />
-    <PackageVersion Include="HanumanInstitute.LibMpv.Avalonia" Version="0.10.6" />
+    <PackageVersion Include="HanumanInstitute.LibMpv.Avalonia" Version="0.11.0" />
     <PackageVersion Include="Hardware.Info" Version="110.0.0.1" />
     <PackageVersion Include="libmpv-package" Version="1.0.8" />
     <PackageVersion Include="LTRData.DiscUtils.Fat" Version="1.0.91" />
