@@ -310,8 +310,9 @@ public partial class MainViewModel : ViewModelBase
 
     public bool DisplayVirtualControls => IsMobile && CurrentInputDriver == 0 && DualScreenBackend?.IsActive != true;
 
-    public double BorderWidth { get; set; } = 3840;
-    public double BorderHeight { get; set; } = 2160;
+    public BorderQuality BorderQuality { get; set; } = BorderQuality.Q4K;
+    [Reactive] public partial double BorderWidth { get; set; } = 3840;
+    [Reactive] public partial double BorderHeight { get; set; } = 2160;
     public ObservableCollection<double> BorderOpacities { get; set; } = [1.0, 0.0];
     private readonly string[] _borders = ["BLACK_BG", string.Empty];
     private int _currentBorderIdx = 0;
@@ -632,14 +633,7 @@ public partial class MainViewModel : ViewModelBase
     {
         foreach (MpvContext mpv in BorderMpvContexts)
         {
-            if (height > width)
-            {
-                mpv.PanScan.Set(width / height);
-            }
-            else
-            {
-                mpv.PanScan.Set(1.0);
-            }
+            mpv.PanScan.Set(1.0);
         }
     }
 
@@ -1509,7 +1503,31 @@ public partial class MainViewModel : ViewModelBase
 
     private void SetBorder(int idx)
     {
-        string video = _borderLocator!.GetBorderPath(_borders[idx]);
+        double width = -1, height = -1;
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            TopLevel top = TopLevel.GetTopLevel(Top)!;
+            width = top.Width * top.RenderScaling;
+            height = top.Height * top.RenderScaling;
+        });
+        BorderQuality = (width >= height) switch
+        {
+            true => width switch
+            {
+                >= 3000 => BorderQuality.Q4K,
+                >= 1500 => BorderQuality.Q1080,
+                _ => BorderQuality.Q720,
+            },
+            _ => height switch
+            {
+                >= 3000 => BorderQuality.Q4K,
+                >= 1500 => BorderQuality.Q1080,
+                _ => BorderQuality.Q720,
+            },
+        };
+        BorderQuality = IsMobile && BorderQuality == BorderQuality.Q4K ? BorderQuality.Q1080 : BorderQuality;
+        
+        string video = _borderLocator!.GetBorderPath(_borders[idx], BorderQuality);
         if (!File.Exists(video))
         {
             _logInterpreter?.AddRecentLog($"[WRAPPER] WARNING: border video not found ({video})");
