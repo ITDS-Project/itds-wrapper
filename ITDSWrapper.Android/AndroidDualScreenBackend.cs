@@ -5,7 +5,6 @@ using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.Views;
 using Android.Widget;
-using Avalonia.Threading;
 using ITDSWrapper.Graphics;
 using Java.Nio;
 
@@ -42,7 +41,7 @@ public class AndroidDualScreenBackend : IDualScreenBackend
                 float[] point = [args.Event!.GetX(), args.Event.GetY()];
                 Matrix inverse = new();
                 _view.ImageMatrix?.Invert(inverse);
-                inverse?.MapPoints(point);
+                inverse.MapPoints(point);
                 OnPress?.Invoke(point[0], point[1] + 192);
                 args.Handled = true;
             }
@@ -77,6 +76,6 @@ public class AndroidDualScreenBackend : IDualScreenBackend
         _pixBuffer.Put(pixels);
         _pixBuffer.Position(0);
         _frame?.CopyPixelsFromBuffer(_pixBuffer);
-        Dispatcher.UIThread.Post(() => _view?.SetImageBitmap(_frame));
+        _view?.PostInvalidate();
     }
 }
