@@ -41,7 +41,9 @@ public partial class App : Application
         }
         else if (!OperatingSystem.IsAndroid())
         {
-            MpvApi.RootPath = Path.Combine(AppContext.BaseDirectory, "runtimes", RuntimeInformation.RuntimeIdentifier, "native");
+            string debugPath = Path.Combine(AppContext.BaseDirectory, "runtimes", RuntimeInformation.RuntimeIdentifier,
+                "native");
+            MpvApi.RootPath = Path.Exists(debugPath) ? debugPath : AppContext.BaseDirectory;
         }
         AvaloniaXamlLoader.Load(this);
     }
