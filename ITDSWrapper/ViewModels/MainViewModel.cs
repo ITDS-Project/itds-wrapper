@@ -257,6 +257,7 @@ public partial class MainViewModel : ViewModelBase
 
     public RetroWrapper Wrapper { get; }
     [Reactive] public partial EmuImageSource? CurrentFrame { get; set; }
+    private byte[]? _secondScreenBuffer = null;
 
     [Reactive] public partial bool SystemSettingsMenuOpen { get; set; }
     [Reactive] public partial bool ControllerSettingsMenuOpen { get; set; }
@@ -1322,7 +1323,9 @@ public partial class MainViewModel : ViewModelBase
         {
             CurrentFrame ??= new(frame[..(frame.Length / 2)], width, height / 2);
             CurrentFrame.SetFrame(frame);
-            DualScreenBackend.SetSecondFrame(frame[(frame.Length / 2)..], width, height);
+            _secondScreenBuffer ??= new byte[frame.Length / 2];
+            Array.Copy(frame, frame.Length / 2, _secondScreenBuffer, 0, _secondScreenBuffer.Length);
+            DualScreenBackend.SetSecondFrame(_secondScreenBuffer, width, height);
         }
     }
 
