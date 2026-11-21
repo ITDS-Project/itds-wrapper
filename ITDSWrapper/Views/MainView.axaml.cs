@@ -26,7 +26,7 @@ public partial class MainView : UserControl
     {
         ((MainViewModel)DataContext!).BorderWidth = e.NewSize.Width;
         ((MainViewModel)DataContext).BorderHeight = e.NewSize.Height;
-        ((MainViewModel)DataContext).PanScanBorders(e.NewSize.Width, e.NewSize.Height);
+        ((MainViewModel)DataContext).PanScanBorders();
         
         if (!MainViewModel.IsMobile || ((MainViewModel)DataContext!).DualScreenBackend?.IsActive == true)
             return;

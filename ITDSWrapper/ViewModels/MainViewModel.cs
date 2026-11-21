@@ -630,7 +630,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public void PanScanBorders(double width, double height)
+    public void PanScanBorders()
     {
         foreach (MpvContext mpv in BorderMpvContexts)
         {
