@@ -18,6 +18,15 @@
     </ItemGroup>
     
     <ItemGroup>
+        <AndroidAsset Include="..\ITDSWrapper\Borders\*_1080.mp4">
+            <Link>Assets\Borders\%(Filename)%(Extension)</Link>
+        </AndroidAsset>
+        <AndroidAsset Include="..\ITDSWrapper\Borders\*_720.mp4">
+            <Link>Assets\Borders\%(Filename)%(Extension)</Link>
+        </AndroidAsset>
+    </ItemGroup>
+    
+    <ItemGroup>
         <AndroidNativeLibrary Include="libs/arm64-v8a/libmelondsds_libretro.so" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always"/>
     </ItemGroup>
 

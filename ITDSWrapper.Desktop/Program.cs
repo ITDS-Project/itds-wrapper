@@ -4,8 +4,8 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using Avalonia;
-using Avalonia.ReactiveUI;
 using ITDSWrapper.Core;
+using ReactiveUI.Avalonia;
 #if IS_LINUX
 using ITDSWrapper.Desktop.Linux;
 #endif
@@ -48,60 +48,30 @@ sealed class Program
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
-            .UseReactiveUI()
+            .UseReactiveUI(b => b.Build())
             .LogToTrace()
-            .With(() =>
+            .With(() => new Win32PlatformOptions
             {
-                Win32RenderingMode[] defaultModes =
+                RenderingMode = 
                 [
-                    Win32RenderingMode.Wgl, Win32RenderingMode.Vulkan, Win32RenderingMode.AngleEgl,
+                    Win32RenderingMode.AngleEgl,
                     Win32RenderingMode.Software,
-                ];
-                if (!Path.Exists(Path.Combine(AppContext.BaseDirectory, "settings", "settings.json")))
-                    return new() { RenderingMode = defaultModes };
-
-                var wrapperSettings = JsonSerializer.Deserialize<Settings>(
-                    File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "settings",
-                        "settings.json")))!;
-                return new Win32PlatformOptions
-                {
-                    RenderingMode = wrapperSettings.WindowsRenderingMode switch
-                    {
-                        WindowsRenderingMode.WINDOWS_GL => [Win32RenderingMode.Wgl],
-                        WindowsRenderingMode.VULKAN => [Win32RenderingMode.Vulkan],
-                        WindowsRenderingMode.ANGLE_EGL => [Win32RenderingMode.AngleEgl],
-                        _ => [Win32RenderingMode.Software],
-                    },
-                };
+                ],
+                CompositionMode = [Win32CompositionMode.LowLatencyDxgiSwapChain],
             })
-            .With(() =>
+            .With(() => new AvaloniaNativePlatformOptions
             {
-                AvaloniaNativeRenderingMode[] defaultModes =
-                [
-                    AvaloniaNativeRenderingMode.Metal, AvaloniaNativeRenderingMode.OpenGl,
-                    AvaloniaNativeRenderingMode.Software,
-                ];
-                if (!Path.Exists(Path.Combine(AppContext.BaseDirectory, "settings", "settings.json")))
-                    return new() { RenderingMode = defaultModes };
-
-                var wrapperSettings = JsonSerializer.Deserialize<Settings>(
-                    File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "settings",
-                        "settings.json")))!;
-                return new AvaloniaNativePlatformOptions
-                {
-                    RenderingMode = wrapperSettings.MacOsRenderingMode switch
-                    {
-                        MacOsRenderingMode.METAL => [AvaloniaNativeRenderingMode.Metal],
-                        MacOsRenderingMode.OPENGL => [AvaloniaNativeRenderingMode.OpenGl],
-                        _ => [AvaloniaNativeRenderingMode.Software],
-                    },
-                };
+                RenderingMode = [
+                    AvaloniaNativeRenderingMode.OpenGl,
+                    AvaloniaNativeRenderingMode.Metal,
+                ],
             })
             .With(() =>
             {
                 X11RenderingMode[] defaultModes =
                 [
-                    X11RenderingMode.Glx, X11RenderingMode.Egl, X11RenderingMode.Vulkan, X11RenderingMode.Software,
+                    X11RenderingMode.Glx,
+                    X11RenderingMode.Egl,
                 ];
                 if (!Path.Exists(Path.Combine(AppContext.BaseDirectory, "settings", "settings.json")))
                     return new() { RenderingMode = defaultModes };
@@ -114,9 +84,7 @@ sealed class Program
                     RenderingMode = wrapperSettings.LinuxRenderingMode switch
                     {
                         LinuxRenderingMode.EGL => [X11RenderingMode.Egl],
-                        LinuxRenderingMode.VULKAN => [X11RenderingMode.Vulkan],
-                        LinuxRenderingMode.GLX => [X11RenderingMode.Glx],
-                        _ => [X11RenderingMode.Software],
+                        _ => [X11RenderingMode.Glx],
                     },
                 };
             })

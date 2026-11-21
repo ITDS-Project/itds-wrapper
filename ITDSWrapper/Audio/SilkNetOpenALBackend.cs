@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Silk.NET.OpenAL;
 
 namespace ITDSWrapper.Audio;
@@ -115,6 +116,15 @@ public class SilkNetOpenALBackend : IAudioBackend
             //AL.SourcePlay(_alSource);
             Al.SourcePlay(_alSource);
         }
+    }
+
+    public void SelectDevice(string device)
+    {
+    }
+
+    public List<string> GetDeviceNames()
+    {
+        return [];
     }
 
     private BufferFormat GetBufferFormat(int numChannels)

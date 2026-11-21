@@ -1,6 +1,7 @@
 // Referenced https://gist.github.com/neilt6/6d07322070470536ea0ba409c343c2a5 while creating this
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Android.Media;
 using ITDSWrapper.Audio;
@@ -111,5 +112,14 @@ public class AndroidAudioBackend : IAudioBackend
             //Write the specified wave buffer to the audio track
             _audioTrack.Write(waveBuffer, 0, waveBuffer.Length);
         }
+    }
+
+    public void SelectDevice(string device)
+    {
+    }
+
+    public List<string> GetDeviceNames()
+    {
+        return [];
     }
 }

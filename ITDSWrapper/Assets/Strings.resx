@@ -21,8 +21,8 @@
     <data name="GameTitle" xml:space="preserve">
         <value>Into the Dream Spring</value>
     </data>
-    <data name="SettingsDisplay" xml:space="preserve">
-        <value>Display Settings</value>
+    <data name="SystemSettings" xml:space="preserve">
+        <value>System Settings</value>
     </data>
     <data name="SettingsBackToGame" xml:space="preserve">
         <value>Back to Game</value>
@@ -31,7 +31,7 @@
         <value>Menu</value>
     </data>
     <data name="SettingsController" xml:space="preserve">
-        <value>Controller Settings</value>
+        <value>Controls</value>
     </data>
     <data name="SettingsLegal" xml:space="preserve">
         <value>Legal</value>
@@ -72,17 +72,11 @@
     <data name="SettingsGeneral" xml:space="preserve">
         <value>General Settings</value>
     </data>
-    <data name="SettingsAccessibility" xml:space="preserve">
-        <value>Accessibility Settings</value>
-    </data>
     <data name="SettingsControllerHeader" xml:space="preserve">
-        <value>Controller</value>
+        <value>Controls</value>
     </data>
-    <data name="SettingsAccessibilityHeader" xml:space="preserve">
-        <value>Accessibility</value>
-    </data>
-    <data name="SettingsDisplayHeader" xml:space="preserve">
-        <value>Display</value>
+    <data name="SettingsSystemHeader" xml:space="preserve">
+        <value>System Settings</value>
     </data>
     <data name="SettingSwitchOff" xml:space="preserve">
         <value>Off</value>
@@ -124,7 +118,7 @@
         <value>Graphics Backend</value>
     </data>
     <data name="WindowsRenderingModeAngleEgl" xml:space="preserve">
-        <value>ANGLE EGL</value>
+        <value>Angle EGL</value>
     </data>
     <data name="WindowsRenderingModeVulkan" xml:space="preserve">
         <value>Vulkan</value>
@@ -173,5 +167,77 @@
     </data>
     <data name="SettingsFeedback" xml:space="preserve">
         <value>Feedback</value>
+    </data>
+    <data name="BindingADescription" xml:space="preserve">
+        <value>Confirm/Advance Text</value>
+    </data>
+    <data name="BindingBDescription" xml:space="preserve">
+        <value>Back/Run</value>
+    </data>
+    <data name="BindingXDescription" xml:space="preserve">
+        <value>Open Pouch</value>
+    </data>
+    <data name="BindingYDescription" xml:space="preserve">
+        <value>Toggle Auto/Open Map</value>
+    </data>
+    <data name="BindingLDescription" xml:space="preserve">
+        <value>Rotate Cam Left</value>
+    </data>
+    <data name="BindingRDescription" xml:space="preserve">
+        <value>Rotate Cam Right</value>
+    </data>
+    <data name="BindingDUpDescription" xml:space="preserve">
+        <value>Navigate/Move Up</value>
+    </data>
+    <data name="BindingDDownDescription" xml:space="preserve">
+        <value>Navigate/Move Down</value>
+    </data>
+    <data name="BindingDRightDescription" xml:space="preserve">
+        <value>Navigate/Move Right</value>
+    </data>
+    <data name="BindingDLeftDescription" xml:space="preserve">
+        <value>Navigate/Move Left</value>
+    </data>
+    <data name="BindingStartDescription" xml:space="preserve">
+        <value>Pause</value>
+    </data>
+    <data name="BindingSelectDescription" xml:space="preserve">
+        <value>Wrapper Menu</value>
+    </data>
+    <data name="BindingNotMapped" xml:space="preserve">
+        <value>Not mapped</value>
+    </data>
+    <data name="BindingUnknown" xml:space="preserve">
+        <value>Unknown</value>
+    </data>
+    <data name="NoControllerDetected" xml:space="preserve">
+        <value>No Controller Detected</value>
+    </data>
+    <data name="ModifyControlBindings" xml:space="preserve">
+        <value>Modify Control Bindings</value>
+    </data>
+    <data name="ResetButton" xml:space="preserve">
+        <value>Reset</value>
+    </data>
+    <data name="DoneButton" xml:space="preserve">
+        <value>Done</value>
+    </data>
+    <data name="SettingsKeyBindingsHeader" xml:space="preserve">
+        <value>Input Bindings</value>
+    </data>
+    <data name="KeyBindingsActionHeader" xml:space="preserve">
+        <value>Action</value>
+    </data>
+    <data name="KeyBindingsButtonHeader" xml:space="preserve">
+        <value>Controller Binding</value>
+    </data>
+    <data name="KeyBindingsKeyHeader" xml:space="preserve">
+        <value>Keyboard Binding</value>
+    </data>
+    <data name="SettingsAudioDevice" xml:space="preserve">
+        <value>Audio Device</value>
+    </data>
+    <data name="InputBindingPressToRecordPrompt" xml:space="preserve">
+        <value>[Press to Record]</value>
     </data>
 </root>

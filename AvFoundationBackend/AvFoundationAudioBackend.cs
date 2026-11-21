@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using System.Collections.Generic;
 using System.Threading;
 using AVFoundation;
 using ITDSWrapper.Audio;
@@ -97,6 +98,15 @@ public class AvFoundationAudioBackend : IAudioBackend
         _audioPlayerNode?.ScheduleBuffer(pcmBuffer, () => _bufferSemaphore?.Release());
 
         _bufferIndex = (_bufferIndex + 1) % NumberOfBuffers;
+    }
+
+    public void SelectDevice(string device)
+    {
+    }
+
+    public List<string> GetDeviceNames()
+    {
+        return [];
     }
 
     private static unsafe void CopyBuffer(byte[] source, AVAudioPcmBuffer destination)

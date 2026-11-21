@@ -16,7 +16,12 @@ public class IosUpdater(IosControllerInputDriver inputDriver) : IUpdater
             
             inputDriver.SetController(GCController.Controllers[0]);
             int returnValue = -1;
-            GCController.Current!.ExtendedGamepad.ValueChangedHandler += (_, _) => returnValue = 1;
+            GCController.Current!.ExtendedGamepad.ValueChangedHandler += (_, args) =>
+            {
+                inputDriver.Push(args);
+                inputDriver.Release(args);
+                returnValue = 1;
+            };
             return returnValue;
         }
         return -1;

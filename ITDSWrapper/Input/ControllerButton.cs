@@ -1,0 +1,30 @@
+namespace ITDSWrapper.Input;
+
+public enum ControllerButton
+{
+    A,
+    B,
+    X,
+    Y,
+    DPadUp,
+    DPadDown,
+    DPadLeft,
+    DPadRight,
+    LeftBumper,
+    RightBumper,
+    LeftTrigger,
+    RightTrigger,
+    LeftStickUp,
+    LeftStickDown,
+    LeftStickLeft,
+    LeftStickRight,
+    RightStickUp,
+    RightStickDown,
+    RightStickLeft,
+    RightStickRight,
+    LeftStickClick,
+    RightStickClick,
+    Start,
+    Select,
+    Unknown,
+}

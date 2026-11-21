@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using Avalonia.Input;
 using DynamicData;
+using ITDSWrapper.Input;
 
 namespace ITDSWrapper.Core;
 
@@ -24,7 +27,9 @@ public class Settings
     public WindowsRenderingMode WindowsRenderingMode { get; set; } = WindowsRenderingMode.WINDOWS_GL;
     public MacOsRenderingMode MacOsRenderingMode { get; set; } = MacOsRenderingMode.METAL;
     public LinuxRenderingMode LinuxRenderingMode { get; set; } = LinuxRenderingMode.GLX;
-    
+
+    public Dictionary<uint, PhysicalKey?> KeyBindings { get; set; } = [];
+    public Dictionary<uint, ControllerButton?> ControllerBindings { get; set; } = [];
 
     public void Save(string path)
     {
@@ -83,6 +88,4 @@ public enum LinuxRenderingMode
 {
     GLX,
     EGL,
-    VULKAN,
-    SOFTWARE,
 }

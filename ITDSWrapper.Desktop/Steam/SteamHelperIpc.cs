@@ -1,17 +1,37 @@
 using System;
+using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace ITDSWrapper.Desktop.Steam;
 
 public class SteamHelperIpc
 {
-    private readonly NamedPipeClientStream _steamworksHelperPipe = new("SteamworksHelperPipe");
-    private readonly NamedPipeServerStream _steamworksReturnPipe = new("SteamworksReturnPipe");
+    private readonly NamedPipeClientStream _steamworksHelperPipe;
+    private readonly NamedPipeServerStream _steamworksReturnPipe;
 
     public SteamHelperIpc()
     {
+        for (int i = 0; i < 5; i++)
+        {
+            try
+            {
+                _steamworksHelperPipe = new("SteamworksHelperPipe");
+                _steamworksReturnPipe = new("SteamworksReturnPipe");
+                break;
+            }
+            catch (IOException)
+            {
+                Thread.Sleep(200 * (int)Math.Pow(i, 2));
+            }
+        }
+
+        if (_steamworksHelperPipe is null || _steamworksReturnPipe is null)
+        {
+            throw new IOException("Named pipes couldn't be created!");
+        }
         _steamworksHelperPipe.Connect();
         _steamworksReturnPipe.WaitForConnection();
     }

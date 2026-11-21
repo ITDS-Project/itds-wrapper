@@ -1,7 +1,6 @@
 using System;
+using System.Collections.Generic;
 using ITDSWrapper.Audio;
-using NAudio.Dsp;
-using NAudio.Wave.SampleProviders;
 #if IS_LINUX
 using NAudio.Wave;
 using NAudio.Wave.Alsa;
@@ -16,14 +15,30 @@ public class AlsaAudioBackend : IAudioBackend
     private AlsaOut? _wavePlayer;
     private BufferedWaveProvider? _waveProvider;
     private bool _paused;
+    private readonly List<string> _devices = [];
 #endif
 
     public void Initialize(double sampleRate)
     {
 #if IS_LINUX
-        _waveProvider = new(new((int)sampleRate, 2));
+        _waveProvider = new(new((int)sampleRate, 2), TimeSpan.FromMilliseconds(150));
+        foreach (AlsaDeviceInfo device in AlsaDeviceEnumerator.GetPlaybackDevices())
+        {
+            try
+            {
+                if (device.Name.Equals("null", StringComparison.OrdinalIgnoreCase))
+                    continue;
+                _wavePlayer = new(device.Name);
+                _devices.Add(device.Name);
+            }
+            catch
+            {
+                Console.WriteLine($"Failed to initialize Alsa device {device.Name} ({device.Description}");
+            }
+        }
+
         _wavePlayer = new();
-        _wavePlayer.Init(new WdlResamplingSampleProvider(_waveProvider.ToSampleProvider(), 48000));
+        _wavePlayer?.Init(_waveProvider);
         _wavePlayer?.Play();
 #endif
     }
@@ -47,7 +62,31 @@ public class AlsaAudioBackend : IAudioBackend
     public void PlaySamples(byte[] samples)
     {
 #if IS_LINUX
-        _waveProvider?.AddSamples(samples, 0, samples.Length);
+        try
+        {
+            _waveProvider?.AddSamples(samples, 0, samples.Length);
+        }
+        catch
+        {
+            _waveProvider?.ClearBuffer();
+        }
+#endif
+    }
+
+    public void SelectDevice(string device)
+    {
+#if IS_LINUX
+        _wavePlayer = new(device);
+        _wavePlayer?.Init(_waveProvider!);
+#endif
+    }
+
+    public List<string> GetDeviceNames()
+    {
+#if IS_LINUX
+        return _devices;
+#else
+        return [];
 #endif
     }
 }
