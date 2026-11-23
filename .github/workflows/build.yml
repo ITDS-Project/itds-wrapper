@@ -400,6 +400,8 @@ jobs:
       shell: bash
     - name: Deploy to Steam
       uses: game-ci/steam-deploy@v3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         username: ${{ secrets.STEAM_USERNAME }}          
         configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
