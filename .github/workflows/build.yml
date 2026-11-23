@@ -412,4 +412,3 @@ jobs:
         depot2Path: linux-x64
         depot3Path: macos
         releaseBranch: default
-      continue-on-error: true
