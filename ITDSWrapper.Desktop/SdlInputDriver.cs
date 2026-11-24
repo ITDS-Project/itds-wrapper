@@ -72,7 +72,17 @@ public class SdlInputDriver : IInputDriver
 
     public int PumpView()
     {
-        Dispatcher.UIThread.Invoke(() => _contextHost.View?.DoEvents());
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            try
+            {
+                _contextHost.View?.DoEvents();
+            }
+            catch (IndexOutOfRangeException ex)
+            {
+                Console.WriteLine("Probably the capture button ig.");
+            }
+        });
         if (_requestControl)
         {
             _requestControl = false;
