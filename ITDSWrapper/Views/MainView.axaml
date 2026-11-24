@@ -166,7 +166,7 @@
                         <Label Grid.Row="0" Grid.Column="2" Classes="setting-value" Content="{Binding WindowingModeDesc}" IsVisible="{Binding !IsMobile}"/>
                         <Button Grid.Row="0" Grid.Column="3" Classes="setting-button" Content="▷" Command="{Binding ChangeWindowingSettingsCommand}"
                                 CommandParameter="{x:True}" IsVisible="{Binding !IsMobile}"/>
-                        <Rectangle Grid.Row="0" Grid.Column="0" Classes="divider" />
+                        <Rectangle IsVisible="{Binding !IsMobile}" Grid.Row="0" Grid.Column="0" Classes="divider" />
 
                         <Label Grid.Row="1" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsFullScreenMonitor}" IsVisible="{Binding !IsMobile}"/>
                         <Button Grid.Row="1" Grid.Column="1" Classes="setting-button" Content="◁" Command="{Binding ChangeCurrentMonitorCommand}"
@@ -174,7 +174,7 @@
                         <Label Grid.Row="1" Grid.Column="2" Classes="setting-value" Content="{Binding CurrentMonitor}" IsVisible="{Binding !IsMobile}"/>
                         <Button Grid.Row="1" Grid.Column="3" Classes="setting-button" Content="▷" Command="{Binding ChangeCurrentMonitorCommand}"
                                 CommandParameter="{x:True}" IsVisible="{Binding !IsMobile}"/>
-                        <Rectangle Grid.Row="1" Grid.Column="0" Classes="divider" />
+                        <Rectangle IsVisible="{Binding !IsMobile}" Grid.Row="1" Grid.Column="0" Classes="divider" />
                         
                         <Label Grid.Row="2" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsScreenLayout}" IsVisible="{Binding !IsMobile}"/>
                         <Button Grid.Row="2" Grid.Column="1" Classes="setting-button" Content="◁" Command="{Binding ChangeScreenLayoutCommand}"
@@ -183,7 +183,7 @@
                                IsEnabled="{Binding !TargetScreenLayoutLocked}"/>
                         <Button Grid.Row="2" Grid.Column="3" Classes="setting-button" Content="▷" Command="{Binding ChangeScreenLayoutCommand}"
                                 CommandParameter="{x:True}" IsVisible="{Binding !IsMobile}" IsEnabled="{Binding !TargetScreenLayoutLocked}"/>
-                        <Rectangle Grid.Row="2" Grid.Column="0" Classes="divider" />
+                        <Rectangle IsVisible="{Binding !IsMobile}" Grid.Row="2" Grid.Column="0" Classes="divider" />
                         
                         <Label Grid.Row="3" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsBorders}"/>
                         <Button Grid.Row="3" Grid.Column="1" Classes="setting-button" Content="◁" Command="{Binding ChangeBorderSettingsCommand}"/>
@@ -195,11 +195,9 @@
                         <Button IsVisible="{OnPlatform 'False', Linux='True'}" Grid.Row="4" Grid.Column="1" Classes="setting-button" Content="◁"
                                 Command="{Binding ChangeRenderingModeCommand}" CommandParameter="{x:False}"/>
                         <Label IsVisible="{OnPlatform 'False', Linux='True'}" Grid.Row="4" Grid.Column="2" Classes="setting-value" Content="{Binding LinuxRenderingModeDesc}"/>
-                        <!-- <Label IsVisible="{OnPlatform 'False', macOS='True'}" Grid.Row="4" Grid.Column="2" Classes="setting-value" Content="{Binding MacOsRenderingModeDesc}"/> -->
-                        <!-- <Label IsVisible="{OnPlatform 'False', Windows='True'}" Grid.Row="4" Grid.Column="2" Classes="setting-value" Content="{Binding WindowsRenderingModeDesc}"/> -->
                         <Button IsVisible="{OnPlatform 'False', Linux='True'}" Grid.Row="4" Grid.Column="3" Classes="setting-button" Content="▷"
                                 Command="{Binding ChangeRenderingModeCommand}" CommandParameter="{x:True}"/>
-                        <Rectangle Grid.Row="4" Grid.Column="0" Classes="divider" />
+                        <Rectangle IsVisible="{OnPlatform 'False', Linux='True'}" Grid.Row="4" Grid.Column="0" Classes="divider" />
                         
                         <Label IsVisible="{Binding CanSelectAudioDevice}" Grid.Row="5" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsAudioDevice}"/>
                         <Button IsVisible="{Binding CanSelectAudioDevice}" Grid.Row="5" Grid.Column="1" Classes="setting-button" Content="◁"
@@ -207,7 +205,7 @@
                         <Label IsVisible="{Binding CanSelectAudioDevice}" Grid.Row="5" Grid.Column="2" Classes="setting-value" Content="{Binding CurrentAudioDevice}"/>
                         <Button IsVisible="{Binding CanSelectAudioDevice}" Grid.Row="5" Grid.Column="3" Classes="setting-button" Content="▷"
                                 Command="{Binding ChangeAudioDeviceSettingsCommand}" CommandParameter="{x:True}"/>
-                        <Rectangle Grid.Row="5" Grid.Column="0" Classes="divider" />
+                        <Rectangle IsVisible="{Binding CanSelectAudioDevice}" Grid.Row="5" Grid.Column="0" Classes="divider" />
                         
                         <Label Grid.Row="6" Grid.Column="0" Classes="setting" Content="{x:Static assets:Strings.SettingsScreenReader}"/>
                         <Button Grid.Row="6" Grid.Column="1" Classes="setting-button" Content="◁" Command="{Binding ChangeScreenReaderSettingsCommand}"/>
