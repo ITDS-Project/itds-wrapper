@@ -1622,6 +1622,8 @@ public partial class MainViewModel : ViewModelBase
                     new((int)CurrentFrame.Size.Width, (int)CurrentFrame.Size.Height, SKColorType.Bgra8888,
                         SKAlphaType.Opaque), CurrentFrame.Frame)), feedback.Id);
         }
+        _logInterpreter?.PlaytestApiClient.TrySendSavefileAsync(
+            Path.GetFullPath(RetroWrapper.GetDirectoryForPlatform("saves")), feedback.Id);
 
         commentBox.Clear();
         ToggleMenuOverlay();

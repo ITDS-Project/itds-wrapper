@@ -9,6 +9,9 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using DiscUtils.Fat;
+using DiscUtils.Streams;
+using Libretro.NET;
 using SkiaSharp;
 
 namespace ITDSWrapper.Playtest;
@@ -128,6 +131,68 @@ public class PlaytestApiClient
             if (!response.IsSuccessStatusCode)
             {
                 Console.WriteLine($"Failed to send screenshot: {(int)response.StatusCode} {response.ReasonPhrase}");
+            }
+
+            return (int)response.StatusCode < 500;
+        }
+
+        return false;
+    }
+
+    private const string SaveFileName = "itds-demo.sav";
+    public async Task<bool> TrySendSavefileAsync(string saveDir, string feedbackId)
+    {
+        // Code borrowed from SteamworksHelper
+        // MIT Licensed
+        string sdCardPath = Path.Combine(saveDir, "melonDS DS", "dldi_sd_card.bin");
+        if (OperatingSystem.IsWindows())
+        {
+            string sdCardCopyPath = Path.Combine(saveDir, "melonDS DS", "dldi_sd_card_copy.bin");
+            Thread.Sleep(500); // Sleep for just a sec before copying the SD card to get write updates
+            File.Copy(sdCardPath, sdCardCopyPath, true);
+            sdCardPath = sdCardCopyPath;
+        }
+
+        byte[] sdCardBytes = await File.ReadAllBytesAsync(sdCardPath);
+        using MemoryStream sdCardStream = new(sdCardBytes[0x7E00..]);
+        using FatFileSystem sdCardFat = new(sdCardStream, Ownership.None);
+        if (!sdCardFat.FileExists(SaveFileName))
+        {
+            return false;
+        }
+
+        await using SparseStream savStream = sdCardFat.OpenFile(SaveFileName, FileMode.Open);
+        byte[] savFile = new byte[savStream.Length];
+        savStream.ReadExactly(savFile);
+        
+        if (OperatingSystem.IsWindows())
+        {
+            File.Delete(sdCardPath);
+        }
+        // End borrowed segment
+        
+        for (int attempt = 0; attempt < 5; attempt++)
+        {
+            HttpResponseMessage response;
+            try
+            {
+                response = await _httpClient.PostAsync($"save?sessionGuid={_sessionGuid}&id={feedbackId}", new ByteArrayContent(savFile) { Headers = { ContentType = new("application/octet-stream") }});
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to send save file: {ex.Message}");
+                return false;
+            }
+
+            if (response.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                await Task.Delay(response.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(3));
+                continue;
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Failed to send save file: {(int)response.StatusCode} {response.ReasonPhrase}");
             }
 
             return (int)response.StatusCode < 500;
