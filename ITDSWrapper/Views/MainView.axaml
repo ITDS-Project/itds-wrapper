@@ -259,9 +259,9 @@
                             <HeaderedItemsControl.Header>
                                 <Grid ColumnDefinitions="*,Auto,Auto" Classes="settingsgrid">
                                     <Label Grid.Column="0" Classes="binding" Content="{x:Static assets:Strings.KeyBindingsActionHeader}" />
-                                    <Label Grid.Column="1" Classes="binding"
+                                    <Label Grid.Column="1" Classes="binding-value"
                                             Content="{x:Static assets:Strings.KeyBindingsKeyHeader}"/>
-                                    <Label Grid.Column="2" Classes="binding"
+                                    <Label Grid.Column="2" Classes="binding-value"
                                             Content="{x:Static assets:Strings.KeyBindingsButtonHeader}" />
                                 </Grid>
                             </HeaderedItemsControl.Header>
