@@ -5,7 +5,6 @@ using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.Views;
 using Android.Widget;
-using Avalonia.Threading;
 using ITDSWrapper.Graphics;
 using Java.Nio;
 
@@ -17,6 +16,7 @@ public class AndroidDualScreenBackend : IDualScreenBackend
     private ImageView? _view;
     private Bitmap? _frame;
     private ByteBuffer? _pixBuffer;
+    private int _prevLength;
     
     public bool IsActive { get; set; } = false;
     public event Action? ActiveChanged;
@@ -41,7 +41,7 @@ public class AndroidDualScreenBackend : IDualScreenBackend
                 float[] point = [args.Event!.GetX(), args.Event.GetY()];
                 Matrix inverse = new();
                 _view.ImageMatrix?.Invert(inverse);
-                inverse?.MapPoints(point);
+                inverse.MapPoints(point);
                 OnPress?.Invoke(point[0], point[1] + 192);
                 args.Handled = true;
             }
@@ -59,6 +59,11 @@ public class AndroidDualScreenBackend : IDualScreenBackend
     
     public void SetSecondFrame(byte[] pixels, uint width, uint height)
     {
+        if (_pixBuffer is null || pixels.Length != _prevLength)
+        {
+            _pixBuffer = ByteBuffer.Allocate(pixels.Length);
+            _prevLength = pixels.Length;
+        }
         for (int y = 0; y < height / 2; y++)
         {
             for (int x = 0; x < width; x++)
@@ -66,8 +71,11 @@ public class AndroidDualScreenBackend : IDualScreenBackend
                 (pixels[(y * width + x) * 4], pixels[(y * width + x) * 4 + 2]) = (pixels[(y * width + x) * 4 + 2], pixels[(y * width + x) * 4]);
             }
         }
-        _pixBuffer = ByteBuffer.Wrap(pixels);
+
+        _pixBuffer.Position(0);
+        _pixBuffer.Put(pixels);
+        _pixBuffer.Position(0);
         _frame?.CopyPixelsFromBuffer(_pixBuffer);
-        Dispatcher.UIThread.Post(() => _view?.SetImageBitmap(_frame));
+        _view?.PostInvalidate();
     }
 }

@@ -62,4 +62,16 @@
         <ReferenceNativeSymbol Include="SDL_iPhoneSetAnimationCallback" SymbolType="Function" SymbolMode="Ignore" />
         <ReferenceNativeSymbol Include="SDL_OnApplicationDidChangeStatusBarOrientation" SymbolType="Function" SymbolMode="Ignore" />
     </ItemGroup>
+
+    <Target Name="SetBorderPublishFolderType"
+            BeforeTargets="_ComputePublishLocation"
+            Condition="'$(TargetFramework)' == 'net10.0-macos'">
+        <ItemGroup>
+            <ResolvedFileToPublish
+                    Update="@(ResolvedFileToPublish)"
+                    Condition="'%(ResolvedFileToPublish.Extension)' == '.mp4' And $([System.String]::new('%(ResolvedFileToPublish.TargetPath)').StartsWith('Borders'))">
+                <PublishFolderType>Assembly</PublishFolderType>
+            </ResolvedFileToPublish>
+        </ItemGroup>
+    </Target>
 </Project>

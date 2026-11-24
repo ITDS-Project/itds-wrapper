@@ -1,20 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using DynamicData;
+using HanumanInstitute.LibMpv;
+using HanumanInstitute.LibMpv.Avalonia;
 using ITDSWrapper.Assets;
 using ITDSWrapper.Audio;
 using ITDSWrapper.Core;
@@ -27,14 +31,16 @@ using ITDSWrapper.Views;
 using Libretro.NET;
 using Libretro.NET.Bindings;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using SkiaSharp;
 
 namespace ITDSWrapper.ViewModels;
 
-public class MainViewModel : ViewModelBase
+public partial class MainViewModel : ViewModelBase
 {
     public static bool IsMobile => OperatingSystem.IsAndroid() || OperatingSystem.IsIOS();
+    public static bool CanSelectAudioDevice => !IsMobile && !OperatingSystem.IsMacOS();
+    private bool _shown;
 
     public Control? Top { get; set; }
 
@@ -43,10 +49,10 @@ public class MainViewModel : ViewModelBase
         SCREEN_LAYOUT,
     }
 
-    [Reactive] public WindowState WindowState { get; set; }
-    [Reactive] public WindowDecorations Decorations { get; set; }
-    [Reactive] public bool ExtendClientArea { get; set; }
-    [Reactive] public string WindowingModeDesc { get; set; } = Strings.WindowStateFullScreen;
+    [Reactive] public partial WindowState WindowState { get; set; }
+    [Reactive] public partial WindowDecorations Decorations { get; set; }
+    [Reactive] public partial bool ExtendClientArea { get; set; }
+    [Reactive] public partial string WindowingModeDesc { get; set; } = Strings.WindowStateFullScreen;
 
     private bool _ignoreFullScreenReposition;
 
@@ -136,82 +142,78 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    [Reactive] public bool TargetScreenLayoutLocked { get; set; } = false;
-    [Reactive] public string TargetScreenLayoutDesc { get; set; } = Strings.ScreenLayoutTopBottom;
+    [Reactive] public partial bool TargetScreenLayoutLocked { get; set; } = false;
+    [Reactive] public partial string TargetScreenLayoutDesc { get; set; } = Strings.ScreenLayoutTopBottom;
 
     public int TargetScreenLayoutIdx
     {
         get;
         set
         {
+            if (value < 0 || value >= Enum.GetNames<ScreenLayout>().Length)
+                return;
             field = value;
-            if (value >= 0 && value < Enum.GetNames<ScreenLayout>().Length)
+            TargetScreenLayoutDesc = new[]
             {
-                TargetScreenLayoutDesc = new[]
-                {
-                    Strings.ScreenLayoutTopBottom, Strings.ScreenLayoutLeftRight, Strings.ScreenLayoutRightLeft
-                }[value];
-            }
+                Strings.ScreenLayoutTopBottom, Strings.ScreenLayoutLeftRight, Strings.ScreenLayoutRightLeft
+            }[value];
         }
     }
 
-    [Reactive] public string DualScreenModeDesc { get; set; } = Strings.SettingsDualScreenAuto;
+    [Reactive] public partial string DualScreenModeDesc { get; set; } = Strings.SettingsDualScreenAuto;
 
     public int DualScreenModeIdx
     {
         get;
         set
         {
+            if (value < 0 || value >= Enum.GetNames<DualScreenSettings>().Length)
+                return;
             field = value;
-            if (value >= 0 && value < Enum.GetNames<DualScreenSettings>().Length)
+            DualScreenModeDesc = new[]
             {
-                DualScreenModeDesc = new[]
-                {
-                    Strings.SettingsDualScreenAuto, Strings.SettingsDualScreenOn, Strings.SettingsDualScreenOff,
-                }[value];
-            }
+                Strings.SettingsDualScreenAuto, Strings.SettingsDualScreenOn, Strings.SettingsDualScreenOff,
+            }[value];
         }
     }
 
-    [Reactive] public string LinuxRenderingModeDesc { get; set; } = Strings.LinuxRenderingModeGlx;
+    [Reactive] public partial string LinuxRenderingModeDesc { get; set; } = Strings.LinuxRenderingModeGlx;
 
     public int LinuxRenderingModeIdx
     {
         get;
         set
         {
+            if (value < 0 || value >= Enum.GetNames<LinuxRenderingMode>().Length)
+                return;
             field = value;
-            if (value >= 0 && value < Enum.GetNames<LinuxRenderingMode>().Length)
+            LinuxRenderingModeDesc = new[]
             {
-                LinuxRenderingModeDesc = new[]
-                {
-                    Strings.LinuxRenderingModeGlx, Strings.LinuxRenderingModeEgl,
-                    Strings.LinuxRenderingModeVulkan, Strings.LinuxRenderingModeSoftware,
-                }[value];
-            }
+                Strings.LinuxRenderingModeGlx, Strings.LinuxRenderingModeEgl,
+                Strings.LinuxRenderingModeVulkan, Strings.LinuxRenderingModeSoftware,
+            }[value];
         }
     }
 
-    [Reactive] public string MacOsRenderingModeDesc { get; set; } = Strings.MacOsRenderingModeMetal;
+    [Reactive] public partial string MacOsRenderingModeDesc { get; set; } = Strings.MacOsRenderingModeMetal;
 
     public int MacOsRenderingModeIdx
     {
         get;
         set
         {
+            if (value < 0 || value >= Enum.GetNames<MacOsRenderingMode>().Length)
+                return;
             field = value;
-            if (value >= 0 && value < Enum.GetNames<MacOsRenderingMode>().Length)
+            MacOsRenderingModeDesc = new[]
             {
-                MacOsRenderingModeDesc = new[]
-                {
-                    Strings.MacOsRenderingModeMetal, Strings.MacOsRenderingModeOpenGl,
-                    Strings.MacOsRenderingModeSoftware,
-                }[value];
-            }
+                Strings.MacOsRenderingModeMetal, Strings.MacOsRenderingModeOpenGl,
+                Strings.MacOsRenderingModeSoftware,
+            }[value];
         }
     }
 
-    [Reactive] public string WindowsRenderingModeDesc { get; set; } = Strings.WindowsRenderingModeWgl;
+    [Reactive] public partial string WindowsRenderingModeDesc { get; set; } = Strings.WindowsRenderingModeWgl;
 
     public int WindowsRenderingModeIdx
     {
@@ -230,23 +232,42 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    [Reactive] public string BordersSettingDesc { get; set; }
+    [Reactive] public partial string BordersSettingDesc { get; set; }
 
-    [Reactive] public string ScreenReaderSettingDesc { get; set; }
-    [Reactive] public string VirtualButtonsLayoutSettingDesc { get; set; }
-    [Reactive] public string VirtualButtonsHapticsSettingDesc { get; set; }
+    private readonly List<string> _audioDevices;
+    [Reactive] public partial string? CurrentAudioDevice { get; set; }
+
+    public int CurrentAudioDeviceIdx
+    {
+        get;
+        set
+        {
+            if (value < 0 || value >= _audioDevices.Count)
+                return;
+            field = value;
+            CurrentAudioDevice = _audioDevices[value];
+        }
+    }
+
+    [Reactive] public partial string ScreenReaderSettingDesc { get; set; }
+    [Reactive] public partial string VirtualButtonsLayoutSettingDesc { get; set; }
+    [Reactive] public partial string VirtualButtonsHapticsSettingDesc { get; set; }
 
     private readonly Dictionary<Setting, Action> _settingsChangesBuffer = [];
 
     public RetroWrapper Wrapper { get; }
-    [Reactive] public EmuImageSource? CurrentFrame { get; set; }
+    [Reactive] public partial EmuImageSource? CurrentFrame { get; set; }
+    private byte[]? _secondScreenBuffer = null;
 
-    [Reactive] public bool DisplaySettingsMenuOpen { get; set; }
-    [Reactive] public bool ControllerSettingsMenuOpen { get; set; }
-    [Reactive] public bool AccessibilitySettingsMenuOpen { get; set; }
-    [Reactive] public bool LegalMenuOpen { get; set; }
-    [Reactive] public bool FeedbackModalOpen { get; set; }
-    [Reactive] public bool ShowSidebar { get; set; }
+    [Reactive] public partial bool SystemSettingsMenuOpen { get; set; }
+    [Reactive] public partial bool ControllerSettingsMenuOpen { get; set; }
+    [Reactive] public partial bool KeyBindingsSettingsMenuOpen { get; set; }
+    [Reactive] public partial bool LegalMenuOpen { get; set; }
+    [Reactive] public partial bool FeedbackModalOpen { get; set; }
+    [Reactive] public partial bool ShowSidebar { get; set; }
+
+    [Reactive] public partial ControllerDiagramViewModel? ControllerDiagram { get; set; }
+    public AvaloniaList<InputBinding> InputBindings { get; } = [];
 
     public Settings WrapperSettings { get; }
     private int _currentLangBit;
@@ -290,19 +311,24 @@ public class MainViewModel : ViewModelBase
 
     public bool DisplayVirtualControls => IsMobile && CurrentInputDriver == 0 && DualScreenBackend?.IsActive != true;
 
-    [Reactive] public Bitmap? CurrentBorder { get; set; }
-    [Reactive] public Bitmap? NextBorder { get; set; }
-    [Reactive] public double CurrentBorderOpacity { get; set; } = 1.0;
-    [Reactive] public double NextBorderOpacity { get; set; }
-    private System.Timers.Timer? _borderTimer;
-    private string _currentBorder = "BLACK_BG";
-    private int _currentBorderFrame;
-    private string _nextBorder = string.Empty;
-    private int _nextBorderFrame;
+    public BorderQuality BorderQuality { get; set; } = BorderQuality.Q4K;
+    [Reactive] public partial double BorderWidth { get; set; } = 3840;
+    [Reactive] public partial double BorderHeight { get; set; } = 2160;
+    public ObservableCollection<double> BorderOpacities { get; set; } = [1.0, 0.0];
+    private readonly string[] _borders = ["BLACK_BG", string.Empty];
+    private int _currentBorderIdx = 0;
+    private int _nextBorderIdx = 1;
+    private readonly System.Timers.Timer _borderFadeTimer = new(TimeSpan.FromMilliseconds(100));
+
+    public MpvContext[] BorderMpvContexts { get; set; } = [new(), new()];
+    public VideoRenderer Renderer { get; set; }
+    private readonly List<Action> _borderQueuedActions = [];
 
     public bool Closing { get; set; }
 
     private IUpdater? _updater;
+
+    private IBorderLocator? _borderLocator;
 
     private readonly PauseDriver _pauseDriver;
     private readonly LogInterpreter? _logInterpreter;
@@ -319,8 +345,14 @@ public class MainViewModel : ViewModelBase
         get;
         set
         {
+            bool changed = field != value;
             this.RaiseAndSetIfChanged(ref field, value);
             this.RaisePropertyChanged(nameof(DisplayVirtualControls));
+            if (changed)
+            {
+                _logInterpreter!.AddRecentLog(
+                    $"[WRAPPER] CONTROLLER: {_inputDrivers[CurrentInputDriver].GetControllerBrand()} ('{_inputDrivers[CurrentInputDriver].GetControllerRawName()}')");
+            }
         }
     }
 
@@ -336,10 +368,9 @@ public class MainViewModel : ViewModelBase
     public ICommand CloseMenuOverlayCommand { get; }
     public ICommand OpenDisplaySettingsMenuCommand { get; }
     public ICommand OpenControllerSettingsMenuCommand { get; }
-    public ICommand OpenAccessibilitySettingsMenuCommand { get; }
     public ICommand OpenFeedbackCommand { get; }
-    public ICommand OpenSurveyUrlCommand { get; }
     public ICommand OpenLegalMenuCommand { get; }
+    public ICommand OpenKeyBindingsCommand { get; }
     public ICommand OpenDiscordUrlCommand { get; }
     public ICommand QuitToDesktopCommand { get; }
 
@@ -350,6 +381,8 @@ public class MainViewModel : ViewModelBase
     public ICommand ChangeRenderingModeCommand { get; }
     public ICommand ChangeBorderSettingsCommand { get; }
     public ICommand ChangeScreenReaderSettingsCommand { get; }
+    public ICommand ChangeAudioDeviceSettingsCommand { get; }
+    public ICommand RecordControllerBindingCommand { get; }
     public ICommand ChangeControlPadHapticsSettingsCommand { get; }
     public ICommand ChangeVirtualButtonsLayoutSettingsCommand { get; }
 
@@ -371,9 +404,12 @@ public class MainViewModel : ViewModelBase
     public VirtualButtonViewModel? SelectButton { get; set; }
     public VirtualButtonViewModel? MenuButton { get; set; }
 
-    [Reactive] public bool DisplayMenuOverlay { get; set; }
-    [Reactive] public IEffect? ScreenEffect { get; set; }
-    [Reactive] public bool IsFullLayout { get; set; }
+    private bool _menuBButtonDisabled = false;
+    private readonly System.Timers.Timer _menuBButtonTimer = new(TimeSpan.FromSeconds(5));
+
+    [Reactive] public partial bool DisplayMenuOverlay { get; set; }
+    [Reactive] public partial IEffect? ScreenEffect { get; set; }
+    [Reactive] public partial bool IsFullLayout { get; set; }
 
     public MainViewModel()
     {
@@ -395,10 +431,13 @@ public class MainViewModel : ViewModelBase
             ? Strings.SettingsVirtualButtonLayoutFull
             : Strings.SettingsVirtualButtonLayoutRecommended;
         Wrapper = new();
+        _borderLocator = ((App)Application.Current!).BorderLocator ?? new DefaultBorderLocator();
+        _borderFadeTimer.Elapsed += (_, _) => FadeBorder();
+        _borderFadeTimer.Stop();
         _logInterpreter = ((App)Application.Current!).LogInterpreter ?? new();
         _logInterpreter.SetNextBorder = border =>
         {
-            _nextBorder = border;
+            _borders[_nextBorderIdx] = border;
             SetNextBorder();
         };
         if (WrapperSettings.ScreenReaderEnabled)
@@ -412,6 +451,41 @@ public class MainViewModel : ViewModelBase
         byte[] data = new byte[ndsStream.Length];
         ndsStream.ReadExactly(data);
         Wrapper.LoadGame(data);
+
+        if (OperatingSystem.IsLinux())
+        {
+            Renderer = WrapperSettings.LinuxRenderingMode switch
+            {
+                LinuxRenderingMode.GLX or LinuxRenderingMode.EGL => VideoRenderer.OpenGl,
+                _ => VideoRenderer.Software,
+            };
+        }
+        else if (OperatingSystem.IsMacOS())
+        {
+            Renderer = WrapperSettings.MacOsRenderingMode switch
+            {
+                MacOsRenderingMode.METAL => VideoRenderer.Software,
+                MacOsRenderingMode.OPENGL => VideoRenderer.OpenGl,
+                _ => VideoRenderer.Software,
+            };
+        }
+        else if (OperatingSystem.IsWindows())
+        {
+            Renderer = WrapperSettings.WindowsRenderingMode switch
+            {
+                WindowsRenderingMode.WINDOWS_GL or WindowsRenderingMode.ANGLE_EGL => VideoRenderer.OpenGl,
+                WindowsRenderingMode.VULKAN => VideoRenderer.Native,
+                _ => VideoRenderer.Software,
+            };
+        }
+        else if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
+        {
+            Renderer = VideoRenderer.OpenGl;
+        }
+        else
+        {
+            Renderer = VideoRenderer.Auto;
+        }
 
         if (WrapperSettings.BordersEnabled)
         {
@@ -427,6 +501,9 @@ public class MainViewModel : ViewModelBase
         {
             _audioBackend = new SilkNetOpenALBackend(Wrapper.SampleRate, 32);
         }
+
+        _audioDevices = _audioBackend.GetDeviceNames();
+        CurrentAudioDeviceIdx = 0;
 
         if (((App)Application.Current).HapticsBackend is not null)
         {
@@ -491,13 +568,24 @@ public class MainViewModel : ViewModelBase
         _menuInputTimer = new(TimeSpan.FromMilliseconds(300)) { AutoReset = false };
         _menuInputTimer.Elapsed += (_, _) => _acceptingMenuInput = true;
 
+        _menuBButtonTimer.Elapsed += (_, _) =>
+        {
+            _menuBButtonTimer.Stop();
+            _menuBButtonDisabled = false;
+        };
+        foreach (IInputDriver inputDriver in _inputDrivers)
+        {
+            if (inputDriver is DefaultInputDriver)
+                inputDriver.RestoreInputs(WrapperSettings);
+            inputDriver.ControllerChanged += () => inputDriver.RestoreInputs(WrapperSettings);
+        }
+
         CloseMenuOverlayCommand = ReactiveCommand.Create(ToggleMenuOverlay);
-        OpenDisplaySettingsMenuCommand = ReactiveCommand.Create(OpenDisplaySettings);
+        OpenDisplaySettingsMenuCommand = ReactiveCommand.Create(OpenSystemSettings);
         OpenControllerSettingsMenuCommand = ReactiveCommand.Create(OpenControllerSettings);
-        OpenAccessibilitySettingsMenuCommand = ReactiveCommand.Create(OpenAccessibilitySettings);
         OpenFeedbackCommand = ReactiveCommand.Create(OpenFeedback);
-        OpenSurveyUrlCommand = ReactiveCommand.Create(() => OpenUrl("https://google.com"));
         OpenLegalMenuCommand = ReactiveCommand.Create(OpenLegal);
+        OpenKeyBindingsCommand = ReactiveCommand.Create(OpenKeyBindingsSettings);
         OpenDiscordUrlCommand = ReactiveCommand.Create(() => OpenUrl("https://discord.com"));
         QuitToDesktopCommand = ReactiveCommand.Create(CloseApplication);
 
@@ -508,6 +596,8 @@ public class MainViewModel : ViewModelBase
         ChangeRenderingModeCommand = ReactiveCommand.Create<bool>(ChangeRenderingMode);
         ChangeBorderSettingsCommand = ReactiveCommand.Create(ToggleBorderSettings);
         ChangeScreenReaderSettingsCommand = ReactiveCommand.Create(ToggleScreenReader);
+        ChangeAudioDeviceSettingsCommand = ReactiveCommand.Create<bool>(ChangeAudioDevice);
+        RecordControllerBindingCommand = ReactiveCommand.CreateFromTask<Button>(RecordControllerBinding);
         ChangeVirtualButtonsLayoutSettingsCommand = ReactiveCommand.Create(ToggleVirtualButtonsLayout);
         ChangeControlPadHapticsSettingsCommand = ReactiveCommand.Create(ToggleControlPadHaptics);
 
@@ -540,6 +630,21 @@ public class MainViewModel : ViewModelBase
         }
     }
 
+    public void PanScanBorders()
+    {
+        foreach (MpvContext mpv in BorderMpvContexts)
+        {
+            mpv.PanScan.Set(1.0);
+        }
+    }
+
+    public void MarkShown()
+    {
+        _shown = true;
+        _borderQueuedActions.ForEach(a => a.Invoke());
+        _borderQueuedActions.Clear();
+    }
+
     private void CloseApplication()
     {
         // todo a modal warning?
@@ -550,45 +655,80 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private void OpenDisplaySettings()
+    private void OpenSystemSettings()
     {
-        DisplaySettingsMenuOpen = true;
-        LegalMenuOpen = ControllerSettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
+        SystemSettingsMenuOpen = true;
+        LegalMenuOpen = ControllerSettingsMenuOpen = KeyBindingsSettingsMenuOpen = false;
+        ShowSidebar = !IsMobile;
+    }
+
+    private void OpenKeyBindingsSettings()
+    {
+        InputBindings.Clear();
+        Dictionary<uint, PhysicalKey?> keyBindings = [];
+        Dictionary<uint, ControllerButton?> controllerBindings = [];
+        ControllerBrand? controllerBrand = null;
+
+        foreach (IInputDriver driver in _inputDrivers)
+        {
+            foreach (var keyBind in driver.GetKeyBindings())
+            {
+                keyBindings.Add(keyBind.Key, keyBind.Value);
+            }
+
+            foreach (var controllerBind in driver.GetControllerBindings())
+            {
+                controllerBindings.Add(controllerBind.Key, controllerBind.Value);
+            }
+
+            controllerBrand ??= driver.GetControllerBrand() != ControllerBrand.NONE ? driver.GetControllerBrand() : controllerBrand;
+        }
+        
+        foreach (uint inputKey in _inputDrivers[CurrentInputDriver].GetInputKeys())
+        {
+            InputBindings.Add(new()
+            {
+                Action = inputKey,
+                Controller = controllerBrand ?? ControllerBrand.NONE,
+                ControllerButton = controllerBindings.TryGetValue(inputKey, out ControllerButton? cb) ? cb : null,
+                KeyboardKey = keyBindings.TryGetValue(inputKey, out PhysicalKey? kb) ? kb : null,
+            });
+        }
+
+        KeyBindingsSettingsMenuOpen = true;
+        LegalMenuOpen = SystemSettingsMenuOpen = ControllerSettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
     }
 
     private void OpenControllerSettings()
     {
         ControllerSettingsMenuOpen = true;
-        LegalMenuOpen = DisplaySettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
+        LegalMenuOpen = SystemSettingsMenuOpen = KeyBindingsSettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
-    }
-
-    private void OpenAccessibilitySettings()
-    {
-        AccessibilitySettingsMenuOpen = true;
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = LegalMenuOpen = false;
-        ShowSidebar = !IsMobile;
+        IInputDriver controllerDriver = _inputDrivers.Find(i => i.GetControllerBrand() != ControllerBrand.NONE)
+                                        ?? _inputDrivers.Find(i => i is not DefaultInputDriver)
+                                        ?? _inputDrivers[CurrentInputDriver];
+        ControllerDiagram = new(controllerDriver, _logInterpreter!);
     }
 
     private void OpenFeedback()
     {
         FeedbackModalOpen = true;
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = AccessibilitySettingsMenuOpen = LegalMenuOpen = false;
+        SystemSettingsMenuOpen = ControllerSettingsMenuOpen = KeyBindingsSettingsMenuOpen = LegalMenuOpen = false;
         ShowSidebar = false;
     }
 
     private void OpenLegal()
     {
         LegalMenuOpen = true;
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen = AccessibilitySettingsMenuOpen = false;
+        SystemSettingsMenuOpen = ControllerSettingsMenuOpen = KeyBindingsSettingsMenuOpen = false;
         ShowSidebar = !IsMobile;
     }
 
     private void CloseSubMenu()
     {
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen =
-            AccessibilitySettingsMenuOpen = LegalMenuOpen = FeedbackModalOpen = false;
+        SystemSettingsMenuOpen = ControllerSettingsMenuOpen = KeyBindingsSettingsMenuOpen =
+            LegalMenuOpen = FeedbackModalOpen = false;
         ShowSidebar = true;
     }
 
@@ -596,10 +736,30 @@ public class MainViewModel : ViewModelBase
     {
         DisplayMenuOverlay = !DisplayMenuOverlay;
         _pauseDriver.PushPauseState(DisplayMenuOverlay);
-        DisplaySettingsMenuOpen = ControllerSettingsMenuOpen =
-            AccessibilitySettingsMenuOpen = LegalMenuOpen = FeedbackModalOpen = false;
-        ScreenEffect = ScreenEffect is null ? new BlurEffect { Radius = 50 } : null;
+        SystemSettingsMenuOpen = ControllerSettingsMenuOpen = KeyBindingsSettingsMenuOpen =
+            LegalMenuOpen = FeedbackModalOpen = false;
         ShowSidebar = true;
+
+        // Update blur effect (fade in/out)
+        ScreenEffect ??= new BlurEffect { Radius = DisplayMenuOverlay ? 0 : 50 };
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(240.0 / 60) };
+        timer.Tick += (s, e) =>
+        {
+            if (ScreenEffect is not BlurEffect blur || (DisplayMenuOverlay && blur.Radius >= 50) ||
+                (!DisplayMenuOverlay && blur.Radius <= 0))
+            {
+                timer.Stop();
+                if (!DisplayMenuOverlay)
+                {
+                    ScreenEffect = null;
+                }
+
+                return;
+            }
+
+            blur.Radius += DisplayMenuOverlay ? 2 : -2;
+        };
+        timer.Start();
 
         if (!DisplayMenuOverlay)
         {
@@ -787,6 +947,81 @@ public class MainViewModel : ViewModelBase
         WrapperSettings.ScreenReaderEnabled = !WrapperSettings.ScreenReaderEnabled;
     }
 
+    private void ChangeAudioDevice(bool forward)
+    {
+        if (forward)
+        {
+            CurrentAudioDeviceIdx = (CurrentAudioDeviceIdx + 1) % _audioDevices.Count;
+        }
+        else
+        {
+            if (CurrentAudioDeviceIdx == 0)
+                CurrentAudioDeviceIdx = _audioDevices.Count - 1;
+            else
+                CurrentAudioDeviceIdx--;
+        }
+        _audioBackend.SelectDevice(CurrentAudioDevice!);
+    }
+
+    private async Task RecordControllerBinding(Button button)
+    {
+        InputBinding binding = (InputBinding)button.DataContext!;
+        _menuBButtonDisabled = true;
+        _menuBButtonTimer.Start();
+        IBrush? oldBg = button.Background;
+        IBrush? oldFg = button.Foreground;
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            button.Background = Brushes.AliceBlue;
+            button.Foreground = Brushes.Black;
+        });
+
+        object? newBinding = null;
+        if (button.Tag?.Equals("Keyboard") == true)
+        {
+            if (_inputDrivers.FirstOrDefault(d => d is DefaultInputDriver) is DefaultInputDriver driver)
+            {
+                TopLevel.GetTopLevel(Top)!.AddHandler(InputElement.KeyDownEvent, driver.KeyPressed);
+                newBinding = await driver.RecordInput(binding);
+                TopLevel.GetTopLevel(Top)!.RemoveHandler(InputElement.KeyDownEvent, driver.KeyPressed);
+            }
+        }
+        else
+        {
+            if (_inputDrivers.FirstOrDefault(d => d is not DefaultInputDriver) is { } driver)
+            {
+                newBinding = await driver.RecordInput(binding);
+            }
+        }
+        
+        _menuBButtonTimer.Stop();
+        _menuBButtonDisabled = false;
+        
+        if (newBinding is PhysicalKey newKey)
+        {
+            binding.KeyboardKey = newKey;
+        }
+        else if (newBinding is ControllerButton newButton)
+        {
+            binding.ControllerButton = newButton;
+        }
+        
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            button.Background = oldBg;
+            button.Foreground = oldFg;
+        });
+
+        if (_inputDrivers.FirstOrDefault(d => d is DefaultInputDriver) is DefaultInputDriver defaultDriver)
+        {
+            WrapperSettings.KeyBindings = defaultDriver.GetKeyBindings();
+        }
+        if (_inputDrivers.FirstOrDefault(d => d is not DefaultInputDriver) is { } controllerDriver)
+        {
+            WrapperSettings.ControllerBindings = controllerDriver.GetControllerBindings();
+        }
+    }
+
     private void ToggleVirtualButtonsLayout()
     {
         WrapperSettings.VirtualButtonFullLayout = !WrapperSettings.VirtualButtonFullLayout;
@@ -880,6 +1115,12 @@ public class MainViewModel : ViewModelBase
         if (_inputDrivers[CurrentInputDriver] is not DefaultInputDriver)
         {
             return;
+        }
+
+        if (ControllerDiagram is not null &&
+            _inputDrivers[CurrentInputDriver].GetControllerBrand() != ControllerBrand.NONE)
+        {
+            ControllerDiagram.InputDriver = _inputDrivers[CurrentInputDriver];
         }
 
         if (pressed)
@@ -1030,16 +1271,26 @@ public class MainViewModel : ViewModelBase
                         _menuInputTimer.Stop();
                         _menuInputTimer.Start();
                     }
-                    else if (_inputDrivers[CurrentInputDriver].QueryInput(RetroBindings.RETRO_DEVICE_ID_JOYPAD_B))
+                    else if (!_menuBButtonDisabled && _inputDrivers[CurrentInputDriver].QueryInput(RetroBindings.RETRO_DEVICE_ID_JOYPAD_B))
                     {
-                        if (DisplaySettingsMenuOpen || ControllerSettingsMenuOpen || AccessibilitySettingsMenuOpen ||
-                            LegalMenuOpen)
-                            CloseSubMenu();
-                        else
-                            ToggleMenuOverlay();
                         _acceptingMenuInput = false;
                         _menuInputTimer.Stop();
                         _menuInputTimer.Start();
+                        Dispatcher.UIThread.Post(() =>
+                        {
+                            if (KeyBindingsSettingsMenuOpen)
+                            {
+                                OpenControllerSettings();
+                            }
+                            else if (SystemSettingsMenuOpen || ControllerSettingsMenuOpen || LegalMenuOpen)
+                            {
+                                CloseSubMenu();
+                            }
+                            else if (DisplayMenuOverlay)
+                            {
+                                ToggleMenuOverlay();
+                            }
+                        });
                     }
 
                     // Sending a key press changes the input driver, so we have to reset it manually
@@ -1072,7 +1323,9 @@ public class MainViewModel : ViewModelBase
         {
             CurrentFrame ??= new(frame[..(frame.Length / 2)], width, height / 2);
             CurrentFrame.SetFrame(frame);
-            DualScreenBackend.SetSecondFrame(frame[(frame.Length / 2)..], width, height);
+            _secondScreenBuffer ??= new byte[frame.Length / 2];
+            Array.Copy(frame, frame.Length / 2, _secondScreenBuffer, 0, _secondScreenBuffer.Length);
+            DualScreenBackend.SetSecondFrame(_secondScreenBuffer, width, height);
         }
     }
 
@@ -1198,60 +1451,105 @@ public class MainViewModel : ViewModelBase
 
     private void StartBorder()
     {
-        SetBorder();
-        _borderTimer = new(TimeSpan.FromMilliseconds(100)) { AutoReset = true };
-        _borderTimer.Elapsed += (_, _) =>
+        if (_borders[_currentBorderIdx] == "BLACK_BG")
         {
-            _currentBorderFrame = (_currentBorderFrame + 1) % 600;
-            SetBorder();
-        };
-        _borderTimer.Start();
-    }
+            BorderMpvContexts[_currentBorderIdx].Stop().Invoke();
+        }
+        else
+        {
+            SetBorder(_currentBorderIdx);
+        }
 
-    private void StopBorder()
-    {
-        CurrentBorder = null;
-        _borderTimer?.Stop();
-    }
-
-    private void SetBorder()
-    {
-        using Stream borderStream =
-            AssetLoader.Open(
-                new($"avares://ITDSWrapper/Assets/Borders/{_currentBorder}/{_currentBorderFrame + 1:0000}.jpg"));
-        CurrentBorder = new(borderStream);
-
-        if (NextBorder is not null)
+        if (!string.IsNullOrEmpty(_borders[_nextBorderIdx]))
         {
             SetNextBorder();
             FadeBorder();
         }
     }
 
+    private void StopBorder()
+    {
+        BorderMpvContexts[_currentBorderIdx].Stop().Invoke();
+    }
+
     private void SetNextBorder()
     {
-        using Stream borderStream =
-            AssetLoader.Open(new($"avares://ITDSWrapper/Assets/Borders/{_nextBorder}/{_nextBorderFrame + 1:0000}.jpg"));
-        NextBorder = new(borderStream);
+        if (_borders[_nextBorderIdx] == "BLACK_BG")
+        {
+            BorderMpvContexts[_nextBorderIdx].Stop().Invoke();
+        }
+        else
+        {
+            SetBorder(_nextBorderIdx);
+        }
+        
+        _borderFadeTimer.Start();
     }
 
     private void FadeBorder()
     {
-        if (CurrentBorderOpacity < 0.02)
+        if (BorderOpacities[_currentBorderIdx] < 0.02)
         {
-            CurrentBorder = NextBorder;
-            NextBorder = null;
-            CurrentBorderOpacity = 1.0;
-            NextBorderOpacity = 0.0;
-            _currentBorder = _nextBorder;
-            _currentBorderFrame = _nextBorderFrame;
-            _nextBorder = string.Empty;
-            _nextBorderFrame = 0;
+            _borderFadeTimer.Stop();
+            _borders[_currentBorderIdx] = _borders[_nextBorderIdx];
+            _borders[_nextBorderIdx] = string.Empty;
+            (_currentBorderIdx, _nextBorderIdx) = (_nextBorderIdx, _currentBorderIdx);
+            BorderOpacities[_currentBorderIdx] = 1.0;
+            BorderOpacities[_nextBorderIdx] = 0.0;
+            BorderMpvContexts[_nextBorderIdx].Stop().Invoke();
             return;
         }
 
-        CurrentBorderOpacity -= 0.02;
-        NextBorderOpacity += 0.02;
+        BorderOpacities[_currentBorderIdx] -= 0.02;
+        BorderOpacities[_nextBorderIdx] += 0.02;
+    }
+
+    private void SetBorder(int idx)
+    {
+        double width = -1, height = -1;
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            TopLevel top = TopLevel.GetTopLevel(Top)!;
+            width = top.Width * top.RenderScaling;
+            height = top.Height * top.RenderScaling;
+        });
+        BorderQuality = (width >= height) switch
+        {
+            true => width switch
+            {
+                >= 3000 => BorderQuality.Q4K,
+                >= 1500 => BorderQuality.Q1080,
+                _ => BorderQuality.Q720,
+            },
+            _ => height switch
+            {
+                >= 3000 => BorderQuality.Q4K,
+                >= 1500 => BorderQuality.Q1080,
+                _ => BorderQuality.Q720,
+            },
+        };
+        BorderQuality = IsMobile && BorderQuality == BorderQuality.Q4K ? BorderQuality.Q1080 : BorderQuality;
+        
+        string video = _borderLocator!.GetBorderPath(_borders[idx], BorderQuality);
+        if (!File.Exists(video))
+        {
+            _logInterpreter?.AddRecentLog($"[WRAPPER] WARNING: border video not found ({video})");
+            return;
+        }
+
+        if (!_shown)
+        {
+            _borderQueuedActions.Add(() =>
+            {
+                BorderMpvContexts[idx].LoadFile(video).Invoke();
+                BorderMpvContexts[idx].LoopFile.Set("inf");
+            });
+        }
+        else
+        {
+            BorderMpvContexts[idx].LoadFile(video).Invoke();
+            BorderMpvContexts[idx].LoopFile.Set("inf");
+        }
     }
 
     private void AssignVirtualBindings()
@@ -1313,7 +1611,8 @@ public class MainViewModel : ViewModelBase
 
     private void GiveFeedback(FeedbackSentiment sentiment, TextBox commentBox)
     {
-        PlaytestFeedback feedback = new(Guid.NewGuid().ToString(), sentiment.ToString(), commentBox.Text ?? string.Empty,
+        PlaytestFeedback feedback = new(Guid.NewGuid().ToString(), sentiment.ToString(),
+            commentBox.Text ?? string.Empty,
             CurrentFrame is not null);
         _logInterpreter?.AddRecentLog($"[WRAPPER] FEEDBACK: {JsonSerializer.Serialize(feedback)}");
         if (CurrentFrame is not null)
@@ -1323,6 +1622,8 @@ public class MainViewModel : ViewModelBase
                     new((int)CurrentFrame.Size.Width, (int)CurrentFrame.Size.Height, SKColorType.Bgra8888,
                         SKAlphaType.Opaque), CurrentFrame.Frame)), feedback.Id);
         }
+        _logInterpreter?.PlaytestApiClient.TrySendSavefileAsync(
+            Path.GetFullPath(RetroWrapper.GetDirectoryForPlatform("saves")), feedback.Id);
 
         commentBox.Clear();
         ToggleMenuOverlay();

@@ -1,9 +1,9 @@
 using System.Globalization;
-using Foundation;
 using Avalonia;
 using Avalonia.iOS;
-using Avalonia.ReactiveUI;
 using AvFoundationBackend;
+using Foundation;
+using ReactiveUI.Avalonia;
 
 namespace ITDSWrapper.iOS;
 
@@ -19,7 +19,7 @@ public partial class AppDelegate : AvaloniaAppDelegate<App>
     {
         return base.CustomizeAppBuilder(builder)
             .WithInterFont()
-            .UseReactiveUI()
+            .UseReactiveUI(b => b.Build())
             .AfterSetup(b =>
             {
                 IosControllerInputDriver inputDriver = new();

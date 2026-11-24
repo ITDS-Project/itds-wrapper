@@ -58,11 +58,182 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Confirm/Advance Text.
+        /// </summary>
+        public static string BindingADescription {
+            get {
+                return ResourceManager.GetString("BindingADescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Back/Run.
+        /// </summary>
+        public static string BindingBDescription {
+            get {
+                return ResourceManager.GetString("BindingBDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Navigate/Move Down.
+        /// </summary>
+        public static string BindingDDownDescription {
+            get {
+                return ResourceManager.GetString("BindingDDownDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Navigate/Move Left.
+        /// </summary>
+        public static string BindingDLeftDescription {
+            get {
+                return ResourceManager.GetString("BindingDLeftDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Navigate/Move Right.
+        /// </summary>
+        public static string BindingDRightDescription {
+            get {
+                return ResourceManager.GetString("BindingDRightDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Navigate/Move Up.
+        /// </summary>
+        public static string BindingDUpDescription {
+            get {
+                return ResourceManager.GetString("BindingDUpDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rotate Cam Left.
+        /// </summary>
+        public static string BindingLDescription {
+            get {
+                return ResourceManager.GetString("BindingLDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not mapped.
+        /// </summary>
+        public static string BindingNotMapped {
+            get {
+                return ResourceManager.GetString("BindingNotMapped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rotate Cam Right.
+        /// </summary>
+        public static string BindingRDescription {
+            get {
+                return ResourceManager.GetString("BindingRDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrapper Menu.
+        /// </summary>
+        public static string BindingSelectDescription {
+            get {
+                return ResourceManager.GetString("BindingSelectDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause.
+        /// </summary>
+        public static string BindingStartDescription {
+            get {
+                return ResourceManager.GetString("BindingStartDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown.
+        /// </summary>
+        public static string BindingUnknown {
+            get {
+                return ResourceManager.GetString("BindingUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Pouch.
+        /// </summary>
+        public static string BindingXDescription {
+            get {
+                return ResourceManager.GetString("BindingXDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggle Auto/Open Map.
+        /// </summary>
+        public static string BindingYDescription {
+            get {
+                return ResourceManager.GetString("BindingYDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Done.
+        /// </summary>
+        public static string DoneButton {
+            get {
+                return ResourceManager.GetString("DoneButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Into the Dream Spring.
         /// </summary>
         public static string GameTitle {
             get {
                 return ResourceManager.GetString("GameTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [Press to Record].
+        /// </summary>
+        public static string InputBindingPressToRecordPrompt {
+            get {
+                return ResourceManager.GetString("InputBindingPressToRecordPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Action.
+        /// </summary>
+        public static string KeyBindingsActionHeader {
+            get {
+                return ResourceManager.GetString("KeyBindingsActionHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Controller Binding.
+        /// </summary>
+        public static string KeyBindingsButtonHeader {
+            get {
+                return ResourceManager.GetString("KeyBindingsButtonHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keyboard Binding.
+        /// </summary>
+        public static string KeyBindingsKeyHeader {
+            get {
+                return ResourceManager.GetString("KeyBindingsKeyHeader", resourceCulture);
             }
         }
         
@@ -139,6 +310,33 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Modify Control Bindings.
+        /// </summary>
+        public static string ModifyControlBindings {
+            get {
+                return ResourceManager.GetString("ModifyControlBindings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Controller Detected.
+        /// </summary>
+        public static string NoControllerDetected {
+            get {
+                return ResourceManager.GetString("NoControllerDetected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset.
+        /// </summary>
+        public static string ResetButton {
+            get {
+                return ResourceManager.GetString("ResetButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Horizontal (Bottom on Right).
         /// </summary>
         public static string ScreenLayoutLeftRight {
@@ -166,20 +364,11 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Accessibility Settings.
+        ///   Looks up a localized string similar to Audio Device.
         /// </summary>
-        public static string SettingsAccessibility {
+        public static string SettingsAudioDevice {
             get {
-                return ResourceManager.GetString("SettingsAccessibility", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Accessibility.
-        /// </summary>
-        public static string SettingsAccessibilityHeader {
-            get {
-                return ResourceManager.GetString("SettingsAccessibilityHeader", resourceCulture);
+                return ResourceManager.GetString("SettingsAudioDevice", resourceCulture);
             }
         }
         
@@ -211,7 +400,7 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Controller Settings.
+        ///   Looks up a localized string similar to Controls.
         /// </summary>
         public static string SettingsController {
             get {
@@ -220,7 +409,7 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Controller.
+        ///   Looks up a localized string similar to Controls.
         /// </summary>
         public static string SettingsControllerHeader {
             get {
@@ -243,24 +432,6 @@ namespace ITDSWrapper.Assets {
         public static string SettingsDiscord {
             get {
                 return ResourceManager.GetString("SettingsDiscord", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Display Settings.
-        /// </summary>
-        public static string SettingsDisplay {
-            get {
-                return ResourceManager.GetString("SettingsDisplay", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Display.
-        /// </summary>
-        public static string SettingsDisplayHeader {
-            get {
-                return ResourceManager.GetString("SettingsDisplayHeader", resourceCulture);
             }
         }
         
@@ -337,6 +508,15 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Input Bindings.
+        /// </summary>
+        public static string SettingsKeyBindingsHeader {
+            get {
+                return ResourceManager.GetString("SettingsKeyBindingsHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Legal.
         /// </summary>
         public static string SettingsLegal {
@@ -378,6 +558,15 @@ namespace ITDSWrapper.Assets {
         public static string SettingsScreenReader {
             get {
                 return ResourceManager.GetString("SettingsScreenReader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to System Settings.
+        /// </summary>
+        public static string SettingsSystemHeader {
+            get {
+                return ResourceManager.GetString("SettingsSystemHeader", resourceCulture);
             }
         }
         
@@ -454,7 +643,16 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ANGLE EGL.
+        ///   Looks up a localized string similar to System Settings.
+        /// </summary>
+        public static string SystemSettings {
+            get {
+                return ResourceManager.GetString("SystemSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Angle EGL.
         /// </summary>
         public static string WindowsRenderingModeAngleEgl {
             get {

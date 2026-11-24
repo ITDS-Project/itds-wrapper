@@ -1,7 +1,10 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Platform;
 using Avalonia.Input;
+using Avalonia.Interactivity;
+using ITDSWrapper.Graphics;
 using ITDSWrapper.ViewModels;
 
 namespace ITDSWrapper.Views;
@@ -13,8 +16,18 @@ public partial class MainView : UserControl
         InitializeComponent();
     }
 
+    protected override void OnLoaded(RoutedEventArgs e)
+    {
+        base.OnLoaded(e);
+        ((MainViewModel)DataContext!).MarkShown();
+    }
+
     private void MainView_OnSizeChanged(object? sender, SizeChangedEventArgs e)
     {
+        ((MainViewModel)DataContext!).BorderWidth = e.NewSize.Width;
+        ((MainViewModel)DataContext).BorderHeight = e.NewSize.Height;
+        ((MainViewModel)DataContext).PanScanBorders();
+        
         if (!MainViewModel.IsMobile || ((MainViewModel)DataContext!).DualScreenBackend?.IsActive == true)
             return;
 
@@ -30,7 +43,7 @@ public partial class MainView : UserControl
     {
         ((MainViewModel)DataContext!).ResizeEmuScreen(e.NewSize.Width, e.NewSize.Height);
 
-        var insetsManager = TopLevel.GetTopLevel(this)?.InsetsManager;
+        IInsetsManager? insetsManager = TopLevel.GetTopLevel(this)?.InsetsManager;
         insetsManager?.DisplayEdgeToEdgePreference = true;
         insetsManager?.IsSystemBarVisible = false;
         ((MainViewModel)DataContext!).TopPadding = (int?)insetsManager?.SafeAreaPadding.Top ?? 0;

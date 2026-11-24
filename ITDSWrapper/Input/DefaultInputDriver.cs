@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Input;
+using ITDSWrapper.Assets;
+using ITDSWrapper.Core;
 using Libretro.NET.Bindings;
 
 namespace ITDSWrapper.Input;
@@ -10,8 +13,11 @@ public class DefaultInputDriver : IInputDriver
 {
     private readonly Dictionary<uint, object?> _bindings;
     private readonly Dictionary<uint, Action> _specialActions = [];
+    private PhysicalKey? _recordedKey;
 
     public bool RequestInputUpdate { get; set; }
+    public bool IsRecordingInput { get; private set; }
+    public event Action? ControllerChanged;
 
     public DefaultInputDriver(bool isMobile, Action openSettings)
     {
@@ -31,7 +37,6 @@ public class DefaultInputDriver : IInputDriver
                 { RetroBindings.RETRO_DEVICE_ID_JOYPAD_LEFT, null },
                 { RetroBindings.RETRO_DEVICE_ID_JOYPAD_START, null },
                 { RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT, null },
-                { RetroBindings.RETRO_DEVICE_ID_JOYPAD_R2, null },
             };
         }
         else
@@ -49,9 +54,9 @@ public class DefaultInputDriver : IInputDriver
                 { RetroBindings.RETRO_DEVICE_ID_JOYPAD_DOWN, new PhysicalKeyInput(PhysicalKey.ArrowDown) },
                 { RetroBindings.RETRO_DEVICE_ID_JOYPAD_LEFT, new PhysicalKeyInput(PhysicalKey.ArrowLeft) },
                 { RetroBindings.RETRO_DEVICE_ID_JOYPAD_START, new PhysicalKeyInput(PhysicalKey.Enter) },
-                { RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT, new PhysicalKeyInput(PhysicalKey.ShiftRight) },
-                { RetroBindings.RETRO_DEVICE_ID_JOYPAD_R2, new PhysicalKeyInput(PhysicalKey.Escape) { SpecialAction = openSettings } },
+                { RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT, new PhysicalKeyInput(PhysicalKey.Escape) { SpecialAction = openSettings } },
             };
+            SetSpecialAction(RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT, openSettings);
         }
     }
 
@@ -61,7 +66,7 @@ public class DefaultInputDriver : IInputDriver
 
     public uint[] GetInputKeys()
     {
-        return _bindings.Keys.ToArray();
+        return [.. _bindings.Keys];
     }
 
     public void SetSpecialAction(uint button, Action specialAction)
@@ -70,6 +75,7 @@ public class DefaultInputDriver : IInputDriver
         {
             _specialActions[button] = specialAction;
         }
+
         if (_bindings.TryGetValue(button, out object? input) && input is PhysicalKeyInput keyInput)
         {
             keyInput.SpecialAction = specialAction;
@@ -87,6 +93,11 @@ public class DefaultInputDriver : IInputDriver
         {
             SetSpecialAction(input, specialAction);
         }
+    }
+
+    public string GetLocalisedBinding(ControllerButton button)
+    {
+        return Strings.BindingUnknown;
     }
 
     public bool QueryInput(uint id)
@@ -112,5 +123,70 @@ public class DefaultInputDriver : IInputDriver
 
     public void DoRumble(ushort strength)
     {
+    }
+
+    public ControllerBrand GetControllerBrand()
+    {
+        return ControllerBrand.NONE;
+    }
+
+    public string GetControllerRawName()
+    {
+        return "Default Input";
+    }
+
+    public Dictionary<uint, ControllerButton?> GetControllerBindings()
+    {
+        return [];
+    }
+
+    public Dictionary<uint, PhysicalKey?> GetKeyBindings()
+    {
+        return _bindings.ToDictionary(binding => binding.Key,
+            binding =>
+            {
+                if (binding.Value is PhysicalKeyInput keyInput)
+                {
+                    return keyInput.PhysicalKey;
+                }
+
+                return (PhysicalKey?)null;
+            });
+    }
+
+    public async Task<object?> RecordInput(InputBinding binding)
+    {
+        PhysicalKeyInput? keyInput = null;
+        IsRecordingInput = true;
+        for (int i = 0; i < 50; i++)
+        {
+            if (_recordedKey is not null)
+            {
+                keyInput = new((PhysicalKey)_recordedKey!);
+                SetBinding(binding.Action, keyInput);
+                break;
+            }
+            await Task.Delay(TimeSpan.FromSeconds(0.1));
+        }
+        _recordedKey = null;
+        IsRecordingInput = false;
+        
+        return keyInput?.PhysicalKey;
+    }
+
+    public void RestoreInputs(Settings settings)
+    {
+        if (settings.KeyBindings.Count <= 0)
+            return;
+        foreach (var keyBinding in settings.KeyBindings)
+        {
+            SetBinding(keyBinding.Key,
+                keyBinding.Value is not null ? new PhysicalKeyInput((PhysicalKey)keyBinding.Value) : null);
+        }
+    }
+
+    public void KeyPressed(object? sender, KeyEventArgs eventArgs)
+    {
+        _recordedKey = eventArgs.PhysicalKey;
     }
 }

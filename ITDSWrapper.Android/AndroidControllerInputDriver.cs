@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.OS;
 using Android.Views;
+using Avalonia.Input;
+using ITDSWrapper.Assets;
+using ITDSWrapper.Core;
 using ITDSWrapper.Input;
 using Libretro.NET.Bindings;
 
@@ -14,7 +18,12 @@ public class AndroidControllerInputDriver : IInputDriver
     private readonly Dictionary<uint, AndroidControllerInput?> _inputDictionary = [];
     private readonly Dictionary<uint, Action> _specialActions = [];
 
+    private Action<AndroidInputContainer?>? _recordInput;
+    private AndroidInputContainer? _recordedInput;
+
     public bool RequestInputUpdate { get; set; }
+    public bool IsRecordingInput => _recordInput is not null;
+    public event Action? ControllerChanged;
 
     public void SetController(InputDevice controller)
     {
@@ -32,6 +41,8 @@ public class AndroidControllerInputDriver : IInputDriver
         SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_R, new AndroidControllerInput(new(AndroidInputType.KEY, Keycode.ButtonR1, null)));
         SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_START, new AndroidControllerInput(new(AndroidInputType.KEY, Keycode.ButtonStart, null)));
         SetBinding(RetroBindings.RETRO_DEVICE_ID_JOYPAD_SELECT, new AndroidControllerInput(new(AndroidInputType.KEY, Keycode.ButtonSelect, null)));
+        
+        ControllerChanged?.Invoke();
     }
     
     public void Shutdown()
@@ -75,6 +86,18 @@ public class AndroidControllerInputDriver : IInputDriver
         }
     }
 
+    public string GetLocalisedBinding(ControllerButton button)
+    {
+        foreach ((uint a, AndroidControllerInput? b) in _inputDictionary)
+        {
+            if (b is not null && button == b.GetGenericButtonName())
+            {
+                return InputDescriptions.Descriptions[a];
+            }
+        }
+        return Strings.BindingNotMapped;
+    }
+    
     public bool QueryInput(uint id)
     {
         return _inputDictionary.ContainsKey(id) && (_inputDictionary[id]?.IsSet ?? false);
@@ -88,6 +111,8 @@ public class AndroidControllerInputDriver : IInputDriver
             {
                 input?.Press(androidInput);
             }
+            
+            _recordInput?.Invoke(androidInput);
         }
     }
 
@@ -114,6 +139,74 @@ public class AndroidControllerInputDriver : IInputDriver
         else
         {
             Controller?.Vibrator?.Vibrate(VibrationEffect.CreateOneShot(1000, strength / 258 + 1));
+        }
+    }
+
+    public ControllerBrand GetControllerBrand()
+    {
+        return InputDescriptions.MatchControllerBrandByName(Controller?.Name ?? string.Empty);
+    }
+
+    public string GetControllerRawName()
+    {
+        return Controller?.Name ?? string.Empty;
+    }
+
+    public Dictionary<uint, ControllerButton?> GetControllerBindings()
+    {
+        return _inputDictionary.ToDictionary(i => i.Key, i => i.Value?.GetGenericButtonName());
+    }
+
+    public Dictionary<uint, PhysicalKey?> GetKeyBindings()
+    {
+        return [];
+    }
+
+    public async Task<object?> RecordInput(InputBinding binding)
+    {
+        _recordInput = b => _recordedInput = b;
+        AndroidControllerInput? androidInput = null;
+        for (int i = 0; i < 50; i++)
+        {
+            if (_recordedInput is not null)
+            {
+                androidInput = new(_recordedInput);
+                SetBinding(binding.Action, androidInput);
+                break;
+            }
+            await Task.Delay(TimeSpan.FromSeconds(0.1));
+        }
+        _recordInput = null;
+        _recordedInput = null;
+        
+        return androidInput?.GetGenericButtonName();
+    }
+
+    public void RestoreInputs(Settings settings)
+    {
+        if (settings.ControllerBindings.Count <= 0)
+            return;
+        foreach (var controllerBinding in settings.ControllerBindings)
+        {
+            AndroidInputContainer? input = controllerBinding.Value switch
+            {
+                ControllerButton.A => new(AndroidInputType.KEY, Keycode.ButtonA, null),
+                ControllerButton.B => new(AndroidInputType.KEY, Keycode.ButtonB, null),
+                ControllerButton.X => new(AndroidInputType.KEY, Keycode.ButtonX, null),
+                ControllerButton.Y => new(AndroidInputType.KEY, Keycode.ButtonY, null),
+                ControllerButton.DPadUp => new(AndroidInputType.KEY, Keycode.DpadUp, null),
+                ControllerButton.DPadRight => new(AndroidInputType.KEY, Keycode.DpadRight, null),
+                ControllerButton.DPadDown => new(AndroidInputType.KEY, Keycode.DpadDown, null),
+                ControllerButton.DPadLeft => new(AndroidInputType.KEY, Keycode.DpadLeft, null),
+                ControllerButton.LeftBumper => new(AndroidInputType.KEY, Keycode.ButtonL1, null),
+                ControllerButton.RightBumper => new(AndroidInputType.KEY, Keycode.ButtonR1, null),
+                ControllerButton.LeftStickClick => new(AndroidInputType.KEY, Keycode.ButtonThumbl, null),
+                ControllerButton.RightStickClick => new(AndroidInputType.KEY, Keycode.ButtonThumbr, null),
+                ControllerButton.Select => new(AndroidInputType.KEY, Keycode.ButtonSelect, null),
+                ControllerButton.Start => new(AndroidInputType.KEY, Keycode.ButtonStart, null),
+                _ => null,
+            };
+            SetBinding(controllerBinding.Key, input is not null ? new AndroidControllerInput(input) : null);
         }
     }
 }
