@@ -195,7 +195,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    [Reactive] public partial string MacOsRenderingModeDesc { get; set; } = Strings.MacOsRenderingModeMetal;
+    [Reactive] public partial string MacOsRenderingModeDesc { get; set; } = Strings.MacOsRenderingModeOpenGl;
 
     public int MacOsRenderingModeIdx
     {
@@ -213,7 +213,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    [Reactive] public partial string WindowsRenderingModeDesc { get; set; } = Strings.WindowsRenderingModeWgl;
+    [Reactive] public partial string WindowsRenderingModeDesc { get; set; } = Strings.WindowsRenderingModeAngleEgl;
 
     public int WindowsRenderingModeIdx
     {
@@ -321,7 +321,6 @@ public partial class MainViewModel : ViewModelBase
     private readonly System.Timers.Timer _borderFadeTimer = new(TimeSpan.FromMilliseconds(100));
 
     public MpvContext[] BorderMpvContexts { get; set; } = [new(), new()];
-    public VideoRenderer Renderer { get; set; }
     private readonly List<Action> _borderQueuedActions = [];
 
     public bool Closing { get; set; }
@@ -451,41 +450,6 @@ public partial class MainViewModel : ViewModelBase
         byte[] data = new byte[ndsStream.Length];
         ndsStream.ReadExactly(data);
         Wrapper.LoadGame(data);
-
-        if (OperatingSystem.IsLinux())
-        {
-            Renderer = WrapperSettings.LinuxRenderingMode switch
-            {
-                LinuxRenderingMode.GLX or LinuxRenderingMode.EGL => VideoRenderer.OpenGl,
-                _ => VideoRenderer.Software,
-            };
-        }
-        else if (OperatingSystem.IsMacOS())
-        {
-            Renderer = WrapperSettings.MacOsRenderingMode switch
-            {
-                MacOsRenderingMode.METAL => VideoRenderer.Software,
-                MacOsRenderingMode.OPENGL => VideoRenderer.OpenGl,
-                _ => VideoRenderer.Software,
-            };
-        }
-        else if (OperatingSystem.IsWindows())
-        {
-            Renderer = WrapperSettings.WindowsRenderingMode switch
-            {
-                WindowsRenderingMode.WINDOWS_GL or WindowsRenderingMode.ANGLE_EGL => VideoRenderer.OpenGl,
-                WindowsRenderingMode.VULKAN => VideoRenderer.Native,
-                _ => VideoRenderer.Software,
-            };
-        }
-        else if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
-        {
-            Renderer = VideoRenderer.OpenGl;
-        }
-        else
-        {
-            Renderer = VideoRenderer.Auto;
-        }
 
         if (WrapperSettings.BordersEnabled)
         {

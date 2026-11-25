@@ -61,7 +61,8 @@ sealed class Program
             })
             .With(() => new AvaloniaNativePlatformOptions
             {
-                RenderingMode = [
+                RenderingMode =
+                [
                     AvaloniaNativeRenderingMode.OpenGl,
                     AvaloniaNativeRenderingMode.Metal,
                 ],
