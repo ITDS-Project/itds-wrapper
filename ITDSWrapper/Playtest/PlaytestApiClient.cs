@@ -49,6 +49,10 @@ public class PlaytestApiClient
 
     public void QueueLogs(List<string> logs)
     {
+        for (var i = 0; i < logs.Count; i++)
+        {
+            logs[i] = logs[i].Replace(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "~");
+        }
         _requestsQueue.Enqueue(new(_sessionGuid, Username?.Replace("\0", "") ?? string.Empty, _platformId,
             string.Join("", logs), _currentRequest++));
     }
