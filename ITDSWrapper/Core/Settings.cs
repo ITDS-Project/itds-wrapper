@@ -24,8 +24,8 @@ public class Settings
     public int WindowLocationY { get; set; }
     public ScreenLayout CurrentScreenLayout { get; set; } = ScreenLayout.TOP_BOTTOM;
     public DualScreenSettings DualScreenMode { get; set; } = DualScreenSettings.AUTO;
-    public WindowsRenderingMode WindowsRenderingMode { get; set; } = WindowsRenderingMode.WINDOWS_GL;
-    public MacOsRenderingMode MacOsRenderingMode { get; set; } = MacOsRenderingMode.METAL;
+    public WindowsRenderingMode WindowsRenderingMode { get; set; } = WindowsRenderingMode.ANGLE_EGL;
+    public MacOsRenderingMode MacOsRenderingMode { get; set; } = MacOsRenderingMode.OPENGL;
     public LinuxRenderingMode LinuxRenderingMode { get; set; } = LinuxRenderingMode.GLX;
 
     public Dictionary<uint, PhysicalKey?> KeyBindings { get; set; } = [];
@@ -71,16 +71,16 @@ public enum DualScreenSettings
 
 public enum WindowsRenderingMode
 {
+    ANGLE_EGL,
     WINDOWS_GL,
     VULKAN,
-    ANGLE_EGL,
     SOFTWARE,
 }
 
 public enum MacOsRenderingMode
 {
-    METAL,
     OPENGL,
+    METAL,
     SOFTWARE,
 }
 
