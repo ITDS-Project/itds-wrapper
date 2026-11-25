@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ITDSWrapper.Assets;
 using ITDSWrapper.Audio;
 #if IS_WINDOWS
 using NAudio.CoreAudioApi;
@@ -63,7 +64,11 @@ public class WasapiAudioBackend : IAudioBackend
 #if IS_WINDOWS
         MMDeviceEnumerator enumerator = new();
         MMDeviceCollection devices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-        MMDevice? mmDevice = devices.FirstOrDefault(d => d.DeviceFriendlyName.Equals(device));
+        string defaultId = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia).ID;
+        MMDevice? mmDevice = devices
+            .OrderByDescending(d => d.ID == defaultId)
+            .DistinctBy(d => d.DeviceFriendlyName)
+            .FirstOrDefault(d => (d.ID == defaultId ? $"{d.DeviceFriendlyName} {Strings.DefaultAudioDevice}" : d.DeviceFriendlyName).Equals(device));
         _wavePlayer = BuildWasapiPlayer(mmDevice ?? enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console));
         _wavePlayer.Init(_waveProvider!);
         _wavePlayer?.Play();
@@ -73,13 +78,17 @@ public class WasapiAudioBackend : IAudioBackend
     public List<string> GetDeviceNames()
     {
 #if IS_WINDOWS
+        MMDeviceEnumerator enumerator = new();
+        string defaultId = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia).ID;
         return
         [
-            .. new MMDeviceEnumerator().EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)
-                .Select(d => d.DeviceFriendlyName)
+            .. enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)
+                .OrderByDescending(d => d.ID == defaultId)
+                .DistinctBy(d => d.DeviceFriendlyName)
+                .Select(d => d.ID == defaultId ? $"{d.DeviceFriendlyName} {Strings.DefaultAudioDevice}" : d.DeviceFriendlyName)
         ];
 #else
-        return [];
+    return [];
 #endif
     }
     
