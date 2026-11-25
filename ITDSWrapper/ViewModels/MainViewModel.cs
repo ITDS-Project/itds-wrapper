@@ -919,16 +919,16 @@ public partial class MainViewModel : ViewModelBase
     {
         if (WrapperSettings.BordersEnabled)
         {
-            StopBorder();
+            WrapperSettings.BordersEnabled = false;
             BordersSettingDesc = Strings.SettingSwitchDisabled;
+            StopBorder();
         }
         else
         {
-            StartBorder();
+            WrapperSettings.BordersEnabled = true;
             BordersSettingDesc = Strings.SettingSwitchEnabled;
+            StartBorder();
         }
-
-        WrapperSettings.BordersEnabled = !WrapperSettings.BordersEnabled;
     }
 
     private void ToggleScreenReader()
@@ -1451,6 +1451,9 @@ public partial class MainViewModel : ViewModelBase
 
     private void StartBorder()
     {
+        if (!WrapperSettings.BordersEnabled)
+            return;
+        
         if (_borders[_currentBorderIdx] == "BLACK_BG")
         {
             BorderMpvContexts[_currentBorderIdx].Stop().Invoke();
@@ -1470,10 +1473,14 @@ public partial class MainViewModel : ViewModelBase
     private void StopBorder()
     {
         BorderMpvContexts[_currentBorderIdx].Stop().Invoke();
+        BorderMpvContexts[_nextBorderIdx].Stop().Invoke();
     }
 
     private void SetNextBorder()
     {
+        if (!WrapperSettings.BordersEnabled)
+            return;
+        
         if (_borders[_nextBorderIdx] == "BLACK_BG")
         {
             BorderMpvContexts[_nextBorderIdx].Stop().Invoke();
