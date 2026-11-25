@@ -184,6 +184,15 @@ namespace ITDSWrapper.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (Default).
+        /// </summary>
+        public static string DefaultAudioDevice {
+            get {
+                return ResourceManager.GetString("DefaultAudioDevice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Done.
         /// </summary>
         public static string DoneButton {

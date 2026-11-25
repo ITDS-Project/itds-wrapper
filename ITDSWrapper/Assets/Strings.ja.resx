@@ -233,4 +233,7 @@
     <data name="InputBindingPressToRecordPrompt" xml:space="preserve">
         <value>[Press to Record]</value>
     </data>
+    <data name="DefaultAudioDevice" xml:space="preserve">
+        <value>(Default)</value>
+    </data>
 </root>
