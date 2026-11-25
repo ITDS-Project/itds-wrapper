@@ -234,7 +234,7 @@ jobs:
             single_file: false
             melondsds_src: build/src/libretro/melondsds_libretro.dylib
             melondsds_dst: ITDSWrapper.Desktop/melondsds_libretro.dylib
-            cmake_flags: '-DCMAKE_OSX_ARCHITECTURES:STRING="x86_64" -DENABLE_OGLRENDERER=OFF -DCMAKE_APPLE_SILICON_PROCESSOR="x86_64" -DBUILD_AS_SHARED_LIBRARY=ON'
+            cmake_flags: '-DCMAKE_OSX_ARCHITECTURES:STRING="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=13.0 -DENABLE_OGLRENDERER=OFF -DCMAKE_APPLE_SILICON_PROCESSOR="x86_64" -DBUILD_AS_SHARED_LIBRARY=ON'
             shell: 'bash'
             artifact: 'ITDSWrapper.Desktop.app'
             steamworks_target: 'ITDSWrapper.Desktop.app/Contents/MacOS'
@@ -245,7 +245,7 @@ jobs:
             single_file: false
             melondsds_src: build/src/libretro/melondsds_libretro.dylib
             melondsds_dst: ITDSWrapper.Desktop/melondsds_libretro.dylib
-            cmake_flags: '-DCMAKE_OSX_ARCHITECTURES:STRING="arm64" -DENABLE_OGLRENDERER=OFF -DCMAKE_APPLE_SILICON_PROCESSOR="arm64" -DENABLE_JIT=OFF -DBUILD_AS_SHARED_LIBRARY=ON'
+            cmake_flags: '-DCMAKE_OSX_ARCHITECTURES:STRING="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=13.0 -DENABLE_OGLRENDERER=OFF -DCMAKE_APPLE_SILICON_PROCESSOR="arm64" -DENABLE_JIT=OFF -DBUILD_AS_SHARED_LIBRARY=ON'
             shell: 'bash'
             artifact: 'ITDSWrapper.Desktop.app'
             steamworks_target: 'ITDSWrapper.Desktop.app/Contents/MacOS'
