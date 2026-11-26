@@ -1508,12 +1508,20 @@ public partial class MainViewModel : ViewModelBase
         {
             _borderQueuedActions.Add(() =>
             {
+                BorderMpvContexts[idx].VideoTimingOffset.Set(0);
+                BorderMpvContexts[idx].ApplyProfile("fast").Invoke();
+                BorderMpvContexts[idx].VdLavcThreads.Set(2);
+                BorderMpvContexts[idx].FrameDrop.Set(FrameDropOption.DecoderVo);
                 BorderMpvContexts[idx].LoadFile(video).Invoke();
                 BorderMpvContexts[idx].LoopFile.Set("inf");
             });
         }
         else
         {
+            BorderMpvContexts[idx].VideoTimingOffset.Set(0);
+            BorderMpvContexts[idx].ApplyProfile("fast").Invoke();
+            BorderMpvContexts[idx].VdLavcThreads.Set(2);
+            BorderMpvContexts[idx].FrameDrop.Set(FrameDropOption.DecoderVo);
             BorderMpvContexts[idx].LoadFile(video).Invoke();
             BorderMpvContexts[idx].LoopFile.Set("inf");
         }
