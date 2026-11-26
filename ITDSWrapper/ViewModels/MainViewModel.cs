@@ -1477,25 +1477,21 @@ public partial class MainViewModel : ViewModelBase
 
     private void SetBorder(int idx)
     {
-        double width = -1, height = -1;
-        Dispatcher.UIThread.Invoke(() =>
-        {
-            TopLevel top = TopLevel.GetTopLevel(Top)!;
-            width = top.Width * top.RenderScaling;
-            height = top.Height * top.RenderScaling;
-        });
+        TopLevel? top = TopLevel.GetTopLevel(Top);
+        double width = (top?.ClientSize.Width ?? 0) * (top?.RenderScaling ?? 0);
+        double height = (top?.ClientSize.Height ?? 0) * (top?.RenderScaling ?? 0);
         BorderQuality = (width >= height) switch
         {
             true => width switch
             {
-                >= 3000 => BorderQuality.Q4K,
-                >= 1500 => BorderQuality.Q1080,
+                >= 2500 => BorderQuality.Q4K,
+                >= 1000 => BorderQuality.Q1080,
                 _ => BorderQuality.Q720,
             },
             _ => height switch
             {
-                >= 3000 => BorderQuality.Q4K,
-                >= 1500 => BorderQuality.Q1080,
+                >= 2500 => BorderQuality.Q4K,
+                >= 1000 => BorderQuality.Q1080,
                 _ => BorderQuality.Q720,
             },
         };
