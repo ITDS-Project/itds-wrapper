@@ -7,7 +7,7 @@ public interface IBorderLocator
 
 public enum BorderQuality
 {
-    Q4K,
+    Q1440,
     Q1080,
     Q720,
 }

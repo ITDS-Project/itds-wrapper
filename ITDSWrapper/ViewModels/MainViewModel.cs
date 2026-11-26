@@ -311,7 +311,7 @@ public partial class MainViewModel : ViewModelBase
 
     public bool DisplayVirtualControls => IsMobile && CurrentInputDriver == 0 && DualScreenBackend?.IsActive != true;
 
-    public BorderQuality BorderQuality { get; set; } = BorderQuality.Q4K;
+    public BorderQuality BorderQuality { get; set; } = BorderQuality.Q1440;
     [Reactive] public partial double BorderWidth { get; set; } = 3840;
     [Reactive] public partial double BorderHeight { get; set; } = 2160;
     public ObservableCollection<double> BorderOpacities { get; set; } = [1.0, 0.0];
@@ -1484,18 +1484,18 @@ public partial class MainViewModel : ViewModelBase
         {
             true => width switch
             {
-                >= 2500 => BorderQuality.Q4K,
+                >= 2000 => BorderQuality.Q1440,
                 >= 1000 => BorderQuality.Q1080,
                 _ => BorderQuality.Q720,
             },
             _ => height switch
             {
-                >= 2500 => BorderQuality.Q4K,
+                >= 2000 => BorderQuality.Q1440,
                 >= 1000 => BorderQuality.Q1080,
                 _ => BorderQuality.Q720,
             },
         };
-        BorderQuality = IsMobile && BorderQuality == BorderQuality.Q4K ? BorderQuality.Q1080 : BorderQuality;
+        BorderQuality = IsMobile && BorderQuality == BorderQuality.Q1440 ? BorderQuality.Q1080 : BorderQuality;
         
         string video = _borderLocator!.GetBorderPath(_borders[idx], BorderQuality);
         if (!File.Exists(video))
@@ -1508,12 +1508,20 @@ public partial class MainViewModel : ViewModelBase
         {
             _borderQueuedActions.Add(() =>
             {
+                BorderMpvContexts[idx].VideoTimingOffset.Set(0);
+                BorderMpvContexts[idx].ApplyProfile("fast").Invoke();
+                BorderMpvContexts[idx].VdLavcThreads.Set(2);
+                BorderMpvContexts[idx].FrameDrop.Set(FrameDropOption.DecoderVo);
                 BorderMpvContexts[idx].LoadFile(video).Invoke();
                 BorderMpvContexts[idx].LoopFile.Set("inf");
             });
         }
         else
         {
+            BorderMpvContexts[idx].VideoTimingOffset.Set(0);
+            BorderMpvContexts[idx].ApplyProfile("fast").Invoke();
+            BorderMpvContexts[idx].VdLavcThreads.Set(2);
+            BorderMpvContexts[idx].FrameDrop.Set(FrameDropOption.DecoderVo);
             BorderMpvContexts[idx].LoadFile(video).Invoke();
             BorderMpvContexts[idx].LoopFile.Set("inf");
         }
