@@ -411,4 +411,3 @@ jobs:
         depot1Path: win-x64
         depot2Path: linux-x64
         depot3Path: macos
-        releaseBranch: default
